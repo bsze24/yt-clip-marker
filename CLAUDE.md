@@ -61,7 +61,7 @@ Modular split (`content/index.js`, `content/panel.js`, `content/hotkeys.js`, etc
 - Always create a NEW branch for each change (never reuse old names).
 - One PR per change, even small ones.
 - Don't push new commits while BugBot is mid-review (wait or the review restarts).
-- Clear, single-line commit messages with PR number prefix (e.g. `PR 1: skeleton extension with shadow-DOM panel`).
+- Commit messages: concise single-line title with PR number prefix (e.g. `PR 1: skeleton extension with shadow-DOM panel`), plus an optional body for context, bullet points, or rationale. Title stays single-line; body is free-form.
 
 ## Session prompt audit
 
