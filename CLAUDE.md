@@ -18,7 +18,7 @@ There is no server, no database, no build step, no npm dependencies, no deployme
 
 - `CLAUDE.md`
 - `docs/youtube-clip-marker-prd.md` — full product requirements
-- The current PR spec (e.g., `docs/pr-1-skeleton.md`)
+- The current PR spec (e.g., `docs/prs/pr-1-skeleton.md`)
 
 ## Architecture rules
 
@@ -40,7 +40,8 @@ yt-clip-marker/
 ├── CLAUDE.md
 ├── docs/
 │   ├── youtube-clip-marker-prd.md
-│   └── pr-*.md
+│   └── prs/
+│       └── pr-*.md
 └── .gitignore
 ```
 
