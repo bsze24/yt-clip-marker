@@ -15,3 +15,7 @@ A placeholder panel labeled "Clip Marker" should appear in the top-right of the 
 ## Status
 
 V1 in active development. See open PRs for current scope and progress.
+
+## Troubleshooting
+
+If the panel doesn't appear on a watch page, check `chrome://extensions` → click "Details" on the extension → "Site access" should be set to allow youtube.com. Reload the watch page after changing.
