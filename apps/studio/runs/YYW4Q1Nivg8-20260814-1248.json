@@ -1,0 +1,6440 @@
+{
+  "videoId": "YYW4Q1Nivg8",
+  "url": "https://www.youtube.com/watch?v=YYW4Q1Nivg8",
+  "title": "2026.06.23_jake_sherman_pennies_from_heaven_stan_first_soloing_Eb_walkup",
+  "createdAt": "2026-08-14T12:48:00+08:00",
+  "markers": [
+    {
+      "start": 0,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "The Stand — another chorus transcribed, sticky fingerings",
+      "rationale": "R-CONCEPT. New idea at 0:00: transcribed another chorus, sticky parts."
+    },
+    {
+      "start": 80,
+      "end": null,
+      "kind": "TAKE",
+      "description": "The Stand solo playthrough",
+      "rationale": "R-TAKE-GAP. GAP 58s @ 1:20."
+    },
+    {
+      "start": 157,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo — later choruses",
+      "rationale": "R-TAKE-GAP. GAP 42s @ 2:37. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 192,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Last chorus of the solo",
+      "rationale": "R-TAKE-GAP. GAP 35s @ 3:12. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 235,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Sticky parts — the alt lick",
+      "rationale": "R-CONCEPT. New idea at 3:55: alt lick sticky parts."
+    },
+    {
+      "start": 310,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Wrist too high at the start",
+      "rationale": "R-CONCEPT. Correction at 5:10: wrist too high."
+    },
+    {
+      "start": 428,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "On the F, let go of the muscles",
+      "rationale": "R-CONCEPT. New idea at 7:08: let go of muscles on F."
+    },
+    {
+      "start": 454,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Catch D-flat on the way to A-flat; release the F",
+      "rationale": "R-CONCEPT. New idea at 7:34: catch D-flat on the way to A-flat."
+    },
+    {
+      "start": 507,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "A-flat: hover, don't collapse the wrist",
+      "rationale": "R-CONCEPT. Correction at 8:27: don't drop/collapse on A-flat."
+    },
+    {
+      "start": 670,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Whole-chorus take → next sticky lick",
+      "rationale": "R-TAKE-GAP. GAP 22s @ 11:10."
+    },
+    {
+      "start": 707,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Let go of the thumb / wavy / not glued to A",
+      "rationale": "R-CONCEPT. Correction at 11:47: let go of the thumb, wavy."
+    },
+    {
+      "start": 831,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "A-flat rotation (slight up); wrist not already turned",
+      "rationale": "R-CONCEPT. New idea at 13:51: A-flat is actually up (rotation)."
+    },
+    {
+      "start": 993,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "One wave — flick vs wave; don't roll too far",
+      "rationale": "R-CONCEPT. New idea at 16:33: one wave, don't roll wrist too far."
+    },
+    {
+      "start": 1034,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Forget the right-turn; wrist falls at F-sharp",
+      "rationale": "R-CONCEPT. Correction at 17:14: forget the right-turn; wrist falls at F-sharp."
+    },
+    {
+      "start": 1121,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Same movement as the harder lick",
+      "rationale": "R-TAKE-GAP. GAP 38s @ 18:41."
+    },
+    {
+      "start": 1178,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Hard lick — can do it, not in time",
+      "rationale": "R-TAKE-GAP. GAP 23s @ 19:38."
+    },
+    {
+      "start": 1246,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Double-note slowing you down; two different fingers",
+      "rationale": "R-CONCEPT. New idea at 20:46: double note is the hard part; two fingers."
+    },
+    {
+      "start": 1301,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "After thumb, keep it above B (tilt, don't hold)",
+      "rationale": "R-CONCEPT. Correction at 21:41: keep thumb above B without holding."
+    },
+    {
+      "start": 1423,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Crossing over is fine if released — it's about not reaching",
+      "rationale": "R-CONCEPT. New idea at 23:43: cross-over ok if muscle released; don't reach."
+    },
+    {
+      "start": 1556,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Release the thumb completely (over G)",
+      "rationale": "R-CONCEPT. Correction at 25:56: release thumb completely, over G."
+    },
+    {
+      "start": 1679,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Same as alt lick — catch D-flat on the way to B-flat",
+      "rationale": "R-CONCEPT. New idea at 27:59: same as alt lick, catch D-flat to B-flat."
+    },
+    {
+      "start": 1725,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Wrist elevated and loose — all the hard places",
+      "rationale": "R-CONCEPT. New idea at 28:45: wrist elevated and loose."
+    },
+    {
+      "start": 1763,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "F-sharp to D-flat without missing a beat",
+      "rationale": "R-CONCEPT. New idea at 29:23: F-sharp to D-flat; wrist goes up."
+    },
+    {
+      "start": 1866,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Upward scale — fingery / rewrite the thumb-under",
+      "rationale": "R-TAKE-GAP. GAP 25s @ 31:06."
+    },
+    {
+      "start": 1987,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "New fingering, skip the slide; cross-under is bad",
+      "rationale": "R-CONCEPT. Correction at 33:07: rewrite fingering; skip the slide."
+    },
+    {
+      "start": 2068,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Every hard place: wrist up, flowing, no tension",
+      "rationale": "R-CONCEPT. New idea at 34:28: every hard place is wrist up/flowing."
+    },
+    {
+      "start": 2153,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Line before the ending",
+      "rationale": "R-TAKE-GAP. GAP 24s @ 35:53."
+    },
+    {
+      "start": 2269,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Ending fingering — thumb on D",
+      "rationale": "R-CONCEPT. New idea at 37:49: want thumb on D for the ending line."
+    },
+    {
+      "start": 2313,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "This solo was all about technique",
+      "rationale": "R-CONCEPT. New idea at 38:33: this solo was about learning technique."
+    },
+    {
+      "start": 2335,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Harmony of the improv",
+      "rationale": "R-CONCEPT. New idea at 38:55: go through the harmony of the improv."
+    },
+    {
+      "start": 2348,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "2nd-inversion major triad is a sound",
+      "rationale": "R-CONCEPT. New idea at 39:08: second-inversion major triad is a sound."
+    },
+    {
+      "start": 2395,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "iv minor = backdoor / b7 dominant",
+      "rationale": "R-CONCEPT. New idea at 39:55: iv minor is backdoor / b7 dominant."
+    },
+    {
+      "start": 2426,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Backdoor dominant is iv–I (plagal)",
+      "rationale": "R-CONCEPT. New idea at 40:26: backdoor dominant is iv–I plagal."
+    },
+    {
+      "start": 2465,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Two strongest resolutions: V–I and IV–I",
+      "rationale": "R-CONCEPT. New idea at 41:05: two strongest resolutions V–I and IV–I."
+    },
+    {
+      "start": 2531,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Tritone vs D7",
+      "rationale": "R-CONCEPT. New idea at 42:11: tritone vs heard as D7."
+    },
+    {
+      "start": 2556,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Blues + diminished; #11 / sus",
+      "rationale": "R-CONCEPT. New idea at 42:36: blues plus diminished; #11 / sus."
+    },
+    {
+      "start": 2641,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Tritone vs D7#9 / altered",
+      "rationale": "R-CONCEPT. New idea at 44:01: tritone vs D7#9 / altered."
+    },
+    {
+      "start": 2717,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Skip Am7, go straight to D7",
+      "rationale": "R-CONCEPT. Correction at 45:17: skip Am7, go straight to D7."
+    },
+    {
+      "start": 2730,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "C alt vs tritone sub (half-step up and down)",
+      "rationale": "R-CONCEPT. New idea at 45:30: C alt vs tritone; half-step up and down."
+    },
+    {
+      "start": 2814,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Soloed the other tune (half-dim start), not The Stand",
+      "rationale": "R-CONCEPT. New idea at 46:54: soloed the other tune (half-dim start)."
+    },
+    {
+      "start": 2883,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo take — switch recordings (stops)",
+      "rationale": "R-TAKE-GAP. GAP 32s @ 48:03."
+    },
+    {
+      "start": 2924,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo take",
+      "rationale": "R-TAKE-GAP. GAP 20s @ 48:44. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 2974,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo take",
+      "rationale": "R-TAKE-GAP. GAP 30s @ 49:34. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 3030,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo take",
+      "rationale": "R-TAKE-GAP. GAP 29s @ 50:30. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 3141,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Solo take",
+      "rationale": "R-TAKE-GAP. GAP 40s @ 52:21. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 3218,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Speed up — pretend a faster tempo",
+      "rationale": "R-CONCEPT. New idea at 53:38: play this line as if at a faster tempo."
+    },
+    {
+      "start": 3278,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Loop 4-bar chunks (backdoor ii-V)",
+      "rationale": "R-CONCEPT. New idea at 54:38: loop 4-bar chunks, especially backdoor ii-V."
+    },
+    {
+      "start": 3340,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Hearing vs executing; hand ahead of ear",
+      "rationale": "R-CONCEPT. New idea at 55:40: hearing-a-line limit vs executing; hand ahead of ear."
+    },
+    {
+      "start": 3413,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "LH voicings + horizontal vs vertical",
+      "rationale": "R-CONCEPT. New idea at 56:53: LH voicings and horizontal vs vertical."
+    },
+    {
+      "start": 4471,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Linear (sax) vs vertical (chords); make going-up musical",
+      "rationale": "R-CONCEPT. New idea at 1:14:31: linear vs vertical; make going-up musical."
+    },
+    {
+      "start": 4582,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Up / down / from anywhere — nearest good chord",
+      "rationale": "R-CONCEPT. New idea at 1:16:22: up, down, from anywhere; nearest good chord."
+    },
+    {
+      "start": 4657,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Comp going-up shapes in LH on a track",
+      "rationale": "R-CONCEPT. New idea at 1:17:37: comp going-up shapes in LH on a track."
+    },
+    {
+      "start": 4702,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Comping 20 min as soloing",
+      "rationale": "R-CONCEPT. New idea at 1:18:22: comping 20 min is soloing."
+    },
+    {
+      "start": 4732,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Jake demo — melody, harmonized",
+      "rationale": "R-TAKE-GAP. GAP 54s @ 1:19:51. R-TAKE-LABEL. Demo of melody-focused comping."
+    },
+    {
+      "start": 4791,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Comping/solo demo",
+      "rationale": "R-TAKE-GAP. GAP 54s @ 1:19:51. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 4852,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Comping is soloing; shout choruses",
+      "rationale": "R-CONCEPT. New idea at 1:20:52: comping is soloing; shout choruses."
+    },
+    {
+      "start": 4892,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Write simple blues lines and harmonize (12-bar)",
+      "rationale": "R-CONCEPT. New idea at 1:21:32: write simple blues lines and harmonize."
+    },
+    {
+      "start": 4989,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Simpler demo",
+      "rationale": "R-TAKE-GAP. GAP 32s @ 1:23:09."
+    },
+    {
+      "start": 5036,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Breakthrough — 4 notes from anywhere",
+      "rationale": "R-CONCEPT. New idea at 1:23:56: going-up is macro; 4 notes from anywhere."
+    },
+    {
+      "start": 5063,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Same top note, change chords underneath",
+      "rationale": "R-CONCEPT. New idea at 1:24:23: same top note, change chords underneath."
+    },
+    {
+      "start": 5088,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Pennies — LH rootless voicings",
+      "rationale": "R-CONCEPT. New idea at 1:24:48: Pennies LH rootless voicings."
+    },
+    {
+      "start": 5145,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Pennies rootless voicings",
+      "rationale": "R-TAKE-GAP. GAP 25s @ 1:25:45."
+    },
+    {
+      "start": 5205,
+      "end": null,
+      "kind": "TAKE",
+      "description": "Bigger voicings",
+      "rationale": "R-TAKE-GAP. GAP 45s @ 1:26:45. R-TAKE-CLUSTER."
+    },
+    {
+      "start": 5318,
+      "end": null,
+      "kind": "CONCEPT",
+      "description": "Homework: LH, then solo not-so-slow; call-and-response",
+      "rationale": "R-CONCEPT. New idea at 1:28:38: LH a day or two, then solo; call-and-response."
+    }
+  ],
+  "cues": [
+    {
+      "start": 0.0,
+      "text": "Yes. Yes. Can I play a little bit of I"
+    },
+    {
+      "start": 3.0,
+      "text": "transcribed another chorus of the stand."
+    },
+    {
+      "start": 6.0,
+      "text": "Great. Um, so let me actually just show"
+    },
+    {
+      "start": 8.0,
+      "text": "you where I am with all that."
+    },
+    {
+      "start": 10.0,
+      "text": ">> And I two still sticky parts from a"
+    },
+    {
+      "start": 11.0,
+      "text": "fingering perspective. So I'm just"
+    },
+    {
+      "start": 14.0,
+      "text": ">> here."
+    },
+    {
+      "start": 18.0,
+      "text": ">> Mhm. Okay."
+    },
+    {
+      "start": 22.0,
+      "text": ">> Tell me if the stand is too loud."
+    },
+    {
+      "start": 80.0,
+      "text": "Heat. Heat.",
+      "gapBefore": 58
+    },
+    {
+      "start": 105.0,
+      "text": "There's a little bit.",
+      "gapBefore": 24
+    },
+    {
+      "start": 113.0,
+      "text": "All"
+    },
+    {
+      "start": 114.0,
+      "text": "right."
+    },
+    {
+      "start": 157.0,
+      "text": "Heat. Heat.",
+      "gapBefore": 42
+    },
+    {
+      "start": 192.0,
+      "text": "Wow.",
+      "gapBefore": 35
+    },
+    {
+      "start": 199.0,
+      "text": "Uh,"
+    },
+    {
+      "start": 199.0,
+      "text": ">> nice."
+    },
+    {
+      "start": 200.0,
+      "text": ">> That last course was definitely my"
+    },
+    {
+      "start": 201.0,
+      "text": "favorite, I think, of the solo. Uh,"
+    },
+    {
+      "start": 202.0,
+      "text": ">> cool. Yeah, it's an amazing solo. Well"
+    },
+    {
+      "start": 204.0,
+      "text": "played."
+    },
+    {
+      "start": 205.0,
+      "text": ">> Thank you."
+    },
+    {
+      "start": 205.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 206.0,
+      "text": ">> that camera is choppy still. So,"
+    },
+    {
+      "start": 209.0,
+      "text": ">> oh, this one. Okay. Yeah, that's"
+    },
+    {
+      "start": 210.0,
+      "text": "unfortunate. Um,"
+    },
+    {
+      "start": 212.0,
+      "text": ">> it is. So, I I I heard it all. It's"
+    },
+    {
+      "start": 214.0,
+      "text": "chopp. It's choppy only in the visual."
+    },
+    {
+      "start": 216.0,
+      "text": ">> Um, so I couldn't really tell when the"
+    },
+    {
+      "start": 219.0,
+      "text": "fingering needed work. So maybe do it"
+    },
+    {
+      "start": 221.0,
+      "text": "again on this camera."
+    },
+    {
+      "start": 223.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 224.0,
+      "text": ">> but it sounds great."
+    },
+    {
+      "start": 225.0,
+      "text": ">> Oh, I see. Okay. Yeah. Let me uh Yeah."
+    },
+    {
+      "start": 227.0,
+      "text": "And then I can show you. I forgot that I"
+    },
+    {
+      "start": 228.0,
+      "text": "still had this here."
+    },
+    {
+      "start": 235.0,
+      "text": ">> So the sticky parts from the first"
+    },
+    {
+      "start": 236.0,
+      "text": "course that we worked on are Can you"
+    },
+    {
+      "start": 238.0,
+      "text": "hear this?"
+    },
+    {
+      "start": 239.0,
+      "text": ">> Uhhuh."
+    },
+    {
+      "start": 240.0,
+      "text": ">> Um, let's see."
+    },
+    {
+      "start": 242.0,
+      "text": "Uh, the alt lick. So this one."
+    },
+    {
+      "start": 247.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 252.0,
+      "text": "Yeah. Um, let me get to a place where I"
+    },
+    {
+      "start": 256.0,
+      "text": "can play."
+    },
+    {
+      "start": 261.0,
+      "text": ">> Well, it kind of shows the importance of"
+    },
+    {
+      "start": 263.0,
+      "text": "technique cuz I can usually pull it off"
+    },
+    {
+      "start": 265.0,
+      "text": "when I'm practicing, but when I was"
+    },
+    {
+      "start": 266.0,
+      "text": "playing in front of you, then I totally"
+    },
+    {
+      "start": 267.0,
+      "text": ">> Totally. Oh, that's a thing."
+    },
+    {
+      "start": 269.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 270.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 272.0,
+      "text": "Okay. Play it again."
+    },
+    {
+      "start": 274.0,
+      "text": ">> So, this is what we"
+    },
+    {
+      "start": 278.0,
+      "text": ">> Mhm. It looks pretty good."
+    },
+    {
+      "start": 279.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 286.0,
+      "text": "yours looks so much more natural."
+    },
+    {
+      "start": 289.0,
+      "text": ">> Uh, let me see. You do it again."
+    },
+    {
+      "start": 296.0,
+      "text": "One 4 3 2 1. Is that what we have?"
+    },
+    {
+      "start": 300.0,
+      "text": ">> 1 4 3 2 1. Yeah. Yeah. Yeah. Mhm."
+    },
+    {
+      "start": 306.0,
+      "text": ">> Let me just do it a little bit."
+    },
+    {
+      "start": 310.0,
+      "text": "Okay. I feel like your wrist is too high"
+    },
+    {
+      "start": 311.0,
+      "text": "at the beginning."
+    },
+    {
+      "start": 312.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 314.0,
+      "text": ">> That looks a bit low. Just uh you had it"
+    },
+    {
+      "start": 318.0,
+      "text": "like up here."
+    },
+    {
+      "start": 320.0,
+      "text": ">> Just take it a little down."
+    },
+    {
+      "start": 321.0,
+      "text": ">> You know what I can do? I can actually"
+    },
+    {
+      "start": 323.0,
+      "text": "Oops. One second."
+    },
+    {
+      "start": 327.0,
+      "text": ">> This is super hard though. This is like"
+    },
+    {
+      "start": 329.0,
+      "text": ">> It is. Yeah. But I want to nail it. So,"
+    },
+    {
+      "start": 333.0,
+      "text": ">> it's the kind of thing that will get"
+    },
+    {
+      "start": 335.0,
+      "text": "easier. Like there's also a part of it"
+    },
+    {
+      "start": 338.0,
+      "text": "where you have to just uh"
+    },
+    {
+      "start": 340.0,
+      "text": ">> suck it up,"
+    },
+    {
+      "start": 341.0,
+      "text": ">> let go and like keep learning other"
+    },
+    {
+      "start": 343.0,
+      "text": "stuff, you know?"
+    },
+    {
+      "start": 344.0,
+      "text": ">> Yeah. Yeah. Totally. Totally."
+    },
+    {
+      "start": 346.0,
+      "text": ">> I think it's good though to to revisit"
+    },
+    {
+      "start": 348.0,
+      "text": "it. I'm not saying we shouldn't. Just uh"
+    },
+    {
+      "start": 351.0,
+      "text": ">> some things can't be mastered like they"
+    },
+    {
+      "start": 353.0,
+      "text": "they'll lock into place years later."
+    },
+    {
+      "start": 355.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 364.0,
+      "text": "Cute little hell."
+    },
+    {
+      "start": 376.0,
+      "text": "actually. Probably the side angle is"
+    },
+    {
+      "start": 377.0,
+      "text": "probably more helpful."
+    },
+    {
+      "start": 379.0,
+      "text": ">> Yeah, that's"
+    },
+    {
+      "start": 383.0,
+      "text": "Yeah, it looks good."
+    },
+    {
+      "start": 386.0,
+      "text": ">> So, maybe just work on it 100,000 times."
+    },
+    {
+      "start": 389.0,
+      "text": ">> Do it again. I have some more things to"
+    },
+    {
+      "start": 391.0,
+      "text": "say."
+    },
+    {
+      "start": 396.0,
+      "text": "do that"
+    },
+    {
+      "start": 400.0,
+      "text": "again."
+    },
+    {
+      "start": 401.0,
+      "text": ">> Yours looks more actually, even though"
+    },
+    {
+      "start": 402.0,
+      "text": "you told me to raise my wrist, yours"
+    },
+    {
+      "start": 404.0,
+      "text": "actually looks low to me. Um,"
+    },
+    {
+      "start": 409.0,
+      "text": ">> yeah, just try it a little lower in"
+    },
+    {
+      "start": 411.0,
+      "text": "general."
+    },
+    {
+      "start": 415.0,
+      "text": ">> Does that feel better?"
+    },
+    {
+      "start": 416.0,
+      "text": ">> It does. Yeah,"
+    },
+    {
+      "start": 417.0,
+      "text": ">> that that looks a lot less intense."
+    },
+    {
+      "start": 423.0,
+      "text": "That feels a lot better. Yeah, it does."
+    },
+    {
+      "start": 425.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 428.0,
+      "text": ">> Let's do that thing where on the F you"
+    },
+    {
+      "start": 430.0,
+      "text": "let go of"
+    },
+    {
+      "start": 431.0,
+      "text": ">> Can you lower the camera? Oh, yeah."
+    },
+    {
+      "start": 434.0,
+      "text": ">> You let go of the muscles but have"
+    },
+    {
+      "start": 436.0,
+      "text": ">> Oh, I see. Yeah. Yeah."
+    },
+    {
+      "start": 441.0,
+      "text": ">> Yeah. Yeah. But do it really slow."
+    },
+    {
+      "start": 449.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 452.0,
+      "text": "Yep."
+    },
+    {
+      "start": 454.0,
+      "text": ">> And the moment that you play the D flat,"
+    },
+    {
+      "start": 457.0,
+      "text": "you can let go of the F from being"
+    },
+    {
+      "start": 458.0,
+      "text": "played."
+    },
+    {
+      "start": 460.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 462.0,
+      "text": ">> Yeah. Yeah. So, the the risk with that"
+    },
+    {
+      "start": 464.0,
+      "text": "one is that I kind of I know you don't"
+    },
+    {
+      "start": 466.0,
+      "text": "like when I go, you know, I kind of"
+    },
+    {
+      "start": 467.0,
+      "text": "rotate this underneath. Yeah."
+    },
+    {
+      "start": 472.0,
+      "text": ">> Okay. So, the way that I deal with that"
+    },
+    {
+      "start": 475.0,
+      "text": "is at the D flat."
+    },
+    {
+      "start": 477.0,
+      "text": ">> Mhm. That's when my wrist goes up in"
+    },
+    {
+      "start": 479.0,
+      "text": "order to get to this to there."
+    },
+    {
+      "start": 482.0,
+      "text": ">> Yeah. And I remember the thing you said"
+    },
+    {
+      "start": 483.0,
+      "text": "is that you're actually almost you're"
+    },
+    {
+      "start": 484.0,
+      "text": "not actually you're almost like catching"
+    },
+    {
+      "start": 486.0,
+      "text": "the D flat on the way to the A flat. Is"
+    },
+    {
+      "start": 487.0,
+      "text": "that right?"
+    },
+    {
+      "start": 488.0,
+      "text": ">> Totally."
+    },
+    {
+      "start": 490.0,
+      "text": "Okay. So, did we do this?"
+    },
+    {
+      "start": 493.0,
+      "text": ">> No."
+    },
+    {
+      "start": 494.0,
+      "text": ">> Let's try that."
+    },
+    {
+      "start": 496.0,
+      "text": ">> Oh."
+    },
+    {
+      "start": 502.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 503.0,
+      "text": ">> Oh, that's a super helpful one."
+    },
+    {
+      "start": 507.0,
+      "text": "Cool. And when you hit the A flat, don't"
+    },
+    {
+      "start": 510.0,
+      "text": "drop. Don't drop like that."
+    },
+    {
+      "start": 513.0,
+      "text": ">> Just you're hovering over it and it sort"
+    },
+    {
+      "start": 515.0,
+      "text": "of"
+    },
+    {
+      "start": 516.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 517.0,
+      "text": ">> My wrist doesn't collapse."
+    },
+    {
+      "start": 521.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 523.0,
+      "text": ">> There it was. Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 527.0,
+      "text": ">> That look good. Yeah. Do that."
+    },
+    {
+      "start": 531.0,
+      "text": ">> That's a good That's a good one."
+    },
+    {
+      "start": 536.0,
+      "text": "You know what? You know what the main"
+    },
+    {
+      "start": 537.0,
+      "text": "challenge is? It's like you're kind of"
+    },
+    {
+      "start": 538.0,
+      "text": "floating over the top over the the the"
+    },
+    {
+      "start": 541.0,
+      "text": "bottom or the the last part of the line."
+    },
+    {
+      "start": 543.0,
+      "text": ">> But it's hard for me to do that"
+    },
+    {
+      "start": 545.0,
+      "text": ">> without like I'm keeping firmness in my"
+    },
+    {
+      "start": 547.0,
+      "text": "wrist risk to do that. If that makes"
+    },
+    {
+      "start": 549.0,
+      "text": "sense."
+    },
+    {
+      "start": 553.0,
+      "text": ">> You're saying if you don't keep"
+    },
+    {
+      "start": 554.0,
+      "text": "firmness, what happens?"
+    },
+    {
+      "start": 556.0,
+      "text": ">> I'm saying uh to keep the feeling that"
+    },
+    {
+      "start": 558.0,
+      "text": "I'm floating over the keyed over that"
+    },
+    {
+      "start": 559.0,
+      "text": "last part of the line. Like my wrist"
+    },
+    {
+      "start": 561.0,
+      "text": "does have some tension in it basically."
+    },
+    {
+      "start": 562.0,
+      "text": ">> Okay. I feel like my wrist doesn't have"
+    },
+    {
+      "start": 565.0,
+      "text": "tension in it."
+    },
+    {
+      "start": 566.0,
+      "text": ">> Um I feel like it's supported"
+    },
+    {
+      "start": 568.0,
+      "text": ">> like I feel tension like here and like"
+    },
+    {
+      "start": 572.0,
+      "text": "in my"
+    },
+    {
+      "start": 574.0,
+      "text": ">> uh shoulder and stuff and and but this"
+    },
+    {
+      "start": 576.0,
+      "text": "right here feels like this."
+    },
+    {
+      "start": 578.0,
+      "text": ">> Yep. Mhm. Mhm."
+    },
+    {
+      "start": 581.0,
+      "text": ">> It's my Yeah, it's it feels like this"
+    },
+    {
+      "start": 584.0,
+      "text": "muscle is keeping it it up."
+    },
+    {
+      "start": 588.0,
+      "text": ">> That That does help. That does help. But"
+    },
+    {
+      "start": 590.0,
+      "text": "honestly, like it just kind of feels"
+    },
+    {
+      "start": 591.0,
+      "text": "like I just need to keep practicing this"
+    },
+    {
+      "start": 592.0,
+      "text": "over, like you said,"
+    },
+    {
+      "start": 594.0,
+      "text": ">> long period of time."
+    },
+    {
+      "start": 595.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 595.0,
+      "text": ">> I I think this is good. This bounce."
+    },
+    {
+      "start": 598.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 602.0,
+      "text": ">> No. Um"
+    },
+    {
+      "start": 604.0,
+      "text": ">> the way you're placing the A flat down,"
+    },
+    {
+      "start": 606.0,
+      "text": "isn't it?"
+    },
+    {
+      "start": 607.0,
+      "text": ">> M"
+    },
+    {
+      "start": 609.0,
+      "text": ">> like it's totally floaty up here."
+    },
+    {
+      "start": 612.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 613.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 617.0,
+      "text": ">> There. Yeah. I think it's actually"
+    },
+    {
+      "start": 619.0,
+      "text": "helpful to play those next notes."
+    },
+    {
+      "start": 620.0,
+      "text": ">> Yeah. Yep."
+    },
+    {
+      "start": 623.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 624.0,
+      "text": ">> Mhm. Mhm."
+    },
+    {
+      "start": 626.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 627.0,
+      "text": ">> That's all."
+    },
+    {
+      "start": 628.0,
+      "text": ">> What was the Okay. Okay. Um, what was"
+    },
+    {
+      "start": 631.0,
+      "text": "the other line that's hard?"
+    },
+    {
+      "start": 638.0,
+      "text": ">> Want to play the whole thing again?"
+    },
+    {
+      "start": 639.0,
+      "text": ">> Oh, yeah. Sure. Sure. Okay. Yeah."
+    },
+    {
+      "start": 648.0,
+      "text": "Tilt the camera down a little. Yeah."
+    },
+    {
+      "start": 670.0,
+      "text": "Let's stop for a second. Let's do uh",
+      "gapBefore": 22
+    },
+    {
+      "start": 675.0,
+      "text": ">> or whatever that one is."
+    },
+    {
+      "start": 676.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 678.0,
+      "text": ">> From a little before."
+    },
+    {
+      "start": 679.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 683.0,
+      "text": ">> That one."
+    },
+    {
+      "start": 690.0,
+      "text": ">> That That doesn't look quite right."
+    },
+    {
+      "start": 694.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 700.0,
+      "text": "Yeah. That that looks fingery."
+    },
+    {
+      "start": 703.0,
+      "text": ">> Mhm. Mhm."
+    },
+    {
+      "start": 706.0,
+      "text": ">> Uh,"
+    },
+    {
+      "start": 707.0,
+      "text": "let go of the thumb. Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 709.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 712.0,
+      "text": ">> Great. So, what chang So much better. So"
+    },
+    {
+      "start": 715.0,
+      "text": "much better. Um, I I just copied you."
+    },
+    {
+      "start": 718.0,
+      "text": "Oh, what I saw basically. Let me just"
+    },
+    {
+      "start": 719.0,
+      "text": ">> Okay, cool."
+    },
+    {
+      "start": 719.0,
+      "text": ">> You're just more like wavy basically."
+    },
+    {
+      "start": 721.0,
+      "text": ">> Wavy. And like the thumb isn't glued to"
+    },
+    {
+      "start": 723.0,
+      "text": "the A. I think that's what changed."
+    },
+    {
+      "start": 725.0,
+      "text": ">> Yes. Yes. Yes. Yes. Yes."
+    },
+    {
+      "start": 728.0,
+      "text": ">> Okay, cool. So that's that part."
+    },
+    {
+      "start": 730.0,
+      "text": ">> And then magically it sounded a lot"
+    },
+    {
+      "start": 731.0,
+      "text": "better,"
+    },
+    {
+      "start": 732.0,
+      "text": ">> right?"
+    },
+    {
+      "start": 734.0,
+      "text": "And let's continue that line."
+    },
+    {
+      "start": 738.0,
+      "text": ">> Cool. Let's get that too."
+    },
+    {
+      "start": 744.0,
+      "text": ">> I got one one at the bottom there."
+    },
+    {
+      "start": 747.0,
+      "text": ">> Yeah. No."
+    },
+    {
+      "start": 749.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 751.0,
+      "text": ">> 3 1 32"
+    },
+    {
+      "start": 757.0,
+      "text": ">> three. So five."
+    },
+    {
+      "start": 759.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 760.0,
+      "text": ">> 3 1."
+    },
+    {
+      "start": 761.0,
+      "text": ">> Oh,"
+    },
+    {
+      "start": 763.0,
+      "text": ">> 3 2 1."
+    },
+    {
+      "start": 765.0,
+      "text": ">> I see."
+    },
+    {
+      "start": 769.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 770.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 772.0,
+      "text": ">> So much."
+    },
+    {
+      "start": 772.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 774.0,
+      "text": "Okay. And at the bottom, this is very"
+    },
+    {
+      "start": 777.0,
+      "text": "similar to the"
+    },
+    {
+      "start": 780.0,
+      "text": "whatever. Uh"
+    },
+    {
+      "start": 790.0,
+      "text": ">> yeah. Yeah. It's like suspended there"
+    },
+    {
+      "start": 797.0,
+      "text": "like a baby version of it."
+    },
+    {
+      "start": 799.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 801.0,
+      "text": "Right."
+    },
+    {
+      "start": 803.0,
+      "text": "So, let's try uh"
+    },
+    {
+      "start": 809.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 816.0,
+      "text": ">> I see."
+    },
+    {
+      "start": 819.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 821.0,
+      "text": ">> Uh try the A flat. Uh don't have your"
+    },
+    {
+      "start": 825.0,
+      "text": "wrist already turned. Like it looks too"
+    },
+    {
+      "start": 827.0,
+      "text": "turned."
+    },
+    {
+      "start": 827.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 831.0,
+      "text": "Okay, I'm having a new idea."
+    },
+    {
+      "start": 834.0,
+      "text": "I feel like this A flat is actually up"
+    },
+    {
+      "start": 837.0,
+      "text": "like this. This is exaggerated, but up."
+    },
+    {
+      "start": 842.0,
+      "text": ">> Yeah, that's the rotation."
+    },
+    {
+      "start": 849.0,
+      "text": ">> But that's kind of like against the"
+    },
+    {
+      "start": 851.0,
+      "text": "gravity of where your hand is going,"
+    },
+    {
+      "start": 852.0,
+      "text": "right?"
+    },
+    {
+      "start": 854.0,
+      "text": "because you're kind of like you're kind"
+    },
+    {
+      "start": 855.0,
+      "text": "of collapsing down here and then you"
+    },
+    {
+      "start": 856.0,
+      "text": "obvious"
+    },
+    {
+      "start": 859.0,
+      "text": ">> Right. Well, check it out. I I feel this"
+    },
+    {
+      "start": 862.0,
+      "text": "d."
+    },
+    {
+      "start": 869.0,
+      "text": "Ah,"
+    },
+    {
+      "start": 870.0,
+      "text": ">> something like that. I know it looks"
+    },
+    {
+      "start": 874.0,
+      "text": "weird until"
+    },
+    {
+      "start": 874.0,
+      "text": ">> No, but I like it. Yeah."
+    },
+    {
+      "start": 876.0,
+      "text": ">> Yeah. I feel like it's exaggerated right"
+    },
+    {
+      "start": 878.0,
+      "text": "now, but there's like a tiny bit"
+    },
+    {
+      "start": 883.0,
+      "text": "So the the first duga is this, right?"
+    },
+    {
+      "start": 887.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 895.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 897.0,
+      "text": ">> Yeah. Now I feel like it could be either"
+    },
+    {
+      "start": 899.0,
+      "text": "one."
+    },
+    {
+      "start": 900.0,
+      "text": ">> Like I I'm not sure if they work"
+    },
+    {
+      "start": 902.0,
+      "text": "together or they're two different ways"
+    },
+    {
+      "start": 904.0,
+      "text": "to do it."
+    },
+    {
+      "start": 905.0,
+      "text": ">> Let me try to figure that out."
+    },
+    {
+      "start": 915.0,
+      "text": "I don't know. Like, it's definitely not"
+    },
+    {
+      "start": 918.0,
+      "text": "fullon dooga da da,"
+    },
+    {
+      "start": 920.0,
+      "text": ">> but I feel like like it's not the wrist"
+    },
+    {
+      "start": 924.0,
+      "text": "shouldn't be already all the way turned."
+    },
+    {
+      "start": 926.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 927.0,
+      "text": ">> When you get here, cuz then there's"
+    },
+    {
+      "start": 928.0,
+      "text": "nowhere to go there."
+    },
+    {
+      "start": 929.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 932.0,
+      "text": ">> It's like the A flat has a slight up."
+    },
+    {
+      "start": 935.0,
+      "text": ">> So, here's a question for you. when your"
+    },
+    {
+      "start": 937.0,
+      "text": "when your finger's on the C,"
+    },
+    {
+      "start": 939.0,
+      "text": ">> like where's the gravity of like where's"
+    },
+    {
+      "start": 942.0,
+      "text": "the gravity of your or where's the"
+    },
+    {
+      "start": 943.0,
+      "text": "center of gravity of your your"
+    },
+    {
+      "start": 945.0,
+      "text": ">> Are you still kind of going this way on"
+    },
+    {
+      "start": 947.0,
+      "text": "the"
+    },
+    {
+      "start": 948.0,
+      "text": ">> Wait, the line is"
+    },
+    {
+      "start": 950.0,
+      "text": ">> Oh,"
+    },
+    {
+      "start": 954.0,
+      "text": "what what we say it's a"
+    },
+    {
+      "start": 960.0,
+      "text": ">> Wait, is it is it dead? I think it's"
+    },
+    {
+      "start": 963.0,
+      "text": ">> No, no, no. Yeah."
+    },
+    {
+      "start": 970.0,
+      "text": "There it is. That looked good."
+    },
+    {
+      "start": 972.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 979.0,
+      "text": ">> I guess on the thumb you're your your"
+    },
+    {
+      "start": 980.0,
+      "text": "your grav the the center of gravity has"
+    },
+    {
+      "start": 983.0,
+      "text": "to be moving closer to the A flat,"
+    },
+    {
+      "start": 984.0,
+      "text": "right?"
+    },
+    {
+      "start": 985.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 991.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 993.0,
+      "text": "Okay. Okay. Now, let's try it without"
+    },
+    {
+      "start": 994.0,
+      "text": "that switch and see if you can just have"
+    },
+    {
+      "start": 997.0,
+      "text": "it be one wave, but don't roll your"
+    },
+    {
+      "start": 999.0,
+      "text": "wrist over too far."
+    },
+    {
+      "start": 1001.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1004.0,
+      "text": ">> Is it more like a flick at the bottom"
+    },
+    {
+      "start": 1006.0,
+      "text": "than a than a wave?"
+    },
+    {
+      "start": 1008.0,
+      "text": ">> Uh,"
+    },
+    {
+      "start": 1013.0,
+      "text": "I feel like"
+    },
+    {
+      "start": 1015.0,
+      "text": "I feel like that this right this this"
+    },
+    {
+      "start": 1018.0,
+      "text": "turn may have been the wrong thing."
+    },
+    {
+      "start": 1020.0,
+      "text": ">> Okay. Okay. But what it is saying is"
+    },
+    {
+      "start": 1022.0,
+      "text": "that there needs to be circles."
+    },
+    {
+      "start": 1024.0,
+      "text": ">> Yeah. Yeah. Yeah. Yeah. I feel like"
+    },
+    {
+      "start": 1026.0,
+      "text": "we're really stretching the limits of"
+    },
+    {
+      "start": 1027.0,
+      "text": "the English language."
+    },
+    {
+      "start": 1028.0,
+      "text": ">> Totally."
+    },
+    {
+      "start": 1030.0,
+      "text": ">> Um, try it again. Forget about this"
+    },
+    {
+      "start": 1033.0,
+      "text": "right turn."
+    },
+    {
+      "start": 1034.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 1034.0,
+      "text": ">> Have it just be one thing, but but don't"
+    },
+    {
+      "start": 1038.0,
+      "text": "have your wrist fall until the F sharp."
+    },
+    {
+      "start": 1040.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 1043.0,
+      "text": ">> That looks better."
+    },
+    {
+      "start": 1048.0,
+      "text": ">> It looks good. the the the thing that uh"
+    },
+    {
+      "start": 1051.0,
+      "text": "it does feel like a little bit of a"
+    },
+    {
+      "start": 1052.0,
+      "text": "flick to get to the A flat a little bit."
+    },
+    {
+      "start": 1058.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 1059.0,
+      "text": "Okay, let's try."
+    },
+    {
+      "start": 1068.0,
+      "text": "Yeah, I guess actually it would be"
+    },
+    {
+      "start": 1074.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 1077.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 1080.0,
+      "text": "Cool."
+    },
+    {
+      "start": 1083.0,
+      "text": "And now let's add"
+    },
+    {
+      "start": 1121.0,
+      "text": "My wrist is going up diagonal.",
+      "gapBefore": 38
+    },
+    {
+      "start": 1126.0,
+      "text": ">> It is the same movement as the harder"
+    },
+    {
+      "start": 1128.0,
+      "text": "one. The one that I struggle with."
+    },
+    {
+      "start": 1130.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1132.0,
+      "text": "Yeah, that looks good."
+    },
+    {
+      "start": 1134.0,
+      "text": ">> Sorry I told you to go backwards. I"
+    },
+    {
+      "start": 1136.0,
+      "text": "think maybe that's in there, but it's"
+    },
+    {
+      "start": 1138.0,
+      "text": "not necessary for us."
+    },
+    {
+      "start": 1141.0,
+      "text": ">> That looks good."
+    },
+    {
+      "start": 1141.0,
+      "text": ">> Yeah. Yeah."
+    },
+    {
+      "start": 1144.0,
+      "text": ">> Okay,"
+    },
+    {
+      "start": 1145.0,
+      "text": ">> cool."
+    },
+    {
+      "start": 1146.0,
+      "text": ">> Cool. Moving on."
+    },
+    {
+      "start": 1147.0,
+      "text": ">> Get me up."
+    },
+    {
+      "start": 1154.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1178.0,
+      "text": "Ah",
+      "gapBefore": 23
+    },
+    {
+      "start": 1180.0,
+      "text": "yeah,"
+    },
+    {
+      "start": 1190.0,
+      "text": ">> that looks hard."
+    },
+    {
+      "start": 1191.0,
+      "text": ">> That's the part. Yeah, that's the one"
+    },
+    {
+      "start": 1192.0,
+      "text": "that uh I I can do it, but I It's hard"
+    },
+    {
+      "start": 1194.0,
+      "text": "for me to do it in time at that tempo,"
+    },
+    {
+      "start": 1196.0,
+      "text": "basically."
+    },
+    {
+      "start": 1197.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 1200.0,
+      "text": ">> it's hard for me to get this."
+    },
+    {
+      "start": 1205.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1208.0,
+      "text": "Let me see."
+    },
+    {
+      "start": 1218.0,
+      "text": "Can you do just that part?"
+    },
+    {
+      "start": 1223.0,
+      "text": "That part."
+    },
+    {
+      "start": 1226.0,
+      "text": ">> That looks pretty good. So, what's the"
+    },
+    {
+      "start": 1228.0,
+      "text": "hard part?"
+    },
+    {
+      "start": 1228.0,
+      "text": ">> That's okay. The hard part is like"
+    },
+    {
+      "start": 1229.0,
+      "text": "getting there from what happens before."
+    },
+    {
+      "start": 1232.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 1246.0,
+      "text": ">> I feel like the double note is slowing"
+    },
+    {
+      "start": 1247.0,
+      "text": "you down."
+    },
+    {
+      "start": 1248.0,
+      "text": ">> Yes. Um,"
+    },
+    {
+      "start": 1251.0,
+      "text": ">> yeah, you get tension, but that's"
+    },
+    {
+      "start": 1253.0,
+      "text": "normal. That's pretty much the hardest"
+    },
+    {
+      "start": 1255.0,
+      "text": "thing to do on piano is a double note."
+    },
+    {
+      "start": 1256.0,
+      "text": "Um,"
+    },
+    {
+      "start": 1258.0,
+      "text": ">> I do them with two different fingers."
+    },
+    {
+      "start": 1261.0,
+      "text": "Not everyone does that. Um,"
+    },
+    {
+      "start": 1263.0,
+      "text": "but"
+    },
+    {
+      "start": 1265.0,
+      "text": "this it's going to feel awkward at the"
+    },
+    {
+      "start": 1267.0,
+      "text": "beginning because like I've practiced it"
+    },
+    {
+      "start": 1268.0,
+      "text": "a lot. But"
+    },
+    {
+      "start": 1272.0,
+      "text": "1 3"
+    },
+    {
+      "start": 1276.0,
+      "text": "1"
+    },
+    {
+      "start": 1278.0,
+      "text": ">> Let's do one uh sorry 2 1 3."
+    },
+    {
+      "start": 1282.0,
+      "text": ">> Oh"
+    },
+    {
+      "start": 1284.0,
+      "text": ">> yeah."
+    },
+    {
+      "start": 1294.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 1296.0,
+      "text": "So,"
+    },
+    {
+      "start": 1298.0,
+      "text": ">> so"
+    },
+    {
+      "start": 1301.0,
+      "text": "after you play the thumb"
+    },
+    {
+      "start": 1302.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1303.0,
+      "text": ">> keep your thumb basically above the B."
+    },
+    {
+      "start": 1310.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1311.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1313.0,
+      "text": ">> So, Yep. That's So, how could you"
+    },
+    {
+      "start": 1316.0,
+      "text": "possibly play that live?"
+    },
+    {
+      "start": 1318.0,
+      "text": ">> By practicing double notes. Yeah,"
+    },
+    {
+      "start": 1320.0,
+      "text": ">> by practicing this line."
+    },
+    {
+      "start": 1324.0,
+      "text": ">> So, yeah, that's definitely easier."
+    },
+    {
+      "start": 1328.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1332.0,
+      "text": "Yeah. Again."
+    },
+    {
+      "start": 1334.0,
+      "text": ">> Yeah. And then"
+    },
+    {
+      "start": 1336.0,
+      "text": ">> see if you can keep your thumb"
+    },
+    {
+      "start": 1338.0,
+      "text": ">> see if you can keep your thumb in this"
+    },
+    {
+      "start": 1340.0,
+      "text": "area without holding it with your"
+    },
+    {
+      "start": 1341.0,
+      "text": "muscles, but just sort of like tilting"
+    },
+    {
+      "start": 1343.0,
+      "text": "your hand a little."
+    },
+    {
+      "start": 1350.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1350.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1351.0,
+      "text": ">> That's how I would do it."
+    },
+    {
+      "start": 1353.0,
+      "text": ">> I think past a certain tempo, that's the"
+    },
+    {
+      "start": 1355.0,
+      "text": "only way it's going to happen."
+    },
+    {
+      "start": 1356.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 1358.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 1358.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1358.0,
+      "text": ">> And I guess the goal is to be able to"
+    },
+    {
+      "start": 1360.0,
+      "text": "play everything at maximum tempo."
+    },
+    {
+      "start": 1362.0,
+      "text": ">> At maximum"
+    },
+    {
+      "start": 1362.0,
+      "text": ">> Yeah. I mean, this is this is pretty"
+    },
+    {
+      "start": 1364.0,
+      "text": "close to maximum tempo for me. Um,"
+    },
+    {
+      "start": 1380.0,
+      "text": "let's not let's not play through all"
+    },
+    {
+      "start": 1381.0,
+      "text": "this."
+    },
+    {
+      "start": 1384.0,
+      "text": "Well,"
+    },
+    {
+      "start": 1402.0,
+      "text": "I don't I don't love that. Thumb thumb"
+    },
+    {
+      "start": 1404.0,
+      "text": "thumb."
+    },
+    {
+      "start": 1404.0,
+      "text": ">> Yeah. I don't know why. Yeah. Oh,"
+    },
+    {
+      "start": 1407.0,
+      "text": ">> two."
+    },
+    {
+      "start": 1408.0,
+      "text": ">> Oh."
+    },
+    {
+      "start": 1411.0,
+      "text": ">> Oh, I'm sorry. I go"
+    },
+    {
+      "start": 1414.0,
+      "text": ">> Oh, you don't like this one?"
+    },
+    {
+      "start": 1415.0,
+      "text": ">> I don't like that one."
+    },
+    {
+      "start": 1416.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1416.0,
+      "text": ">> Uh 2 one. Is that what you just did?"
+    },
+    {
+      "start": 1419.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1420.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1421.0,
+      "text": ">> Yeah. Yeah. Yeah. Totally."
+    },
+    {
+      "start": 1422.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1423.0,
+      "text": ">> Um, so it sounds like I over"
+    },
+    {
+      "start": 1424.0,
+      "text": "internalized the lesson that you have"
+    },
+    {
+      "start": 1425.0,
+      "text": "about don't crossing over because"
+    },
+    {
+      "start": 1427.0,
+      "text": "sometimes you do obviously you have to"
+    },
+    {
+      "start": 1428.0,
+      "text": "cross over at some points."
+    },
+    {
+      "start": 1431.0,
+      "text": ">> Yeah. Um,"
+    },
+    {
+      "start": 1434.0,
+      "text": "yeah. I think I should have better"
+    },
+    {
+      "start": 1435.0,
+      "text": "language about it cuz it's fine to cross"
+    },
+    {
+      "start": 1438.0,
+      "text": "over if you're if you've let go of your"
+    },
+    {
+      "start": 1440.0,
+      "text": "muscle completely."
+    },
+    {
+      "start": 1442.0,
+      "text": ">> You know, like"
+    },
+    {
+      "start": 1444.0,
+      "text": ">> don't it's about not reaching."
+    },
+    {
+      "start": 1446.0,
+      "text": ">> Mhm. Mhm."
+    },
+    {
+      "start": 1449.0,
+      "text": "Like,"
+    },
+    {
+      "start": 1452.0,
+      "text": ">> yeah, I guess"
+    },
+    {
+      "start": 1453.0,
+      "text": ">> I intuitively get it. I I get it"
+    },
+    {
+      "start": 1455.0,
+      "text": "intuitively."
+    },
+    {
+      "start": 1456.0,
+      "text": ">> This lesson that we did about releasing"
+    },
+    {
+      "start": 1458.0,
+      "text": "when you cross, like I'd never taught"
+    },
+    {
+      "start": 1460.0,
+      "text": "that before and I think that's huge."
+    },
+    {
+      "start": 1462.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1463.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1463.0,
+      "text": ">> So, yeah."
+    },
+    {
+      "start": 1465.0,
+      "text": ">> Yeah. I I intuitively get it. Like even"
+    },
+    {
+      "start": 1468.0,
+      "text": "for the"
+    },
+    {
+      "start": 1471.0,
+      "text": ">> That's actually surprisingly easy easier"
+    },
+    {
+      "start": 1473.0,
+      "text": "than"
+    },
+    {
+      "start": 1473.0,
+      "text": ">> Cool. But but here we're uh what are we"
+    },
+    {
+      "start": 1477.0,
+      "text": "doing? over."
+    },
+    {
+      "start": 1480.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1481.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1482.0,
+      "text": ">> Yeah, that looks good."
+    },
+    {
+      "start": 1493.0,
+      "text": "That's amazing."
+    },
+    {
+      "start": 1498.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 1503.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 1505.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 1510.0,
+      "text": "Oops. It's okay."
+    },
+    {
+      "start": 1515.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1525.0,
+      "text": "I let it go."
+    },
+    {
+      "start": 1527.0,
+      "text": "For some reason, that line doesn't"
+    },
+    {
+      "start": 1528.0,
+      "text": "strike me as much, but"
+    },
+    {
+      "start": 1540.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 1542.0,
+      "text": "Oops. I had one question about that. So,"
+    },
+    {
+      "start": 1544.0,
+      "text": "I go"
+    },
+    {
+      "start": 1545.0,
+      "text": "or is it"
+    },
+    {
+      "start": 1551.0,
+      "text": ">> uh thumb on the bottom?"
+    },
+    {
+      "start": 1552.0,
+      "text": ">> Thumb. Okay."
+    },
+    {
+      "start": 1556.0,
+      "text": ">> Yeah. And uh that's a release the thumb"
+    },
+    {
+      "start": 1558.0,
+      "text": "completely as soon as you can. Yep."
+    },
+    {
+      "start": 1563.0,
+      "text": "How do I do that?"
+    },
+    {
+      "start": 1565.0,
+      "text": ">> Like by the time you're up there."
+    },
+    {
+      "start": 1566.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1567.0,
+      "text": ">> You should be in this position. So your"
+    },
+    {
+      "start": 1569.0,
+      "text": "thumb is going to be over like G."
+    },
+    {
+      "start": 1571.0,
+      "text": ">> Mhm. Mhm. Mhm. Mhm."
+    },
+    {
+      "start": 1578.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 1587.0,
+      "text": ">> Uh-huh."
+    },
+    {
+      "start": 1592.0,
+      "text": "That looks not right."
+    },
+    {
+      "start": 1595.0,
+      "text": "By the way, not by not right, I'm saying"
+    },
+    {
+      "start": 1598.0,
+      "text": "not completely perfect, whereas"
+    },
+    {
+      "start": 1599.0,
+      "text": "everything else perfect."
+    },
+    {
+      "start": 1600.0,
+      "text": ">> I understand. I understand. Yeah."
+    },
+    {
+      "start": 1601.0,
+      "text": ">> Okay. Okay."
+    },
+    {
+      "start": 1605.0,
+      "text": ">> The thing is like I intuitively know"
+    },
+    {
+      "start": 1607.0,
+      "text": "because I'm kind of just surviving those"
+    },
+    {
+      "start": 1608.0,
+      "text": "parts, you know."
+    },
+    {
+      "start": 1609.0,
+      "text": ">> Yeah. Yeah."
+    },
+    {
+      "start": 1614.0,
+      "text": ">> That part."
+    },
+    {
+      "start": 1615.0,
+      "text": ">> Yeah. Yeah."
+    },
+    {
+      "start": 1616.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1618.0,
+      "text": "Are you sliding there?"
+    },
+    {
+      "start": 1619.0,
+      "text": ">> I am."
+    },
+    {
+      "start": 1620.0,
+      "text": ">> Okay. Yeah. No."
+    },
+    {
+      "start": 1622.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 1629.0,
+      "text": ">> I might slide there. Do you slide there?"
+    },
+    {
+      "start": 1634.0,
+      "text": ">> I do."
+    },
+    {
+      "start": 1635.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 1637.0,
+      "text": "Okay."
+    },
+    {
+      "start": 1639.0,
+      "text": "You're crossing over five."
+    },
+    {
+      "start": 1643.0,
+      "text": ">> Yeah. Five. Yeah."
+    },
+    {
+      "start": 1646.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 1646.0,
+      "text": ">> I I don't cross over actually. So it's"
+    },
+    {
+      "start": 1649.0,
+      "text": "I go one five,"
+    },
+    {
+      "start": 1651.0,
+      "text": "right?"
+    },
+    {
+      "start": 1657.0,
+      "text": "Okay."
+    },
+    {
+      "start": 1660.0,
+      "text": "Right."
+    },
+    {
+      "start": 1665.0,
+      "text": "No."
+    },
+    {
+      "start": 1676.0,
+      "text": "Okay."
+    },
+    {
+      "start": 1679.0,
+      "text": "5 4 3 1"
+    },
+    {
+      "start": 1684.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 1686.0,
+      "text": ">> Same kind of thing as the alt one,"
+    },
+    {
+      "start": 1687.0,
+      "text": "right?"
+    },
+    {
+      "start": 1687.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1689.0,
+      "text": ">> Cuz you're you're you're catching the D"
+    },
+    {
+      "start": 1691.0,
+      "text": "flat on the way to the B B flat."
+    },
+    {
+      "start": 1694.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 1697.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1698.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1698.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1702.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1703.0,
+      "text": ">> Yeah. Exactly the same thing."
+    },
+    {
+      "start": 1704.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1706.0,
+      "text": "That to me that's definitely the hardest"
+    },
+    {
+      "start": 1708.0,
+      "text": "technique thing I think for me right"
+    },
+    {
+      "start": 1709.0,
+      "text": "now. Um but I'm catching the alt lick."
+    },
+    {
+      "start": 1711.0,
+      "text": "Did that look okay to you? The"
+    },
+    {
+      "start": 1712.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1714.0,
+      "text": ">> Yeah, that's great."
+    },
+    {
+      "start": 1715.0,
+      "text": ">> Yeah. Okay. Yeah."
+    },
+    {
+      "start": 1718.0,
+      "text": ">> The good thing is they're all really the"
+    },
+    {
+      "start": 1719.0,
+      "text": "same thing. So it's nice to be able to"
+    },
+    {
+      "start": 1721.0,
+      "text": "play different lines that drill the same"
+    },
+    {
+      "start": 1723.0,
+      "text": "thing."
+    },
+    {
+      "start": 1723.0,
+      "text": ">> Same thing. Yeah."
+    },
+    {
+      "start": 1725.0,
+      "text": ">> It's about having the wrist elevated and"
+    },
+    {
+      "start": 1727.0,
+      "text": "loose."
+    },
+    {
+      "start": 1730.0,
+      "text": ">> Maybe I'll just play it a few times."
+    },
+    {
+      "start": 1731.0,
+      "text": "Yeah. And you can look."
+    },
+    {
+      "start": 1732.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1740.0,
+      "text": "messed up."
+    },
+    {
+      "start": 1749.0,
+      "text": "Maybe it's a a good hint that I'm"
+    },
+    {
+      "start": 1751.0,
+      "text": "missing those notes cuz it's like I'm so"
+    },
+    {
+      "start": 1754.0,
+      "text": "loose when I play it slow. I'm basically"
+    },
+    {
+      "start": 1757.0,
+      "text": "like just dropping them there."
+    },
+    {
+      "start": 1763.0,
+      "text": "The magic trick is how you get from the"
+    },
+    {
+      "start": 1765.0,
+      "text": "the F sharp to the the D flat without"
+    },
+    {
+      "start": 1768.0,
+      "text": "missing a beat."
+    },
+    {
+      "start": 1772.0,
+      "text": ">> Uh the F sharp to the D flat."
+    },
+    {
+      "start": 1775.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 1782.0,
+      "text": ">> I guess. Yeah,"
+    },
+    {
+      "start": 1784.0,
+      "text": ">> that's where the wrist goes up."
+    },
+    {
+      "start": 1787.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1790.0,
+      "text": ">> There. That looked good. That looks"
+    },
+    {
+      "start": 1792.0,
+      "text": "great."
+    },
+    {
+      "start": 1797.0,
+      "text": ">> And you go"
+    },
+    {
+      "start": 1801.0,
+      "text": ">> 3 2 1 2."
+    },
+    {
+      "start": 1804.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 1807.0,
+      "text": ">> Okay,"
+    },
+    {
+      "start": 1808.0,
+      "text": ">> that sounds great. That next part of the"
+    },
+    {
+      "start": 1809.0,
+      "text": "line sounds perfect."
+    },
+    {
+      "start": 1812.0,
+      "text": ">> It has It has the right like forward"
+    },
+    {
+      "start": 1814.0,
+      "text": "motion push. It's really good."
+    },
+    {
+      "start": 1815.0,
+      "text": ">> Yeah, I I still my my residual sax sax"
+    },
+    {
+      "start": 1818.0,
+      "text": "days still, but"
+    },
+    {
+      "start": 1820.0,
+      "text": "Oh"
+    },
+    {
+      "start": 1826.0,
+      "text": ">> yeah."
+    },
+    {
+      "start": 1833.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1834.0,
+      "text": ">> So much better."
+    },
+    {
+      "start": 1840.0,
+      "text": "Uh-huh."
+    },
+    {
+      "start": 1866.0,
+      "text": "Let's get that.",
+      "gapBefore": 25
+    },
+    {
+      "start": 1870.0,
+      "text": "up."
+    },
+    {
+      "start": 1882.0,
+      "text": ">> Oh, that part. Yeah."
+    },
+    {
+      "start": 1889.0,
+      "text": ">> Okay. Right there. Sorry, I keep"
+    },
+    {
+      "start": 1891.0,
+      "text": "changing where it is, but"
+    },
+    {
+      "start": 1893.0,
+      "text": ">> that upward scale part."
+    },
+    {
+      "start": 1895.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 1895.0,
+      "text": ">> Uh,"
+    },
+    {
+      "start": 1897.0,
+      "text": ">> I'll stop if you want to come."
+    },
+    {
+      "start": 1898.0,
+      "text": ">> This one."
+    },
+    {
+      "start": 1898.0,
+      "text": ">> Right here. Yep. Yep. That looks"
+    },
+    {
+      "start": 1901.0,
+      "text": "fingery."
+    },
+    {
+      "start": 1905.0,
+      "text": ">> Yeah, something like that. Uh just uh do"
+    },
+    {
+      "start": 1908.0,
+      "text": "that. Do a little less. But that's it."
+    },
+    {
+      "start": 1910.0,
+      "text": "Or just watch. Maybe that's the way that"
+    },
+    {
+      "start": 1912.0,
+      "text": "worked when you watch me."
+    },
+    {
+      "start": 1917.0,
+      "text": ">> My thumb is like above D when I play the"
+    },
+    {
+      "start": 1919.0,
+      "text": "F. Yeah. Yeah."
+    },
+    {
+      "start": 1921.0,
+      "text": ">> Great."
+    },
+    {
+      "start": 1924.0,
+      "text": ">> That's the That's the funnest line. The"
+    },
+    {
+      "start": 1925.0,
+      "text": "most fun line to play."
+    },
+    {
+      "start": 1931.0,
+      "text": "Yeah,"
+    },
+    {
+      "start": 1932.0,
+      "text": ">> that thumb. Uh,"
+    },
+    {
+      "start": 1934.0,
+      "text": ">> the bottom part of it looked uh finger"
+    },
+    {
+      "start": 1936.0,
+      "text": ">> a little thumby. Yeah,"
+    },
+    {
+      "start": 1940.0,
+      "text": ">> wait."
+    },
+    {
+      "start": 1946.0,
+      "text": ">> I go I slide on three."
+    },
+    {
+      "start": 1950.0,
+      "text": ">> But this one one two one."
+    },
+    {
+      "start": 1958.0,
+      "text": "And then"
+    },
+    {
+      "start": 1960.0,
+      "text": ">> that's a lot of thumb. It's like a lot"
+    },
+    {
+      "start": 1961.0,
+      "text": "of thumb going underneath."
+    },
+    {
+      "start": 1962.0,
+      "text": ">> Yeah, it that's the thumb. So"
+    },
+    {
+      "start": 1972.0,
+      "text": ">> the thumb on the D. You play thumb on"
+    },
+    {
+      "start": 1974.0,
+      "text": "the D going back up."
+    },
+    {
+      "start": 1976.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1977.0,
+      "text": ">> That That seems hard."
+    },
+    {
+      "start": 1978.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 1980.0,
+      "text": ">> Okay. I know it's fun to play, but I"
+    },
+    {
+      "start": 1983.0,
+      "text": "think I'm going to change it. Okay."
+    },
+    {
+      "start": 1984.0,
+      "text": "Okay. Yeah."
+    },
+    {
+      "start": 1987.0,
+      "text": ">> 5 4 3 1"
+    },
+    {
+      "start": 1991.0,
+      "text": ">> 3 2 3 1"
+    },
+    {
+      "start": 1994.0,
+      "text": "3 2 Oh. Uh."
+    },
+    {
+      "start": 1999.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 2001.0,
+      "text": "There it is."
+    },
+    {
+      "start": 2003.0,
+      "text": ">> And then that part."
+    },
+    {
+      "start": 2005.0,
+      "text": ">> I haven't figured this out."
+    },
+    {
+      "start": 2008.0,
+      "text": "3 1 3 4 5."
+    },
+    {
+      "start": 2010.0,
+      "text": ">> Yeah, I'm doing that right."
+    },
+    {
+      "start": 2013.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2014.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2014.0,
+      "text": ">> So, yeah, you miss you miss out on the"
+    },
+    {
+      "start": 2017.0,
+      "text": "fun slide, but I think uh having this"
+    },
+    {
+      "start": 2019.0,
+      "text": "one cross under is really bad."
+    },
+    {
+      "start": 2034.0,
+      "text": ">> So, we we're going"
+    },
+    {
+      "start": 2039.0,
+      "text": "we're going one on the D, right? Yep."
+    },
+    {
+      "start": 2042.0,
+      "text": ">> So, it's 431."
+    },
+    {
+      "start": 2044.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 2047.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2049.0,
+      "text": ">> Okay,"
+    },
+    {
+      "start": 2049.0,
+      "text": ">> that's it."
+    },
+    {
+      "start": 2050.0,
+      "text": ">> I think I can figure it out. I can I can"
+    },
+    {
+      "start": 2051.0,
+      "text": "read that."
+    },
+    {
+      "start": 2052.0,
+      "text": ">> Yep. My wrist is up the whole time for"
+    },
+    {
+      "start": 2054.0,
+      "text": "that."
+    },
+    {
+      "start": 2061.0,
+      "text": ">> It's same as we we've done this a few"
+    },
+    {
+      "start": 2063.0,
+      "text": "times. It's like Yeah,"
+    },
+    {
+      "start": 2065.0,
+      "text": ">> cuz you don't want to get too far away."
+    },
+    {
+      "start": 2066.0,
+      "text": "Go for it. Yeah. I feel like almost"
+    },
+    {
+      "start": 2068.0,
+      "text": "every hard place is about having the"
+    },
+    {
+      "start": 2071.0,
+      "text": "wrist just be up and flowing and"
+    },
+    {
+      "start": 2072.0,
+      "text": "supported without any tension in it."
+    },
+    {
+      "start": 2075.0,
+      "text": ">> Correct. Which is much easier to say."
+    },
+    {
+      "start": 2078.0,
+      "text": ">> Sure."
+    },
+    {
+      "start": 2079.0,
+      "text": ">> But but it's all like it all comes back"
+    },
+    {
+      "start": 2081.0,
+      "text": "to having this feeling."
+    },
+    {
+      "start": 2083.0,
+      "text": ">> Yeah. Yeah."
+    },
+    {
+      "start": 2084.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2090.0,
+      "text": ">> I feel like in general you have your"
+    },
+    {
+      "start": 2091.0,
+      "text": "wrist too high. Maybe this is a bad"
+    },
+    {
+      "start": 2093.0,
+      "text": "graphic. It should be more"
+    },
+    {
+      "start": 2096.0,
+      "text": ">> like it feels like this to me, but I"
+    },
+    {
+      "start": 2099.0,
+      "text": "it's not really. It's like"
+    },
+    {
+      "start": 2105.0,
+      "text": ">> I think I know what you're mean."
+    },
+    {
+      "start": 2106.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2107.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 2109.0,
+      "text": ">> That looks great. That looks like it."
+    },
+    {
+      "start": 2115.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2121.0,
+      "text": "Pull it off."
+    },
+    {
+      "start": 2128.0,
+      "text": "I forgot it."
+    },
+    {
+      "start": 2129.0,
+      "text": ">> Yeah. Yeah, you got it."
+    },
+    {
+      "start": 2153.0,
+      "text": "Yeah. Yeah.",
+      "gapBefore": 24
+    },
+    {
+      "start": 2154.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2155.0,
+      "text": ">> Okay. One more line. Uh you know the one"
+    },
+    {
+      "start": 2158.0,
+      "text": "it's a little before the ending."
+    },
+    {
+      "start": 2159.0,
+      "text": ">> Oh. Uh yeah."
+    },
+    {
+      "start": 2164.0,
+      "text": "You're talking about"
+    },
+    {
+      "start": 2174.0,
+      "text": ">> I think right here"
+    },
+    {
+      "start": 2179.0,
+      "text": "that"
+    },
+    {
+      "start": 2180.0,
+      "text": ">> No, that looks good. Go a little before"
+    },
+    {
+      "start": 2182.0,
+      "text": "it."
+    },
+    {
+      "start": 2199.0,
+      "text": "That that I think. Let's do that one."
+    },
+    {
+      "start": 2202.0,
+      "text": ">> I I I messed that up. Yeah. I go uh"
+    },
+    {
+      "start": 2207.0,
+      "text": "up."
+    },
+    {
+      "start": 2215.0,
+      "text": "What comes right before that?"
+    },
+    {
+      "start": 2216.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 2233.0,
+      "text": "that uh"
+    },
+    {
+      "start": 2235.0,
+      "text": "show me that."
+    },
+    {
+      "start": 2238.0,
+      "text": "Show me from before. Yeah."
+    },
+    {
+      "start": 2246.0,
+      "text": "Yeah, you're right. Yeah, it is. It is"
+    },
+    {
+      "start": 2247.0,
+      "text": "kind of awkward."
+    },
+    {
+      "start": 2258.0,
+      "text": "That's hard."
+    },
+    {
+      "start": 2263.0,
+      "text": ">> Okay. Oh,"
+    },
+    {
+      "start": 2269.0,
+      "text": "all right. You're not going to love"
+    },
+    {
+      "start": 2270.0,
+      "text": "this. Uh, how are you doing that?"
+    },
+    {
+      "start": 2276.0,
+      "text": "Okay. 5 4 3 1."
+    },
+    {
+      "start": 2278.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2280.0,
+      "text": ">> Okay. 2 3 1. Uh 2 3 4"
+    },
+    {
+      "start": 2284.0,
+      "text": ">> 2 Oh,"
+    },
+    {
+      "start": 2287.0,
+      "text": ">> yeah. That makes sense."
+    },
+    {
+      "start": 2289.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2290.0,
+      "text": ">> That's pretty rare, I think, that you"
+    },
+    {
+      "start": 2292.0,
+      "text": "would"
+    },
+    {
+      "start": 2293.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2294.0,
+      "text": ">> have that happen, but that's what makes"
+    },
+    {
+      "start": 2296.0,
+      "text": "sense there."
+    },
+    {
+      "start": 2299.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2299.0,
+      "text": ">> And the way you figure that out is that"
+    },
+    {
+      "start": 2300.0,
+      "text": "you know you want the thumb on the on"
+    },
+    {
+      "start": 2301.0,
+      "text": "the on the D."
+    },
+    {
+      "start": 2302.0,
+      "text": ">> Exactly. Yep."
+    },
+    {
+      "start": 2305.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2306.0,
+      "text": ">> It's never going to be smooth to have to"
+    },
+    {
+      "start": 2308.0,
+      "text": "go"
+    },
+    {
+      "start": 2309.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2310.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2310.0,
+      "text": ">> Yeah. Yeah."
+    },
+    {
+      "start": 2312.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 2313.0,
+      "text": ">> So, this solo was all about like"
+    },
+    {
+      "start": 2314.0,
+      "text": "learning technique basic like"
+    },
+    {
+      "start": 2316.0,
+      "text": ">> I guess so. I didn't"
+    },
+    {
+      "start": 2317.0,
+      "text": ">> I mean every solo is that's the thing."
+    },
+    {
+      "start": 2320.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2321.0,
+      "text": ">> Like to really get it to flow right."
+    },
+    {
+      "start": 2323.0,
+      "text": "There's only one best way."
+    },
+    {
+      "start": 2324.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2326.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2326.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 2328.0,
+      "text": ">> cool. You're doing great. I'm sorry you"
+    },
+    {
+      "start": 2330.0,
+      "text": "feel stuck."
+    },
+    {
+      "start": 2331.0,
+      "text": ">> Oh no. Oh no. That part is okay. It's"
+    },
+    {
+      "start": 2333.0,
+      "text": "the improvisation that goes hard."
+    },
+    {
+      "start": 2335.0,
+      "text": ">> Should we go through some of that uh and"
+    },
+    {
+      "start": 2337.0,
+      "text": "make sure we understand the harmony of"
+    },
+    {
+      "start": 2338.0,
+      "text": "it all?"
+    },
+    {
+      "start": 2339.0,
+      "text": ">> Um yeah, this one actually it doesn't"
+    },
+    {
+      "start": 2341.0,
+      "text": "feel that hard to me, but maybe that's"
+    },
+    {
+      "start": 2342.0,
+      "text": "part of my problem is that I should I"
+    },
+    {
+      "start": 2344.0,
+      "text": "should check it. Yeah. Um"
+    },
+    {
+      "start": 2345.0,
+      "text": ">> yeah,"
+    },
+    {
+      "start": 2346.0,
+      "text": ">> so"
+    },
+    {
+      "start": 2348.0,
+      "text": ">> I'm starting to train like I'm starting"
+    },
+    {
+      "start": 2350.0,
+      "text": "to understand that there's just that"
+    },
+    {
+      "start": 2351.0,
+      "text": "that second inversion major triad is"
+    },
+    {
+      "start": 2353.0,
+      "text": "kind of like just a sound, you know?"
+    },
+    {
+      "start": 2362.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2364.0,
+      "text": ">> It's not nothing much to really talk"
+    },
+    {
+      "start": 2365.0,
+      "text": "about, right?"
+    },
+    {
+      "start": 2366.0,
+      "text": ">> Right."
+    },
+    {
+      "start": 2376.0,
+      "text": ">> So to me,"
+    },
+    {
+      "start": 2377.0,
+      "text": ">> yeah. What's that?"
+    },
+    {
+      "start": 2383.0,
+      "text": ">> Titonic"
+    },
+    {
+      "start": 2386.0,
+      "text": "back door. But also blues together like"
+    },
+    {
+      "start": 2389.0,
+      "text": "both together."
+    },
+    {
+      "start": 2390.0,
+      "text": ">> Yep."
+    },
+    {
+      "start": 2392.0,
+      "text": ">> It's almost like a two five in like a"
+    },
+    {
+      "start": 2393.0,
+      "text": "implied two."
+    },
+    {
+      "start": 2395.0,
+      "text": ">> Yeah. I would say less than blues. It's"
+    },
+    {
+      "start": 2399.0,
+      "text": "it's like four minor"
+    },
+    {
+      "start": 2406.0,
+      "text": ">> which which is also flat 7 dominant."
+    },
+    {
+      "start": 2410.0,
+      "text": ">> A backdoor dominant. Yeah."
+    },
+    {
+      "start": 2412.0,
+      "text": ">> It's the two of that five."
+    },
+    {
+      "start": 2414.0,
+      "text": ">> Yes. Yes. The two of the two five. But I"
+    },
+    {
+      "start": 2416.0,
+      "text": "I you just made me connect. So it"
+    },
+    {
+      "start": 2417.0,
+      "text": "actually is it's not just a two five"
+    },
+    {
+      "start": 2420.0,
+      "text": "backdoor dominant like the two is"
+    },
+    {
+      "start": 2422.0,
+      "text": "actually the minor four is actually"
+    },
+    {
+      "start": 2423.0,
+      "text": "functional too if that makes sense."
+    },
+    {
+      "start": 2426.0,
+      "text": ">> Yeah. So a backdoor dominant is a minor"
+    },
+    {
+      "start": 2429.0,
+      "text": "4 to one. This is big I think"
+    },
+    {
+      "start": 2432.0,
+      "text": ">> like"
+    },
+    {
+      "start": 2433.0,
+      "text": ">> the sound of"
+    },
+    {
+      "start": 2438.0,
+      "text": "sorry that's a bad angle. Like the"
+    },
+    {
+      "start": 2440.0,
+      "text": "reason why that is so constant"
+    },
+    {
+      "start": 2442.0,
+      "text": ">> is because it's"
+    },
+    {
+      "start": 2445.0,
+      "text": "It's it's four minor to one which is a"
+    },
+    {
+      "start": 2448.0,
+      "text": "plagal cadence 4 to one."
+    },
+    {
+      "start": 2462.0,
+      "text": "And is that just like a thing or like"
+    },
+    {
+      "start": 2464.0,
+      "text": "how to"
+    },
+    {
+      "start": 2465.0,
+      "text": ">> Yeah, like the two strongest resolutions"
+    },
+    {
+      "start": 2467.0,
+      "text": "are five to one and four one."
+    },
+    {
+      "start": 2469.0,
+      "text": ">> Four to one. But you can also kind of"
+    },
+    {
+      "start": 2471.0,
+      "text": "like change up the major and minor"
+    },
+    {
+      "start": 2472.0,
+      "text": "modality. Uh you can't on the five."
+    },
+    {
+      "start": 2476.0,
+      "text": ">> Five 5-1 is dominant 7 to one and 41"
+    },
+    {
+      "start": 2480.0,
+      "text": ">> uh is major."
+    },
+    {
+      "start": 2481.0,
+      "text": ">> It's either either major or minor. Okay."
+    },
+    {
+      "start": 2483.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2483.0,
+      "text": ">> But yeah. What what is this?"
+    },
+    {
+      "start": 2487.0,
+      "text": ">> Uh that's a D like when you win a game"
+    },
+    {
+      "start": 2489.0,
+      "text": "show."
+    },
+    {
+      "start": 2490.0,
+      "text": ">> It's like sports. Yeah. I don't know."
+    },
+    {
+      "start": 2491.0,
+      "text": ">> Yeah. Yeah. Baseball. Baseball. It's"
+    },
+    {
+      "start": 2493.0,
+      "text": "baseball. Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2495.0,
+      "text": ">> It's probably something before that."
+    },
+    {
+      "start": 2496.0,
+      "text": "It's probably like a symphony or"
+    },
+    {
+      "start": 2497.0,
+      "text": "something."
+    },
+    {
+      "start": 2498.0,
+      "text": ">> Yeah. Yeah. Yeah. Um, but that's what"
+    },
+    {
+      "start": 2501.0,
+      "text": "that is a back door 25."
+    },
+    {
+      "start": 2504.0,
+      "text": "It's it's"
+    },
+    {
+      "start": 2512.0,
+      "text": "so that actually is the origin of a"
+    },
+    {
+      "start": 2513.0,
+      "text": "backdoor dominant. Actually, back door"
+    },
+    {
+      "start": 2515.0,
+      "text": "dominant is downstream of the minor 4 to"
+    },
+    {
+      "start": 2518.0,
+      "text": "one. I basically ratio."
+    },
+    {
+      "start": 2519.0,
+      "text": ">> I've never put that together before, but"
+    },
+    {
+      "start": 2521.0,
+      "text": "yes, that's true."
+    },
+    {
+      "start": 2522.0,
+      "text": ">> Okay, great. Cool."
+    },
+    {
+      "start": 2523.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2531.0,
+      "text": "Uh uh trionee."
+    },
+    {
+      "start": 2534.0,
+      "text": ">> Yeah, right."
+    },
+    {
+      "start": 2535.0,
+      "text": ">> Could be. That's not how I hear that"
+    },
+    {
+      "start": 2536.0,
+      "text": "most clearly, though. I hear that as D7."
+    },
+    {
+      "start": 2544.0,
+      "text": ">> Yep. It's It's"
+    },
+    {
+      "start": 2548.0,
+      "text": "Yeah. Yeah."
+    },
+    {
+      "start": 2554.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2556.0,
+      "text": "And then blues."
+    },
+    {
+      "start": 2564.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 2573.0,
+      "text": ">> That's a blues, but also kind of the"
+    },
+    {
+      "start": 2575.0,
+      "text": "diminish sound."
+    },
+    {
+      "start": 2578.0,
+      "text": ">> Yeah, that thing. Yeah. Both"
+    },
+    {
+      "start": 2581.0,
+      "text": "blues."
+    },
+    {
+      "start": 2588.0,
+      "text": "Please. Yeah."
+    },
+    {
+      "start": 2598.0,
+      "text": ">> H"
+    },
+    {
+      "start": 2600.0,
+      "text": ">> sharp 11."
+    },
+    {
+      "start": 2601.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2607.0,
+      "text": ">> Sussy sound for sure."
+    },
+    {
+      "start": 2609.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2616.0,
+      "text": "More blues."
+    },
+    {
+      "start": 2617.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 2622.0,
+      "text": "some blues."
+    },
+    {
+      "start": 2626.0,
+      "text": ">> And then we did."
+    },
+    {
+      "start": 2629.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2634.0,
+      "text": "Same thing."
+    },
+    {
+      "start": 2637.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2641.0,
+      "text": "No, this is this is definitely trionee."
+    },
+    {
+      "start": 2644.0,
+      "text": ">> It could be. I I hear it as D7 again."
+    },
+    {
+      "start": 2647.0,
+      "text": "It's D7 sharp 9."
+    },
+    {
+      "start": 2648.0,
+      "text": ">> Oh."
+    },
+    {
+      "start": 2650.0,
+      "text": "Mhm. Mhm. Mhm."
+    },
+    {
+      "start": 2654.0,
+      "text": ">> Like trione. There's tritone."
+    },
+    {
+      "start": 2657.0,
+      "text": ">> Yeah. Yeah. Yeah. Yeah. Oh, funny. I was"
+    },
+    {
+      "start": 2659.0,
+      "text": "going to actually say that sounds"
+    },
+    {
+      "start": 2660.0,
+      "text": "altered to me."
+    },
+    {
+      "start": 2661.0,
+      "text": ">> Yeah. Exactly. Oh, okay. Well, altered."
+    },
+    {
+      "start": 2664.0,
+      "text": "Yeah. like uh I feel like he so tritone"
+    },
+    {
+      "start": 2668.0,
+      "text": "on the D7 place."
+    },
+    {
+      "start": 2670.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2671.0,
+      "text": ">> Would sound like this. Like"
+    },
+    {
+      "start": 2676.0,
+      "text": ">> like I feel like he's never playing"
+    },
+    {
+      "start": 2678.0,
+      "text": "that."
+    },
+    {
+      "start": 2678.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2680.0,
+      "text": ">> It's"
+    },
+    {
+      "start": 2685.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2686.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2687.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2688.0,
+      "text": ">> Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 2690.0,
+      "text": "I mean, but D altered is a flat 7, but"
+    },
+    {
+      "start": 2694.0,
+      "text": "something about"
+    },
+    {
+      "start": 2696.0,
+      "text": "it. Just not"
+    },
+    {
+      "start": 2708.0,
+      "text": ">> just not a flat, so I don't know."
+    },
+    {
+      "start": 2709.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2710.0,
+      "text": ">> Sorry."
+    },
+    {
+      "start": 2717.0,
+      "text": "Yeah, I think you can you can not do the"
+    },
+    {
+      "start": 2719.0,
+      "text": "A minor 7. I think it's strong to just"
+    },
+    {
+      "start": 2722.0,
+      "text": "go straight to D7 there."
+    },
+    {
+      "start": 2729.0,
+      "text": ">> So, what's that?"
+    },
+    {
+      "start": 2730.0,
+      "text": ">> That I mean I think this is what I"
+    },
+    {
+      "start": 2733.0,
+      "text": "thought was C alt because it hits all"
+    },
+    {
+      "start": 2735.0,
+      "text": "the like the flat N sharp N sharp 11,"
+    },
+    {
+      "start": 2742.0,
+      "text": "right? Uh yeah, that's C al. What else"
+    },
+    {
+      "start": 2745.0,
+      "text": "could it be?"
+    },
+    {
+      "start": 2746.0,
+      "text": ">> Uh the trionee. So the"
+    },
+    {
+      "start": 2748.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2750.0,
+      "text": ">> And you're right, it does actually sound"
+    },
+    {
+      "start": 2751.0,
+      "text": "more like this, right?"
+    },
+    {
+      "start": 2754.0,
+      "text": ">> But that sounds right."
+    },
+    {
+      "start": 2755.0,
+      "text": ">> To me, it like outlines F# so clearly."
+    },
+    {
+      "start": 2757.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2758.0,
+      "text": ">> We're sort of like splitting hairs, but"
+    },
+    {
+      "start": 2760.0,
+      "text": "also we're not."
+    },
+    {
+      "start": 2762.0,
+      "text": ">> Yeah. Yeah. Yeah. I understand. I"
+    },
+    {
+      "start": 2763.0,
+      "text": "understand."
+    },
+    {
+      "start": 2767.0,
+      "text": ">> Yeah. Like"
+    },
+    {
+      "start": 2769.0,
+      "text": ">> that really feels like playing a half"
+    },
+    {
+      "start": 2771.0,
+      "text": "step up coming back down, which is what"
+    },
+    {
+      "start": 2773.0,
+      "text": "a trionee sub is."
+    },
+    {
+      "start": 2774.0,
+      "text": ">> Mhm. Mhm. Mhm."
+    },
+    {
+      "start": 2776.0,
+      "text": ">> Um, do you know that that playing half"
+    },
+    {
+      "start": 2779.0,
+      "text": "step up and coming down is a trionee"
+    },
+    {
+      "start": 2780.0,
+      "text": "sub?"
+    },
+    {
+      "start": 2783.0,
+      "text": ">> Yeah. I think like conceptually it's"
+    },
+    {
+      "start": 2785.0,
+      "text": "it's pretty Yeah. Yeah. Yeah. Yeah. That"
+    },
+    {
+      "start": 2787.0,
+      "text": "sound Yeah. Yeah. Yeah. Okay. Cool."
+    },
+    {
+      "start": 2789.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2790.0,
+      "text": ">> Um, do you want to hear me solo this a"
+    },
+    {
+      "start": 2793.0,
+      "text": "little bit or"
+    },
+    {
+      "start": 2793.0,
+      "text": ">> Yes, I do. Okay. Uh, this is where the"
+    },
+    {
+      "start": 2797.0,
+      "text": "trouble starts. Um,"
+    },
+    {
+      "start": 2798.0,
+      "text": ">> no."
+    },
+    {
+      "start": 2799.0,
+      "text": ">> Also, I just don't know what the the"
+    },
+    {
+      "start": 2800.0,
+      "text": "voicings are really uh for my left hand."
+    },
+    {
+      "start": 2805.0,
+      "text": "Um,"
+    },
+    {
+      "start": 2811.0,
+      "text": "definitely not that fast."
+    },
+    {
+      "start": 2814.0,
+      "text": "And I sold over the Sarah actually, not"
+    },
+    {
+      "start": 2815.0,
+      "text": "the Stan. Oh,"
+    },
+    {
+      "start": 2817.0,
+      "text": ">> okay."
+    },
+    {
+      "start": 2818.0,
+      "text": ">> Interesting."
+    },
+    {
+      "start": 2818.0,
+      "text": ">> Because I like the half diminished to"
+    },
+    {
+      "start": 2820.0,
+      "text": "start."
+    },
+    {
+      "start": 2823.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 2824.0,
+      "text": "Uh, let's bring this all the way down."
+    },
+    {
+      "start": 2831.0,
+      "text": "The heck. There we go."
+    },
+    {
+      "start": 2843.0,
+      "text": ">> Can you turn your uh camera down?"
+    },
+    {
+      "start": 2847.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 2849.0,
+      "text": ">> Actually, you don't really need to, but"
+    },
+    {
+      "start": 2851.0,
+      "text": "yeah."
+    },
+    {
+      "start": 2883.0,
+      "text": "Okay. Uh I don't like this recording for",
+      "gapBefore": 32
+    },
+    {
+      "start": 2885.0,
+      "text": "soloing over."
+    },
+    {
+      "start": 2886.0,
+      "text": ">> Oh, really?"
+    },
+    {
+      "start": 2887.0,
+      "text": ">> Yeah. I don't I really don't like the"
+    },
+    {
+      "start": 2889.0,
+      "text": "stops."
+    },
+    {
+      "start": 2890.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2890.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 2891.0,
+      "text": "And yeah. Can we do the other one?"
+    },
+    {
+      "start": 2894.0,
+      "text": ">> Yeah. Yeah. Yeah, we we can. We can. We"
+    },
+    {
+      "start": 2895.0,
+      "text": "just try to take him out. Let me try to"
+    },
+    {
+      "start": 2896.0,
+      "text": "take him out."
+    },
+    {
+      "start": 2897.0,
+      "text": ">> I think that's part of your problem."
+    },
+    {
+      "start": 2898.0,
+      "text": "It's just not fun. It doesn't sound fun."
+    },
+    {
+      "start": 2900.0,
+      "text": ">> Yeah. Okay. Okay."
+    },
+    {
+      "start": 2903.0,
+      "text": "Um"
+    },
+    {
+      "start": 2924.0,
+      "text": "Turn the clock up.",
+      "gapBefore": 20
+    },
+    {
+      "start": 2944.0,
+      "text": "That's just",
+      "gapBefore": 20
+    },
+    {
+      "start": 2974.0,
+      "text": "Yeah.",
+      "gapBefore": 30
+    },
+    {
+      "start": 2990.0,
+      "text": "Is it"
+    },
+    {
+      "start": 2996.0,
+      "text": "Ah."
+    },
+    {
+      "start": 3001.0,
+      "text": "Oh, sorry."
+    },
+    {
+      "start": 3030.0,
+      "text": "Okay.",
+      "gapBefore": 29
+    },
+    {
+      "start": 3047.0,
+      "text": "Uh-huh."
+    },
+    {
+      "start": 3052.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 3064.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 3078.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 3084.0,
+      "text": "Yes."
+    },
+    {
+      "start": 3101.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 3141.0,
+      "text": "3.",
+      "gapBefore": 40
+    },
+    {
+      "start": 3155.0,
+      "text": "Hello."
+    },
+    {
+      "start": 3169.0,
+      "text": "Uh-huh."
+    },
+    {
+      "start": 3179.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 3185.0,
+      "text": "Mhm."
+    },
+    {
+      "start": 3195.0,
+      "text": "Uh-huh."
+    },
+    {
+      "start": 3197.0,
+      "text": "Uh-huh."
+    },
+    {
+      "start": 3208.0,
+      "text": ">> Anyways, that's kind of right. Yeah."
+    },
+    {
+      "start": 3210.0,
+      "text": ">> Okay. That didn't sound too stuck."
+    },
+    {
+      "start": 3211.0,
+      "text": ">> Really? Okay. How did it feel?"
+    },
+    {
+      "start": 3213.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 3213.0,
+      "text": ">> did it feel stuck? It felt a little"
+    },
+    {
+      "start": 3216.0,
+      "text": "stuck to me. It felt a little Yeah."
+    },
+    {
+      "start": 3217.0,
+      "text": "Yeah. Yeah."
+    },
+    {
+      "start": 3218.0,
+      "text": ">> Um I have two thoughts. I think you can"
+    },
+    {
+      "start": 3220.0,
+      "text": "up the speed"
+    },
+    {
+      "start": 3222.0,
+      "text": ">> a good bit. I think you"
+    },
+    {
+      "start": 3224.0,
+      "text": ">> you feel stuck because this tempo"
+    },
+    {
+      "start": 3228.0,
+      "text": "I talked about this before and I haven't"
+    },
+    {
+      "start": 3230.0,
+      "text": "put it into words the right way yet. But"
+    },
+    {
+      "start": 3231.0,
+      "text": "like to play at this tempo"
+    },
+    {
+      "start": 3234.0,
+      "text": ">> like no one no jazz great would play"
+    },
+    {
+      "start": 3237.0,
+      "text": "this kind of line at this tempo."
+    },
+    {
+      "start": 3239.0,
+      "text": ">> They would play faster at this tempo."
+    },
+    {
+      "start": 3242.0,
+      "text": ">> Yeah. So you have to"
+    },
+    {
+      "start": 3244.0,
+      "text": ">> like suspend your disbelief and like"
+    },
+    {
+      "start": 3247.0,
+      "text": "pretend that you're playing a faster"
+    },
+    {
+      "start": 3249.0,
+      "text": "tempo"
+    },
+    {
+      "start": 3250.0,
+      "text": ">> to play this kind of line and believe"
+    },
+    {
+      "start": 3251.0,
+      "text": "it. So you probably feel stuck because"
+    },
+    {
+      "start": 3252.0,
+      "text": "like it doesn't feel right."
+    },
+    {
+      "start": 3254.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 3255.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 3256.0,
+      "text": ">> but you just have to trust"
+    },
+    {
+      "start": 3259.0,
+      "text": ">> like like pretend that you're playing at"
+    },
+    {
+      "start": 3260.0,
+      "text": "a faster tempo so that it feels good,"
+    },
+    {
+      "start": 3262.0,
+      "text": "you know?"
+    },
+    {
+      "start": 3263.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 3264.0,
+      "text": ">> I'm trying to do that."
+    },
+    {
+      "start": 3265.0,
+      "text": ">> Yeah. No, it's good. I think but I think"
+    },
+    {
+      "start": 3267.0,
+      "text": "that might be part of the stuck thing"
+    },
+    {
+      "start": 3268.0,
+      "text": "cuz I feel like you're making the"
+    },
+    {
+      "start": 3270.0,
+      "text": "changes and you're"
+    },
+    {
+      "start": 3271.0,
+      "text": ">> you're uh having like fun with it."
+    },
+    {
+      "start": 3274.0,
+      "text": "You're following the lead of the lines."
+    },
+    {
+      "start": 3276.0,
+      "text": "You're doing it right."
+    },
+    {
+      "start": 3277.0,
+      "text": ">> Okay. Okay."
+    },
+    {
+      "start": 3278.0,
+      "text": ">> Um the other thing that I think could be"
+    },
+    {
+      "start": 3281.0,
+      "text": "useful is finding a few places in the"
+    },
+    {
+      "start": 3283.0,
+      "text": "tune that you want to uh really practice"
+    },
+    {
+      "start": 3286.0,
+      "text": "the changes of and loop them. Make some"
+    },
+    {
+      "start": 3288.0,
+      "text": "kind of loop like the back door 25 which"
+    },
+    {
+      "start": 3290.0,
+      "text": "you were getting"
+    },
+    {
+      "start": 3291.0,
+      "text": ">> but it's I think it's on the edge of"
+    },
+    {
+      "start": 3293.0,
+      "text": "your ability still."
+    },
+    {
+      "start": 3294.0,
+      "text": ">> Yeah, totally. Totally. So, I think we"
+    },
+    {
+      "start": 3296.0,
+      "text": "should loop like some kind of four bar"
+    },
+    {
+      "start": 3298.0,
+      "text": "thing that has that."
+    },
+    {
+      "start": 3300.0,
+      "text": ">> Yeah. The right now or like for"
+    },
+    {
+      "start": 3302.0,
+      "text": "practice?"
+    },
+    {
+      "start": 3302.0,
+      "text": ">> Um, sure. We could do it now."
+    },
+    {
+      "start": 3303.0,
+      "text": ">> Uh, no, it's okay. Actually, there's"
+    },
+    {
+      "start": 3305.0,
+      "text": "another thing I want to kind of cover."
+    },
+    {
+      "start": 3306.0,
+      "text": "So, like I think I"
+    },
+    {
+      "start": 3307.0,
+      "text": ">> You know what I mean though? Like you"
+    },
+    {
+      "start": 3308.0,
+      "text": "want to try to drill that moment and"
+    },
+    {
+      "start": 3309.0,
+      "text": "maybe there's one other moment in the"
+    },
+    {
+      "start": 3310.0,
+      "text": "tune that you find that isn't blues."
+    },
+    {
+      "start": 3313.0,
+      "text": "Like somewhere there where it's like,"
+    },
+    {
+      "start": 3315.0,
+      "text": "yes, I really want to make the changes"
+    },
+    {
+      "start": 3316.0,
+      "text": "there. Isolate that."
+    },
+    {
+      "start": 3318.0,
+      "text": ">> Okay. And you're saying actually just"
+    },
+    {
+      "start": 3319.0,
+      "text": "speed it up because it just like it's it"
+    },
+    {
+      "start": 3320.0,
+      "text": "sounds so unnatural to to kind of like"
+    },
+    {
+      "start": 3322.0,
+      "text": "play at that speed. Okay. I think you"
+    },
+    {
+      "start": 3324.0,
+      "text": "have the technique to speed it up."
+    },
+    {
+      "start": 3325.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 3325.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 3327.0,
+      "text": ">> yeah, just try different tempos. Like"
+    },
+    {
+      "start": 3330.0,
+      "text": "it's also it's okay to like not be quite"
+    },
+    {
+      "start": 3332.0,
+      "text": "able to do it."
+    },
+    {
+      "start": 3333.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 3334.0,
+      "text": ">> You just want to like try different"
+    },
+    {
+      "start": 3336.0,
+      "text": "things."
+    },
+    {
+      "start": 3336.0,
+      "text": ">> Like just know the limits of what I can"
+    },
+    {
+      "start": 3338.0,
+      "text": "do at basically."
+    },
+    {
+      "start": 3338.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 3339.0,
+      "text": ">> And like it will be interesting to find"
+    },
+    {
+      "start": 3340.0,
+      "text": "where's the limit of you being able to"
+    },
+    {
+      "start": 3342.0,
+      "text": "hear a line versus where's the uh limit"
+    },
+    {
+      "start": 3344.0,
+      "text": "of you being able to execute it in your"
+    },
+    {
+      "start": 3346.0,
+      "text": "hand. And those are going to be"
+    },
+    {
+      "start": 3348.0,
+      "text": "different places. And that's useful to"
+    },
+    {
+      "start": 3350.0,
+      "text": "know. Mhm. And that's when you slow it"
+    },
+    {
+      "start": 3351.0,
+      "text": "down and you try to figure out, okay,"
+    },
+    {
+      "start": 3352.0,
+      "text": "how do you Yeah."
+    },
+    {
+      "start": 3354.0,
+      "text": ">> Yeah. Like if you if you hear the line"
+    },
+    {
+      "start": 3356.0,
+      "text": "but you can't physically play it and"
+    },
+    {
+      "start": 3358.0,
+      "text": "like can you not physically play it"
+    },
+    {
+      "start": 3359.0,
+      "text": "because you can't quite see it or is it"
+    },
+    {
+      "start": 3362.0,
+      "text": "because your fingers can't do it?"
+    },
+    {
+      "start": 3364.0,
+      "text": ">> It's probably because you can't see it"
+    },
+    {
+      "start": 3365.0,
+      "text": "because I feel like the way we've been"
+    },
+    {
+      "start": 3367.0,
+      "text": "practicing technique, your hand is"
+    },
+    {
+      "start": 3369.0,
+      "text": "actually very developed."
+    },
+    {
+      "start": 3371.0,
+      "text": ">> So"
+    },
+    {
+      "start": 3371.0,
+      "text": ">> Oh, it's way way ahead of like my ear"
+    },
+    {
+      "start": 3373.0,
+      "text": "basically. Yeah. Yeah. So, yeah, we're"
+    },
+    {
+      "start": 3377.0,
+      "text": "probably at a Yeah, just bump it up a"
+    },
+    {
+      "start": 3380.0,
+      "text": "little and it will You'll be surprised"
+    },
+    {
+      "start": 3381.0,
+      "text": "how much fun it is."
+    },
+    {
+      "start": 3383.0,
+      "text": ">> What? What?"
+    },
+    {
+      "start": 3385.0,
+      "text": ">> Huh?"
+    },
+    {
+      "start": 3387.0,
+      "text": ">> Sorry, one second. I'm just getting"
+    },
+    {
+      "start": 3406.0,
+      "text": "Cool. Um, I'm trying to think. I know",
+      "gapBefore": 18
+    },
+    {
+      "start": 3409.0,
+      "text": "I've already tooken a lot of your time,"
+    },
+    {
+      "start": 3410.0,
+      "text": "but I've like Yeah,"
+    },
+    {
+      "start": 3412.0,
+      "text": ">> it's been a while. Let's see."
+    },
+    {
+      "start": 3413.0,
+      "text": ">> Yeah. Yeah. Yeah. Yeah. So, there's two"
+    },
+    {
+      "start": 3414.0,
+      "text": "things on my mind. One is just simply"
+    },
+    {
+      "start": 3417.0,
+      "text": "just like lefth hand voicings to to help"
+    },
+    {
+      "start": 3420.0,
+      "text": ">> uh"
+    },
+    {
+      "start": 3421.0,
+      "text": ">> ground the harmony a bit more. Mhm."
+    },
+    {
+      "start": 3424.0,
+      "text": ">> Um, the second thing is like a bigger"
+    },
+    {
+      "start": 3426.0,
+      "text": "picture thing and that I think you help"
+    },
+    {
+      "start": 3427.0,
+      "text": "me like see what not the like I'm having"
+    },
+    {
+      "start": 3429.0,
+      "text": "a hard time going from playing"
+    },
+    {
+      "start": 3431.0,
+      "text": "horizontally to playing vertically if"
+    },
+    {
+      "start": 3432.0,
+      "text": "that makes sense."
+    },
+    {
+      "start": 3434.0,
+      "text": ">> H vertically meaning following the"
+    },
+    {
+      "start": 3436.0,
+      "text": "chords"
+    },
+    {
+      "start": 3436.0,
+      "text": ">> or like you kind of gave me this"
+    },
+    {
+      "start": 3438.0,
+      "text": "exercise now we're in uh I I won't make"
+    },
+    {
+      "start": 3440.0,
+      "text": "the same mistake. We're in Eflat blues"
+    },
+    {
+      "start": 3442.0,
+      "text": "land. So,"
+    },
+    {
+      "start": 3446.0,
+      "text": "oh,"
+    },
+    {
+      "start": 3451.0,
+      "text": ">> I can't see the other"
+    },
+    {
+      "start": 3452.0,
+      "text": ">> I can hear it. Yeah."
+    },
+    {
+      "start": 3454.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 3454.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 3455.0,
+      "text": ">> And you kind of gave me this exercise"
+    },
+    {
+      "start": 3456.0,
+      "text": "of, you know, start with uh"
+    },
+    {
+      "start": 3461.0,
+      "text": "I can't I'm like totally in."
+    },
+    {
+      "start": 3464.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 3472.0,
+      "text": "Yeah. Okay. Yeah. Anyways, I think you"
+    },
+    {
+      "start": 3474.0,
+      "text": "know the exercise, right? What's what's"
+    },
+    {
+      "start": 3475.0,
+      "text": "going on?"
+    },
+    {
+      "start": 3475.0,
+      "text": ">> Delivery guy."
+    },
+    {
+      "start": 3478.0,
+      "text": ">> I know. Yeah. They they just going to"
+    },
+    {
+      "start": 3480.0,
+      "text": "leave it on the curb, right?"
+    },
+    {
+      "start": 3480.0,
+      "text": ">> No, he wants to bring"
+    },
+    {
+      "start": 3482.0,
+      "text": ">> Oh, really? Okay. Okay. Hey, I have"
+    },
+    {
+      "start": 3484.0,
+      "text": "Yeah. Okay. Okay. I'll be back up. Yeah."
+    },
+    {
+      "start": 3486.0,
+      "text": ">> Okay. No problem."
+    },
+    {
+      "start": 4383.0,
+      "text": "I'm sucked.",
+      "gapBefore": 897
+    },
+    {
+      "start": 4462.0,
+      "text": "Sorry that took longer than expected. No",
+      "gapBefore": 79
+    },
+    {
+      "start": 4464.0,
+      "text": "problem. They had a huge uh Yeah, we"
+    },
+    {
+      "start": 4466.0,
+      "text": "could just end after this question. Um I"
+    },
+    {
+      "start": 4469.0,
+      "text": "think what I was saying was that uh like"
+    },
+    {
+      "start": 4471.0,
+      "text": "the playing linearly, all the stuff"
+    },
+    {
+      "start": 4473.0,
+      "text": "you've taught me so far, like I at least"
+    },
+    {
+      "start": 4474.0,
+      "text": "have a reference point from playing"
+    },
+    {
+      "start": 4475.0,
+      "text": "saxophone. Um, I think the playing"
+    },
+    {
+      "start": 4478.0,
+      "text": "vertically part, you kind of gave me"
+    },
+    {
+      "start": 4479.0,
+      "text": "this exercise of finding the best"
+    },
+    {
+      "start": 4481.0,
+      "text": "voicing, you know,"
+    },
+    {
+      "start": 4483.0,
+      "text": "as we keep going up. Um,"
+    },
+    {
+      "start": 4487.0,
+      "text": "I'm having a hard time like finding like"
+    },
+    {
+      "start": 4490.0,
+      "text": "small exercises to like make it"
+    },
+    {
+      "start": 4492.0,
+      "text": ">> Oh, sorry."
+    },
+    {
+      "start": 4495.0,
+      "text": "to make it musical if that makes sense."
+    },
+    {
+      "start": 4498.0,
+      "text": ">> To make uh the up in chords musical."
+    },
+    {
+      "start": 4501.0,
+      "text": ">> Yeah. Yeah. I I know the point of it,"
+    },
+    {
+      "start": 4502.0,
+      "text": "which is like good voice leading kind of"
+    },
+    {
+      "start": 4504.0,
+      "text": "like in a harmonic way, you know."
+    },
+    {
+      "start": 4506.0,
+      "text": ">> Um but even like simple exercises um"
+    },
+    {
+      "start": 4510.0,
+      "text": ">> would be super helpful to kind of Yeah."
+    },
+    {
+      "start": 4512.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 4515.0,
+      "text": ">> you're okay. So first of all, the the"
+    },
+    {
+      "start": 4519.0,
+      "text": "vertical versus horizontal thing, I'm"
+    },
+    {
+      "start": 4521.0,
+      "text": "not sure I can follow. Yeah. Um"
+    },
+    {
+      "start": 4524.0,
+      "text": "basically to black for lack of better"
+    },
+    {
+      "start": 4525.0,
+      "text": "words is like"
+    },
+    {
+      "start": 4528.0,
+      "text": "how to describe it. I think just simply"
+    },
+    {
+      "start": 4531.0,
+      "text": "just like"
+    },
+    {
+      "start": 4533.0,
+      "text": "like I know how to like work on linear"
+    },
+    {
+      "start": 4535.0,
+      "text": "improvisation because I did that as a"
+    },
+    {
+      "start": 4537.0,
+      "text": "text player, but like"
+    },
+    {
+      "start": 4540.0,
+      "text": "like uh doing that with like chords"
+    },
+    {
+      "start": 4544.0,
+      "text": "underneath I guess is like um"
+    },
+    {
+      "start": 4546.0,
+      "text": ">> like uh playing left hand"
+    },
+    {
+      "start": 4549.0,
+      "text": ">> um or even just like chords with the"
+    },
+    {
+      "start": 4551.0,
+      "text": "right hand like because obviously like I"
+    },
+    {
+      "start": 4552.0,
+      "text": "wouldn't be like literally playing like"
+    },
+    {
+      "start": 4555.0,
+      "text": "you know those chords. Yeah."
+    },
+    {
+      "start": 4557.0,
+      "text": ">> Right."
+    },
+    {
+      "start": 4558.0,
+      "text": ">> Um okay. So, what if you do the exercise"
+    },
+    {
+      "start": 4561.0,
+      "text": "again and don't go just in one"
+    },
+    {
+      "start": 4563.0,
+      "text": "direction, but move when you want to"
+    },
+    {
+      "start": 4566.0,
+      "text": ">> or uh or don't move at all and see how"
+    },
+    {
+      "start": 4568.0,
+      "text": "you can do it."
+    },
+    {
+      "start": 4569.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 4571.0,
+      "text": ">> Um let's just try that for a second and"
+    },
+    {
+      "start": 4574.0,
+      "text": "you can help me tailor this exercise to"
+    },
+    {
+      "start": 4576.0,
+      "text": "to make sense with what you're trying to"
+    },
+    {
+      "start": 4578.0,
+      "text": "do."
+    },
+    {
+      "start": 4579.0,
+      "text": ">> Okay, sounds good. Um,"
+    },
+    {
+      "start": 4582.0,
+      "text": "like the idea with this going up"
+    },
+    {
+      "start": 4585.0,
+      "text": "exercise, like you want to be able to do"
+    },
+    {
+      "start": 4587.0,
+      "text": "that going up, do that going down, and"
+    },
+    {
+      "start": 4589.0,
+      "text": "do that from anywhere so that you can"
+    },
+    {
+      "start": 4591.0,
+      "text": "just find the nearest good chord."
+    },
+    {
+      "start": 4593.0,
+      "text": ">> So that you have a great chord with"
+    },
+    {
+      "start": 4595.0,
+      "text": "every possible melody note for every"
+    },
+    {
+      "start": 4597.0,
+      "text": "possible bass note, which that's the"
+    },
+    {
+      "start": 4599.0,
+      "text": "ultimate goal. And that's what allows"
+    },
+    {
+      "start": 4601.0,
+      "text": "you to play melodies in chords."
+    },
+    {
+      "start": 4604.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 4604.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 4607.0,
+      "text": "can you see my hands? I see a frozen"
+    },
+    {
+      "start": 4609.0,
+      "text": "screen."
+    },
+    {
+      "start": 4610.0,
+      "text": ">> A little It's a little high. It's a"
+    },
+    {
+      "start": 4611.0,
+      "text": "little high."
+    },
+    {
+      "start": 4612.0,
+      "text": ">> Oh, I see. There we go."
+    },
+    {
+      "start": 4613.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4614.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 4615.0,
+      "text": "your screen. Wait."
+    },
+    {
+      "start": 4618.0,
+      "text": ">> Sorry. I don't really know how Zoom look"
+    },
+    {
+      "start": 4620.0,
+      "text": "works, but uh helping maintain"
+    },
+    {
+      "start": 4622.0,
+      "text": ">> I can see"
+    },
+    {
+      "start": 4623.0,
+      "text": ">> maintainers handle a flood of pull"
+    },
+    {
+      "start": 4624.0,
+      "text": "requests is what's on my screen."
+    },
+    {
+      "start": 4626.0,
+      "text": ">> Oh. Oh, I'm sharing my screen. That's"
+    },
+    {
+      "start": 4628.0,
+      "text": "why. Um, okay."
+    },
+    {
+      "start": 4630.0,
+      "text": ">> There we go."
+    },
+    {
+      "start": 4630.0,
+      "text": ">> There we go. Yeah."
+    },
+    {
+      "start": 4634.0,
+      "text": "Um,"
+    },
+    {
+      "start": 4639.0,
+      "text": "okay. So, this exercise going up, you're"
+    },
+    {
+      "start": 4642.0,
+      "text": "saying it doesn't feel musical."
+    },
+    {
+      "start": 4644.0,
+      "text": ">> Yes."
+    },
+    {
+      "start": 4645.0,
+      "text": ">> Uh-huh."
+    },
+    {
+      "start": 4646.0,
+      "text": ">> Yes. Well, I mean, it does, but like how"
+    },
+    {
+      "start": 4648.0,
+      "text": "to bring that back into like if I'm"
+    },
+    {
+      "start": 4650.0,
+      "text": "Here's like how to bring that back into"
+    },
+    {
+      "start": 4652.0,
+      "text": "the blues, like if I'm like a, you know,"
+    },
+    {
+      "start": 4654.0,
+      "text": "Yeah. Yeah."
+    },
+    {
+      "start": 4655.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4655.0,
+      "text": ">> Um,"
+    },
+    {
+      "start": 4657.0,
+      "text": "so what about playing it in your left"
+    },
+    {
+      "start": 4658.0,
+      "text": "hand? um having having a track going and"
+    },
+    {
+      "start": 4663.0,
+      "text": "play it in your left hand"
+    },
+    {
+      "start": 4665.0,
+      "text": ">> uh and like comp with it."
+    },
+    {
+      "start": 4667.0,
+      "text": ">> Yeah, I like that."
+    },
+    {
+      "start": 4670.0,
+      "text": ">> Um the problem is it gets too high. Like"
+    },
+    {
+      "start": 4672.0,
+      "text": "you would never do the whole thing, but"
+    },
+    {
+      "start": 4674.0,
+      "text": "you might start in a certain place."
+    },
+    {
+      "start": 4675.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4676.0,
+      "text": ">> And do a few of them."
+    },
+    {
+      "start": 4677.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 4681.0,
+      "text": ">> Mhm. No, that that already"
+    },
+    {
+      "start": 4683.0,
+      "text": ">> Yeah, I'm not exactly sure. I know"
+    },
+    {
+      "start": 4685.0,
+      "text": "that's a bit helpful, but uh I'm not"
+    },
+    {
+      "start": 4687.0,
+      "text": "sure how to go from"
+    },
+    {
+      "start": 4689.0,
+      "text": "Like I've spent a lot of time walking"
+    },
+    {
+      "start": 4692.0,
+      "text": "bass and comping and not soloing. And"
+    },
+    {
+      "start": 4695.0,
+      "text": "that's how I've like built this muscle."
+    },
+    {
+      "start": 4697.0,
+      "text": ">> I think you don't need to really be"
+    },
+    {
+      "start": 4699.0,
+      "text": "doing the walking bass, but like there's"
+    },
+    {
+      "start": 4702.0,
+      "text": "a flow that you enter that you can enter"
+    },
+    {
+      "start": 4705.0,
+      "text": ">> where you're like making melodies and"
+    },
+    {
+      "start": 4707.0,
+      "text": "it's sort of like you're soloing. You"
+    },
+    {
+      "start": 4709.0,
+      "text": "don't need to be uh actually soloing."
+    },
+    {
+      "start": 4712.0,
+      "text": "Like you can have fun just comping for"
+    },
+    {
+      "start": 4713.0,
+      "text": "20 minutes straight. Totally. Let me try"
+    },
+    {
+      "start": 4715.0,
+      "text": "to demonstrate that and maybe it will"
+    },
+    {
+      "start": 4718.0,
+      "text": "put us on the right track."
+    },
+    {
+      "start": 4719.0,
+      "text": ">> Yep. We're already heading in a good"
+    },
+    {
+      "start": 4721.0,
+      "text": "direction. So, just"
+    },
+    {
+      "start": 4722.0,
+      "text": ">> cool. Um,"
+    },
+    {
+      "start": 4726.0,
+      "text": "no."
+    },
+    {
+      "start": 4730.0,
+      "text": "Okay."
+    },
+    {
+      "start": 4732.0,
+      "text": "So, I'm going to be focusing on the"
+    },
+    {
+      "start": 4734.0,
+      "text": "melody basically and and having it be"
+    },
+    {
+      "start": 4737.0,
+      "text": "harmonized."
+    },
+    {
+      "start": 4791.0,
+      "text": "Blueberry.",
+      "gapBefore": 54
+    },
+    {
+      "start": 4821.0,
+      "text": "Where are you?",
+      "gapBefore": 29
+    },
+    {
+      "start": 4852.0,
+      "text": "Uh, that's a lot of chords, but you get",
+      "gapBefore": 31
+    },
+    {
+      "start": 4855.0,
+      "text": "the point."
+    },
+    {
+      "start": 4855.0,
+      "text": ">> I I do. Yeah. It's almost like we're"
+    },
+    {
+      "start": 4857.0,
+      "text": "back on week one practicing to improv,"
+    },
+    {
+      "start": 4859.0,
+      "text": "which is super simple lines, but just"
+    },
+    {
+      "start": 4860.0,
+      "text": "with chords under that makes sense."
+    },
+    {
+      "start": 4863.0,
+      "text": ">> Yeah,"
+    },
+    {
+      "start": 4864.0,
+      "text": ">> totally. Like,"
+    },
+    {
+      "start": 4866.0,
+      "text": "yeah, comping is soloing. Whoa."
+    },
+    {
+      "start": 4870.0,
+      "text": "It's like, it's like making big band"
+    },
+    {
+      "start": 4874.0,
+      "text": "shout courses or something."
+    },
+    {
+      "start": 4875.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4877.0,
+      "text": ">> Um, does that"
+    },
+    {
+      "start": 4879.0,
+      "text": ">> does big band shout courses mean"
+    },
+    {
+      "start": 4881.0,
+      "text": "something? Yeah. Okay. Yes."
+    },
+    {
+      "start": 4882.0,
+      "text": ">> It's like it's a very simple line that's"
+    },
+    {
+      "start": 4884.0,
+      "text": "repeated."
+    },
+    {
+      "start": 4885.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4885.0,
+      "text": ">> Uh, in the background of a solo. Yeah."
+    },
+    {
+      "start": 4887.0,
+      "text": "Um,"
+    },
+    {
+      "start": 4889.0,
+      "text": "so"
+    },
+    {
+      "start": 4890.0,
+      "text": "maybe something to do could be like"
+    },
+    {
+      "start": 4892.0,
+      "text": "write write a few like very simple lines"
+    },
+    {
+      "start": 4895.0,
+      "text": "through a blues and then harmonize them."
+    },
+    {
+      "start": 4898.0,
+      "text": ">> Mhm. Mhm. Mhm."
+    },
+    {
+      "start": 4900.0,
+      "text": ">> Possibly listen to what I just did and"
+    },
+    {
+      "start": 4902.0,
+      "text": "take"
+    },
+    {
+      "start": 4903.0,
+      "text": ">> some hits hints of that like not the"
+    },
+    {
+      "start": 4906.0,
+      "text": "full chords but the lines like to get"
+    },
+    {
+      "start": 4908.0,
+      "text": "your brain moving"
+    },
+    {
+      "start": 4909.0,
+      "text": ">> and make like"
+    },
+    {
+      "start": 4911.0,
+      "text": ">> make a version of it."
+    },
+    {
+      "start": 4913.0,
+      "text": ">> Yeah. And then work it into improv"
+    },
+    {
+      "start": 4915.0,
+      "text": "actually. Right. You'll have like little"
+    },
+    {
+      "start": 4916.0,
+      "text": "bits where you're kind of coming into"
+    },
+    {
+      "start": 4918.0,
+      "text": "that mode."
+    },
+    {
+      "start": 4919.0,
+      "text": ">> Yeah. I mean, just learning a few of"
+    },
+    {
+      "start": 4922.0,
+      "text": "them."
+    },
+    {
+      "start": 4922.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 4923.0,
+      "text": ">> All the way through. Like learn a 12 bar"
+    },
+    {
+      "start": 4926.0,
+      "text": "thing."
+    },
+    {
+      "start": 4926.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 4927.0,
+      "text": ">> Uh yeah. Like"
+    },
+    {
+      "start": 4930.0,
+      "text": "let me do it again. I'll try to do it a"
+    },
+    {
+      "start": 4934.0,
+      "text": "bit simpler."
+    },
+    {
+      "start": 4935.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 4938.0,
+      "text": "Uh"
+    },
+    {
+      "start": 4944.0,
+      "text": ">> hey Jake. Jake. Yeah. Okay. Can uh your"
+    },
+    {
+      "start": 4946.0,
+      "text": "arm is blocking your your your hands."
+    },
+    {
+      "start": 4951.0,
+      "text": "Thanks."
+    },
+    {
+      "start": 4956.0,
+      "text": "It's okay. That that that that's"
+    },
+    {
+      "start": 4989.0,
+      "text": "D.",
+      "gapBefore": 32
+    },
+    {
+      "start": 5007.0,
+      "text": "Hey.",
+      "gapBefore": 18
+    },
+    {
+      "start": 5010.0,
+      "text": "Hey."
+    },
+    {
+      "start": 5036.0,
+      "text": "totally super help actually. I think",
+      "gapBefore": 26
+    },
+    {
+      "start": 5039.0,
+      "text": ">> definitely breakthrough in terms of how"
+    },
+    {
+      "start": 5040.0,
+      "text": "to think about it. So that's what I was"
+    },
+    {
+      "start": 5042.0,
+      "text": "looking for. Yeah. Yeah."
+    },
+    {
+      "start": 5043.0,
+      "text": ">> Sweet. Uh I think doing Yeah. I guess"
+    },
+    {
+      "start": 5046.0,
+      "text": "that going up thing is like a macro"
+    },
+    {
+      "start": 5049.0,
+      "text": "version of this. Mhm."
+    },
+    {
+      "start": 5050.0,
+      "text": ">> Um I guess it doesn't immediately"
+    },
+    {
+      "start": 5053.0,
+      "text": "transfer because there's no there's no"
+    },
+    {
+      "start": 5056.0,
+      "text": "point where you would actually go that"
+    },
+    {
+      "start": 5058.0,
+      "text": "far up the piano, but but being able to"
+    },
+    {
+      "start": 5060.0,
+      "text": "do it from anywhere for like four notes"
+    },
+    {
+      "start": 5062.0,
+      "text": "is really really important."
+    },
+    {
+      "start": 5063.0,
+      "text": ">> Well, you showed me another exercise in"
+    },
+    {
+      "start": 5064.0,
+      "text": "that, too, which is like playing the"
+    },
+    {
+      "start": 5065.0,
+      "text": "same note at the top, but being able to"
+    },
+    {
+      "start": 5067.0,
+      "text": "change the chords underneath."
+    },
+    {
+      "start": 5068.0,
+      "text": ">> Yeah. As well. Yeah. Yeah. Yeah."
+    },
+    {
+      "start": 5071.0,
+      "text": "Um, so I would say keep doing that up"
+    },
+    {
+      "start": 5074.0,
+      "text": "one or or like do a down one now and"
+    },
+    {
+      "start": 5077.0,
+      "text": "just understand that it's not"
+    },
+    {
+      "start": 5078.0,
+      "text": "immediately going to"
+    },
+    {
+      "start": 5079.0,
+      "text": ">> uh be applicable"
+    },
+    {
+      "start": 5081.0,
+      "text": "fully, but it's like"
+    },
+    {
+      "start": 5083.0,
+      "text": ">> it's so good."
+    },
+    {
+      "start": 5085.0,
+      "text": ">> Yeah. Yeah. Understood. Understood."
+    },
+    {
+      "start": 5086.0,
+      "text": "Understood."
+    },
+    {
+      "start": 5086.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 5087.0,
+      "text": ">> Cool. Cool. Cool."
+    },
+    {
+      "start": 5088.0,
+      "text": ">> Um, can I just get a one minute koda?"
+    },
+    {
+      "start": 5090.0,
+      "text": "I'm not going to ask you to walk through"
+    },
+    {
+      "start": 5092.0,
+      "text": "slowly, but could you just play through"
+    },
+    {
+      "start": 5094.0,
+      "text": "your lefth hand rootless voicings for"
+    },
+    {
+      "start": 5096.0,
+      "text": "the for pennies basically? And I I can I"
+    },
+    {
+      "start": 5098.0,
+      "text": "can transcribe it later basically."
+    },
+    {
+      "start": 5100.0,
+      "text": "Yeah."
+    },
+    {
+      "start": 5105.0,
+      "text": "Okay. Um, you can see that. Yeah, I'm"
+    },
+    {
+      "start": 5109.0,
+      "text": "doing the"
+    },
+    {
+      "start": 5110.0,
+      "text": ">> Mhm."
+    },
+    {
+      "start": 5111.0,
+      "text": ">> Although the one you're playing with"
+    },
+    {
+      "start": 5113.0,
+      "text": "doesn't have that anymore."
+    },
+    {
+      "start": 5114.0,
+      "text": ">> Mhm. But you can play with that"
+    },
+    {
+      "start": 5116.0,
+      "text": "actually."
+    },
+    {
+      "start": 5117.0,
+      "text": ">> It doesn't matter. It That's F6, too."
+    },
+    {
+      "start": 5119.0,
+      "text": ">> Yeah. Mhm. Mhm."
+    },
+    {
+      "start": 5145.0,
+      "text": "H. That doesn't sound good.",
+      "gapBefore": 25
+    },
+    {
+      "start": 5154.0,
+      "text": "Uh,"
+    },
+    {
+      "start": 5159.0,
+      "text": "where is it?"
+    },
+    {
+      "start": 5205.0,
+      "text": "Cool. Cool.",
+      "gapBefore": 45
+    },
+    {
+      "start": 5205.0,
+      "text": ">> Cool."
+    },
+    {
+      "start": 5206.0,
+      "text": ">> Those those were the two notes. I'll do"
+    },
+    {
+      "start": 5208.0,
+      "text": "I'll do bigger ones now."
+    },
+    {
+      "start": 5209.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 5227.0,
+      "text": "I like this one better."
+    },
+    {
+      "start": 5242.0,
+      "text": "Uh, what should we do there?"
+    },
+    {
+      "start": 5254.0,
+      "text": "Nope."
+    },
+    {
+      "start": 5256.0,
+      "text": "There it is."
+    },
+    {
+      "start": 5275.0,
+      "text": "Don't do that.",
+      "gapBefore": 18
+    },
+    {
+      "start": 5280.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 5294.0,
+      "text": "No."
+    },
+    {
+      "start": 5311.0,
+      "text": ">> Cool."
+    },
+    {
+      "start": 5312.0,
+      "text": ">> Sweet."
+    },
+    {
+      "start": 5313.0,
+      "text": ">> That will make it more fun, too. getting"
+    },
+    {
+      "start": 5314.0,
+      "text": "those hands. Yes, totally, totally,"
+    },
+    {
+      "start": 5316.0,
+      "text": "totally. Um, okay, I've run out of"
+    },
+    {
+      "start": 5318.0,
+      "text": "questions."
+    },
+    {
+      "start": 5318.0,
+      "text": ">> Okay. Yeah. Uh, spend a day or two just"
+    },
+    {
+      "start": 5321.0,
+      "text": "working on the left hand,"
+    },
+    {
+      "start": 5323.0,
+      "text": ">> uh, and getting it under your fingers"
+    },
+    {
+      "start": 5325.0,
+      "text": ">> and then probably go back to soloing"
+    },
+    {
+      "start": 5328.0,
+      "text": "slow"
+    },
+    {
+      "start": 5328.0,
+      "text": ">> and get them there,"
+    },
+    {
+      "start": 5330.0,
+      "text": ">> but not so slow."
+    },
+    {
+      "start": 5332.0,
+      "text": ">> Well, I'm saying if you can stomach it,"
+    },
+    {
+      "start": 5334.0,
+      "text": "do it slow again for your left hand"
+    },
+    {
+      "start": 5336.0,
+      "text": "sink,"
+    },
+    {
+      "start": 5337.0,
+      "text": ">> but then bring it up. Uh, remember to"
+    },
+    {
+      "start": 5341.0,
+      "text": "have call and response between the hands"
+    },
+    {
+      "start": 5343.0,
+      "text": "and don't just leave it sitting there."
+    },
+    {
+      "start": 5345.0,
+      "text": ">> And that's gonna add a lot."
+    },
+    {
+      "start": 5346.0,
+      "text": ">> That'll pop."
+    },
+    {
+      "start": 5348.0,
+      "text": ">> Sweet. Thank you, marathon session."
+    },
+    {
+      "start": 5350.0,
+      "text": "Appreciate you. Um, yeah. And uh,"
+    },
+    {
+      "start": 5353.0,
+      "text": ">> okay. I'm going to post. I'm gonna Oh, I"
+    },
+    {
+      "start": 5354.0,
+      "text": "have to send the email."
+    },
+    {
+      "start": 5356.0,
+      "text": ">> Yes. So, I'm ready for you. Whenever you"
+    },
+    {
+      "start": 5358.0,
+      "text": "have the email, I can I can"
+    },
+    {
+      "start": 5360.0,
+      "text": ">> Oh, you're going to do it. Okay. I wrote"
+    },
+    {
+      "start": 5362.0,
+      "text": "it basically."
+    },
+    {
+      "start": 5362.0,
+      "text": ">> You did. Okay. Feel free to send that to"
+    },
+    {
+      "start": 5364.0,
+      "text": "me. Hopefully, it's not going to be"
+    },
+    {
+      "start": 5365.0,
+      "text": "actually I mean, I will do it the first"
+    },
+    {
+      "start": 5367.0,
+      "text": "time. I think you should know how to do"
+    },
+    {
+      "start": 5368.0,
+      "text": "it, but I'm h I'm happy to just go."
+    },
+    {
+      "start": 5370.0,
+      "text": ">> I mean, I did the Mailchimps. I I get"
+    },
+    {
+      "start": 5372.0,
+      "text": "it."
+    },
+    {
+      "start": 5373.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 5374.0,
+      "text": ">> I'm very happy for you to do it."
+    },
+    {
+      "start": 5375.0,
+      "text": ">> Yeah, I'll I'll I'll do it this first"
+    },
+    {
+      "start": 5376.0,
+      "text": "time just so I can work out all the"
+    },
+    {
+      "start": 5378.0,
+      "text": "kinks and then I'll just like let you"
+    },
+    {
+      "start": 5379.0,
+      "text": "know how it works works. Um, anything"
+    },
+    {
+      "start": 5382.0,
+      "text": "else?"
+    },
+    {
+      "start": 5384.0,
+      "text": "Did you want to advertise for organite?"
+    },
+    {
+      "start": 5386.0,
+      "text": ">> Probably. I'm going to post now. So,"
+    },
+    {
+      "start": 5388.0,
+      "text": "hopefully that will do a little better"
+    },
+    {
+      "start": 5390.0,
+      "text": "than the other posts and then we'll uh"
+    },
+    {
+      "start": 5392.0,
+      "text": "advertise that one. Okay."
+    },
+    {
+      "start": 5394.0,
+      "text": ">> I also haven't posted just the flyer"
+    },
+    {
+      "start": 5396.0,
+      "text": "itself. because I can't imagine it will"
+    },
+    {
+      "start": 5398.0,
+      "text": "do well, but I do think it's like sort"
+    },
+    {
+      "start": 5400.0,
+      "text": "of important for it to exist."
+    },
+    {
+      "start": 5401.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 5402.0,
+      "text": ">> For people to know that it maybe that's"
+    },
+    {
+      "start": 5404.0,
+      "text": "what the advertisement is. I don't know."
+    },
+    {
+      "start": 5406.0,
+      "text": "Um"
+    },
+    {
+      "start": 5406.0,
+      "text": ">> yeah."
+    },
+    {
+      "start": 5407.0,
+      "text": ">> Uh no, I don't think so because I think"
+    },
+    {
+      "start": 5409.0,
+      "text": "people need more context. Like they"
+    },
+    {
+      "start": 5410.0,
+      "text": "probably want to hear"
+    },
+    {
+      "start": 5413.0,
+      "text": ">> maybe we could do that too. I mean the"
+    },
+    {
+      "start": 5415.0,
+      "text": "the blurb could be like the only jazz or"
+    },
+    {
+      "start": 5417.0,
+      "text": "the only Hammond V3"
+    },
+    {
+      "start": 5420.0,
+      "text": "show in London or something, you Do you"
+    },
+    {
+      "start": 5422.0,
+      "text": "have a background like uh like clip of a"
+    },
+    {
+      "start": 5425.0,
+      "text": "live thing that we could put on top of"
+    },
+    {
+      "start": 5427.0,
+      "text": "the poster? Like that would feel pretty."
+    },
+    {
+      "start": 5429.0,
+      "text": ">> What do you mean on top of the poster?"
+    },
+    {
+      "start": 5431.0,
+      "text": "Like"
+    },
+    {
+      "start": 5431.0,
+      "text": ">> Oh, like So yeah, a b basically audio."
+    },
+    {
+      "start": 5433.0,
+      "text": "Yeah, sure. Yeah, we can use anything"
+    },
+    {
+      "start": 5435.0,
+      "text": "from my organ."
+    },
+    {
+      "start": 5437.0,
+      "text": ">> Yeah."
+    },
+    {
+      "start": 5437.0,
+      "text": ">> Um totally."
+    },
+    {
+      "start": 5438.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 5439.0,
+      "text": ">> so okay, so I should make a file for"
+    },
+    {
+      "start": 5441.0,
+      "text": "you,"
+    },
+    {
+      "start": 5441.0,
+      "text": ">> I think. So yeah. Yeah. Okay."
+    },
+    {
+      "start": 5443.0,
+      "text": ">> Um"
+    },
+    {
+      "start": 5445.0,
+      "text": ">> Okay."
+    },
+    {
+      "start": 5446.0,
+      "text": ">> All right. Okay. So I have to send you"
+    },
+    {
+      "start": 5448.0,
+      "text": "the email and get that clip going and"
+    },
+    {
+      "start": 5451.0,
+      "text": "post. Yes. Yes."
+    },
+    {
+      "start": 5453.0,
+      "text": ">> All right."
+    },
+    {
+      "start": 5454.0,
+      "text": ">> Sweet. Thank you, sir. Appreciate you,"
+    },
+    {
+      "start": 5455.0,
+      "text": "man."
+    },
+    {
+      "start": 5455.0,
+      "text": ">> Thanks so much. Oh, we need to plan. Oh,"
+    },
+    {
+      "start": 5457.0,
+      "text": "yeah. Next week. Uh, I don't know. So,"
+    },
+    {
+      "start": 5460.0,
+      "text": ">> Oh, yeah. I If you don't mind, I think"
+    },
+    {
+      "start": 5461.0,
+      "text": "what I'll do is I'll just probably shoot"
+    },
+    {
+      "start": 5462.0,
+      "text": "you a text on like Friday, your"
+    },
+    {
+      "start": 5464.0,
+      "text": "afternoon time, my morning. Cool."
+    },
+    {
+      "start": 5466.0,
+      "text": ">> And then you can just give me a sense"
+    },
+    {
+      "start": 5467.0,
+      "text": "for like what your availability buddy is"
+    },
+    {
+      "start": 5468.0,
+      "text": "and then we can sort out that from"
+    },
+    {
+      "start": 5469.0,
+      "text": "there."
+    },
+    {
+      "start": 5469.0,
+      "text": ">> Uh, yeah. It's just the next two weeks"
+    },
+    {
+      "start": 5471.0,
+      "text": "that are sort of crazy, but in general,"
+    },
+    {
+      "start": 5472.0,
+      "text": "I'll be able to plan."
+    },
+    {
+      "start": 5473.0,
+      "text": ">> Understood. That that process works"
+    },
+    {
+      "start": 5474.0,
+      "text": "totally fine for me. So, we can just"
+    },
+    {
+      "start": 5476.0,
+      "text": "keep it keep it rolling."
+    },
+    {
+      "start": 5476.0,
+      "text": ">> Great."
+    },
+    {
+      "start": 5477.0,
+      "text": ">> So, cool. See you, man."
+    },
+    {
+      "start": 5478.0,
+      "text": ">> All right. Thanks."
+    },
+    {
+      "start": 5479.0,
+      "text": ">> Bye."
+    },
+    {
+      "start": 5479.0,
+      "text": ">> Bye. Yep. Tight."
+    }
+  ],
+  "descriptionText": "stan transcriptoin\ncrappy improv\neb blues chord exercises\n\n4:40 Tricky F alt lick fingering\n47:39 Crappy sarah solo-ing\n49:05 Crappy stan solo-ing\n53:40 Jake feedback - playing too slow, try different speed\n54:29 At least making changes\n54:42 Finding a few places to really nail\n55:43 Is the limitation hearing the line or execute the line?\n55:56 And if you can hear the line - is it because you can't see it or because your fingers can't do it?\n56:22 Gap\n1:16:24 Going up Eb blues right hand chords\n1:17:37 Making going up exercise musical - play with left hand\n1:18:12 How to practice comping. Entering flow making melodies.\n1:18:58 Freedom Demo c1\n1:19:27 Freedom Demo c2\n1:19:54 Freedom Demo c3\n1:20:20 Freedom Demo c4\n1:21:05 Comping is solo-ing or big band shout choruses\n1:21:33 Write a few simple lines out and harmonize them\n1:22:37 Simpler Demo c1\n1:23:04 Simpler Demo c2\n1:23:30 Simpler Demo c3\n1:24:08 Going up exercise is a macro version of demos\n1:25:03 Pennies 2 Note Rootless Voicings\n1:26:47 Pennies 3 Note Rootless Voicings\n",
+  "gold": [
+    {
+      "start": 280.0,
+      "label": "Tricky F alt lick fingering"
+    },
+    {
+      "start": 2859.0,
+      "label": "Crappy sarah solo-ing"
+    },
+    {
+      "start": 2945.0,
+      "label": "Crappy stan solo-ing"
+    },
+    {
+      "start": 3220.0,
+      "label": "Jake feedback - playing too slow, try different speed"
+    },
+    {
+      "start": 3269.0,
+      "label": "At least making changes"
+    },
+    {
+      "start": 3282.0,
+      "label": "Finding a few places to really nail"
+    },
+    {
+      "start": 3343.0,
+      "label": "Is the limitation hearing the line or execute the line?"
+    },
+    {
+      "start": 3356.0,
+      "label": "And if you can hear the line - is it because you can't see it or because your fingers can't do it?"
+    },
+    {
+      "start": 3382.0,
+      "label": "Gap"
+    },
+    {
+      "start": 4584.0,
+      "label": "Going up Eb blues right hand chords"
+    },
+    {
+      "start": 4657.0,
+      "label": "Making going up exercise musical - play with left hand"
+    },
+    {
+      "start": 4692.0,
+      "label": "How to practice comping. Entering flow making melodies."
+    },
+    {
+      "start": 4738.0,
+      "label": "Freedom Demo c1"
+    },
+    {
+      "start": 4767.0,
+      "label": "Freedom Demo c2"
+    },
+    {
+      "start": 4794.0,
+      "label": "Freedom Demo c3"
+    },
+    {
+      "start": 4820.0,
+      "label": "Freedom Demo c4"
+    },
+    {
+      "start": 4865.0,
+      "label": "Comping is solo-ing or big band shout choruses"
+    },
+    {
+      "start": 4893.0,
+      "label": "Write a few simple lines out and harmonize them"
+    },
+    {
+      "start": 4957.0,
+      "label": "Simpler Demo c1"
+    },
+    {
+      "start": 4984.0,
+      "label": "Simpler Demo c2"
+    },
+    {
+      "start": 5010.0,
+      "label": "Simpler Demo c3"
+    },
+    {
+      "start": 5048.0,
+      "label": "Going up exercise is a macro version of demos"
+    },
+    {
+      "start": 5103.0,
+      "label": "Pennies 2 Note Rootless Voicings"
+    },
+    {
+      "start": 5207.0,
+      "label": "Pennies 3 Note Rootless Voicings"
+    }
+  ]
+}
