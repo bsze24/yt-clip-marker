@@ -11,7 +11,7 @@ Items deliberately deferred during development. Each has a stable index (`TD-N`)
 
 ## TD-1: Double-injection guard may block legitimate re-mounts
 
-**Where:** `content.js`, top of file — `if (document.getElementById(HOST_ID)) return;`
+**Where:** `apps/extension/content/panel.js`, top of `mount()` — `if (document.getElementById(this.HOST_ID)) return false;`
 
 **Issue:** The guard prevents stacked panels if the content script runs twice against the same DOM (extension reload, accidental re-injection). For PR 1 this is correct behavior. But the guard *also* silently no-ops legitimate re-mounts — e.g., if PR 3's SPA navigation logic ever needs to tear down and rebuild the panel, calling the mount function again will short-circuit at the guard with no error and no rebuild.
 
@@ -25,13 +25,13 @@ if (existing) existing.remove();
 ```
 Or expose an explicit `unmount()` function that callers invoke before re-mounting.
 
-**Trigger to revisit:** First PR that adds dynamic re-mount logic. Likely PR 3 (SPA navigation), though may not be needed if PR 3 only updates panel contents rather than re-mounting the panel itself.
+**Trigger to revisit:** First PR that adds dynamic re-mount logic. ~~Likely PR 3 (SPA navigation)~~ — the two-surface refactor (`docs/prs/pr-3-two-surface-refactor.md`) froze the extension at coarse capture, so SPA remount work is off the table unless the extension grows again.
 
 ---
 
 ## TD-2: Match pattern doesn't cover `youtube.com` without `www.`
 
-**Where:** `manifest.json` — `"matches": ["https://www.youtube.com/watch*"]`
+**Where:** `apps/extension/manifest.json` — `"matches": ["https://www.youtube.com/watch*"]`
 
 **Issue:** Chrome match patterns require exact host matching unless wildcards are used. The current pattern matches `https://www.youtube.com/watch?v=...` but not `https://youtube.com/watch?v=...`. Users who paste or type the bare-domain form land on a YouTube page without the extension loaded.
 

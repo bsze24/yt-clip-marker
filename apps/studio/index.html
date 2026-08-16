@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clip Studio</title>
+  <link rel="stylesheet" href="/ui/styles.css" />
+</head>
+<body class="player-top">
+  <header>
+    <h1>Clip Studio</h1>
+    <select id="runSelect"></select>
+    <form class="ingest" id="ingestForm">
+      <input id="ingestUrl" placeholder="YouTube URL to ingest" autocomplete="off" />
+      <button type="submit" id="ingestBtn">Add video</button>
+      <span class="ingest-state" id="ingestState"></span>
+    </form>
+    <label class="toggle"><input type="checkbox" id="allCues" checked /> all captions</label>
+    <label class="toggle"><input type="checkbox" id="hideFiller" checked /> hide filler</label>
+    <button type="button" class="text-btn" id="fillerWordsBtn">skip words…</button>
+    <button type="button" class="text-btn" id="copyTsBtn">copy timestamps</button>
+    <label class="toggle"><input type="checkbox" id="follow" checked /> follow</label>
+    <label class="toggle"><input type="checkbox" id="evalMode" /> eval mode</label>
+    <div class="stats" id="stats"></div>
+    <div class="save" id="saveState">saved</div>
+  </header>
+  <div class="layout">
+    <div class="player-col">
+      <div class="player-wrap" id="playerWrap">
+        <div id="player"></div>
+        <div class="player-catcher" id="playerCatcher" title="play/pause"></div>
+      </div>
+      <div class="player-meta">
+        <div class="meta" id="meta"></div>
+        <div class="play-rate" id="playRate">1×</div>
+        <div class="hint"><kbd>j</kbd>/<kbd>k</kbd> rows · <kbd>J</kbd>/<kbd>K</kbd> marker rows · <kbd>Enter</kbd> add/edit · <kbd>s</kbd> star · <kbd>g</kbd> check · <kbd>x</kbd> reject/delete · <kbd>Tab</kbd> then <kbd>t</kbd>/<kbd>w</kbd>/<kbd>l</kbd>/<kbd>y</kbd> · <kbd>h</kbd> hide filler · <kbd>f</kbd> follow · <kbd>v</kbd> layout · <kbd>&lt;</kbd>/<kbd>&gt;</kbd> speed · <kbd>space</kbd> play. Follow tracks the playhead; <kbd>j</kbd>/<kbd>k</kbd> pins selection, <kbd>f</kbd> recouples. Gold-tagged rows are YT description timestamps, not captions.</div>
+      </div>
+    </div>
+    <div class="timeline" id="timeline" title="timeline">
+      <div class="timeline-track" id="timelineTrack"></div>
+      <div class="timeline-head" id="timelineHead"></div>
+    </div>
+    <div class="grid-wrap" id="gridWrap" tabindex="-1">
+      <button type="button" class="density" id="density" title="Edit skip words">Hiding filler</button>
+      <div class="grid-scroll" id="gridScroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="sticky">Time</th>
+            <th class="sticky2">Caption</th>
+            <th>Gap</th>
+            <th class="col-eval">g/x</th>
+            <th>Markers</th>
+            <th>Tags</th>
+            <th>Work</th>
+            <th>Lane</th>
+            <th>YT description</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>No runs yet.</div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="fillerModal" hidden>
+    <div class="modal-card" role="dialog" aria-labelledby="fillerTitle">
+      <h2 id="fillerTitle">Skip words</h2>
+      <p>Comma-separated. A caption row is hidden when every token is in this list (1–2 words). Rows with a marker, gap, or YT stamp stay.</p>
+      <input id="fillerWords" autocomplete="off" />
+      <div class="modal-actions">
+        <button type="button" id="fillerReset">Reset default</button>
+        <span class="modal-spacer"></span>
+        <button type="button" id="fillerCancel">Cancel</button>
+        <button type="button" class="primary" id="fillerSave">Save</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/ui/main.js"></script>
+</body>
+</html>
