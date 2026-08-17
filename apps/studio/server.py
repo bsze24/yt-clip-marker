@@ -510,11 +510,13 @@ class Handler(BaseHTTPRequestHandler):
         except ingest.IngestError as err:
             self._json(502, {"error": str(err)})
             return
+        n = len(ingest.extracted_markers(run))
         self._json(200, {
             "ok": True,
             "id": run_id,
             "cueCount": len(run["cues"]),
-            "goldCount": len(run["gold"]),
+            "extractedCount": n,
+            "goldCount": n,
         })
 
     def do_PUT(self):

@@ -32,8 +32,8 @@ Legacy: `kind` (`TAKE` \| `CONCEPT`) appears on old markers and old label events
 
 The studio store is the source of truth (the extension holds marks in memory only):
 
-- `apps/studio/runs/{videoId}-{YYYYMMDD-HHMM}.json` — immutable ingest/model output per video: `videoId`, `url`, `title`, `createdAt`, `markers[]` (suggester output; may be empty), `cues[]` (caption track, `gapBefore` = seconds of silence before the cue), `descriptionText` + `gold[]` (published YT description timestamps).
-- `apps/studio/labels.jsonl` — append-only human events keyed by `(runId, markerIndex)` for markers and `(runId, start)` for human-added clips. Latest event wins; deletes are tombstones (`unmiss`). Full event field list: `apps/studio/README.md`.
+- `apps/studio/runs/{videoId}-{YYYYMMDD-HHMM}.json` — immutable ingest/model output per video: `videoId`, `url`, `title`, `createdAt`, `markers[]` (suggester output; may be empty), `cues[]` (caption track, `gapBefore` = seconds of silence before the cue), `descriptionText` + `extracted[]` (published YT description timestamps; old run files may still have `gold[]` — readers fall back).
+- `apps/studio/labels.jsonl` — append-only human events keyed by `(runId, markerIndex)` for skill markers and `(runId, start)` for added markers. Latest event wins; deletes are tombstones (`unmiss`). Full event field list: `apps/studio/README.md`.
 
 A "current clip set" for a video is a fold over the run file plus its label events. Don't over-specify this store — it's JSONL until it hurts.
 

@@ -2,7 +2,7 @@
 // Work/lane inherit from the previous-in-time annotated marker, then the last
 // saved chapter. Empty existing values fall through to inherit so Enter on a
 // marker still fills the chapter. Edit uses the same form as add.
-import { $, missId, feedbackWhy, withWhy, resolvedLabel } from "./util.js";
+import { $, missId, feedbackWhy, withWhy, resolvedLabel, extractedList } from "./util.js";
 import { S, setSave, rememberChapter } from "./state.js";
 import { api, saveFailed } from "./api.js";
 import { seek } from "./player.js";
@@ -27,10 +27,10 @@ function selectMarkerRow(marker) {
   S.selectedKey = i >= 0 ? rowKey(rows[i], i) : null;
 }
 
-export function openComposer(start, fromGap, cueText, gapBefore, goldLabel) {
+export function openComposer(start, fromGap, cueText, gapBefore, extractedLabel) {
   const existing = S.additions.find((m) => Number(m.start) === Number(start));
-  const gold = (S.current && S.current.run && S.current.run.gold) || [];
-  const fallback = resolvedLabel(gold, start, "") || (goldLabel || "").trim() || (cueText || "").trim();
+  const extracted = extractedList(S.current && S.current.run);
+  const fallback = resolvedLabel(extracted, start, "") || (extractedLabel || "").trim() || (cueText || "").trim();
   const inherited = inheritChapter(start);
   S.composer = {
     mode: existing ? "edit" : "add",
@@ -43,7 +43,7 @@ export function openComposer(start, fromGap, cueText, gapBefore, goldLabel) {
     tags: existing ? (existing.tags || []) : (fromGap ? ["take"] : []),
     lane: (existing && existing.lane) || inherited.lane,
     work: (existing && existing.work) || inherited.work,
-    label: existing ? resolvedLabel(gold, start, existing.description) : fallback,
+    label: existing ? resolvedLabel(extracted, start, existing.description) : fallback,
     why: existing ? existing.why : "",
   };
   S.followPinned = true;
@@ -68,7 +68,7 @@ export function openEditor(marker) {
     tags: [...(marker.tags || [])],
     lane: (marker.lane || "").trim() || inherited.lane,
     work: (marker.work || "").trim() || inherited.work,
-    label: resolvedLabel((S.current && S.current.run && S.current.run.gold) || [], marker.start, marker.description || ""),
+    label: resolvedLabel(extractedList(S.current && S.current.run), marker.start, marker.description || ""),
     why: addition
       ? (addition.why || "")
       : feedbackWhy((S.current.feedback || {})[String(marker.index)] || ""),
@@ -158,7 +158,7 @@ export async function submitComposer() {
 }
 
 // Enter on the grid: submit an open composer, open the editor on a row that
-// already has a marker, or open the add form for a bare caption/gold row.
+// already has a marker, or open the add form for a bare caption/extracted row.
 export function onEnter() {
   if (S.composer) {
     submitComposer();
@@ -175,8 +175,8 @@ export function onEnter() {
     }
   }
   const caption = row.dataset.addText || "";
-  const gold = row.dataset.addGold || "";
-  openComposer(row.dataset.addStart, row.dataset.addGap === "1", caption, row.dataset.addGapbefore, gold);
+  const extracted = row.dataset.addExtracted || "";
+  openComposer(row.dataset.addStart, row.dataset.addGap === "1", caption, row.dataset.addGapbefore, extracted);
 }
 
 // Tab then y: jump to Why. If the composer is open, focus the field; if the
@@ -209,6 +209,6 @@ export function editWhy() {
     row.dataset.addGap === "1",
     row.dataset.addText || "",
     row.dataset.addGapbefore,
-    row.dataset.addGold || "",
+    row.dataset.addExtracted || "",
   );
 }

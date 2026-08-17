@@ -17,7 +17,7 @@ Open http://127.0.0.1:8765. Ingest needs `yt-dlp` on PATH.
 ```
 apps/studio/
   server.py                             HTTP server + label-event store
-  ingest.py                             URL → captions, gaps, description, gold → run file
+  ingest.py                             URL → captions, gaps, description, extracted → run file
   index.html                            markup only; loads /ui/ assets
   ui/                                   ES modules + stylesheet, served via the
                                         allowlisted /ui/ route (no build step)
@@ -43,7 +43,7 @@ UI files are read from disk on every request and sent with `Cache-Control: no-st
 
 The durable record is git-tracked JSON here. Commit `runs/` and `labels.jsonl` to back up work. The append-only labels can later score a new skill version against `check` labels, or train auto-mark from `(videoId, start, description, verdict)`.
 
-A run's `cues` array is the YouTube caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `gold` is timestamps parsed from the public YouTube description. The grid time-aligns all three: caption, marker, and gold share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
+A run's `cues` array is the YouTube caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `extracted` is timestamps parsed from the public YouTube description (deprecated key: `gold`). The grid time-aligns all three: caption, marker, and extracted share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
 
 Runs come from two doors:
 

@@ -1,15 +1,11 @@
 // Fold the current run into YouTube description timestamps and copy them.
-// Gold (already-published stamps) and human-added clips are never dropped.
-// Nearby rows collapse to one line; gold's title and start win when present.
-// Taxonomy still comes from the studio clip (added clip or marker) in that cluster.
-import { MATCH, STAR_TAG, isCheck, isWrong, resolvedLabel, ytStamp } from "./util.js";
+// Extracted (already-published stamps) and added markers are never dropped.
+// Nearby rows collapse to one line; extracted title and start win when present.
+// Taxonomy still comes from the studio clip (added or skill marker) in that cluster.
+import { MATCH, STAR_TAG, isCheck, isWrong, resolvedLabel, ytStamp, extractedList } from "./util.js";
 import { S, setSave } from "./state.js";
 
-const RANK = { gold: 0, miss: 1, skill: 2 };
-
-function goldList() {
-  return (S.current && S.current.run && S.current.run.gold) || [];
-}
+const RANK = { extracted: 0, gold: 0, miss: 1, skill: 2 };
 
 function keepSkill(index) {
   const text = ((S.current.feedback || {})[String(index)] || "");
@@ -49,13 +45,13 @@ function missMeta(m) {
 }
 
 function candidates() {
-  const gold = goldList();
+  const extracted = extractedList(S.current && S.current.run);
   const items = [];
-  gold.forEach((g) => {
+  extracted.forEach((item) => {
     items.push({
-      start: Number(g.start),
-      label: String(g.label || "").trim(),
-      source: "gold",
+      start: Number(item.start),
+      label: String(item.label || "").trim(),
+      source: "extracted",
       tags: [],
       lane: "",
       work: "",
@@ -64,7 +60,7 @@ function candidates() {
   (S.additions || []).forEach((m) => {
     items.push({
       start: Number(m.start),
-      label: resolvedLabel(gold, m.start, m.description),
+      label: resolvedLabel(extracted, m.start, m.description),
       source: "miss",
       ...missMeta(m),
     });
@@ -74,7 +70,7 @@ function candidates() {
     const edited = (S.edits || {})[String(i)];
     items.push({
       start: Number(m.start),
-      label: resolvedLabel(gold, m.start, edited || m.description),
+      label: resolvedLabel(extracted, m.start, edited || m.description),
       source: "skill",
       ...skillMeta(i),
     });

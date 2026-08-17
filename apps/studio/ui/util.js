@@ -112,24 +112,32 @@ export function escapeAttr(s) { return escapeHtml(s); }
 
 export function missId(start) { return "miss:" + Number(start); }
 
+// Description timestamps on a run. New writes use `extracted`; old run files
+// still have `gold`. Prefer the new key.
+export function extractedList(run) {
+  if (!run) return [];
+  if (Array.isArray(run.extracted)) return run.extracted;
+  return run.gold || [];
+}
+
 // Published YT-description stamp nearest this time. The human title on the
 // video wins over marker text and caption fallbacks.
-export function goldNear(gold, start, window = MATCH) {
+export function extractedNear(extracted, start, window = MATCH) {
   let best = null;
   let bestD = window + 1;
-  for (const g of gold || []) {
-    const d = Math.abs(Number(g.start) - Number(start));
+  for (const item of extracted || []) {
+    const d = Math.abs(Number(item.start) - Number(start));
     if (d <= window && d < bestD) {
-      best = g;
+      best = item;
       bestD = d;
     }
   }
   return best;
 }
 
-export function resolvedLabel(gold, start, fallback) {
-  const g = goldNear(gold, start);
-  const label = g && String(g.label || "").trim();
+export function resolvedLabel(extracted, start, fallback) {
+  const hit = extractedNear(extracted, start);
+  const label = hit && String(hit.label || "").trim();
   return label || String(fallback || "").trim();
 }
 

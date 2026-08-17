@@ -16,7 +16,7 @@ Context for planning and execution in Claude. This is a **suggested path**, not 
 
 3. **Skill as the linear-watch replacement.** `yt-clipper` skill fetches the caption track (`yt-dlp`), flags silence gaps, and proposes a copious TAKE/CONCEPT candidate list. Approximate neighborhoods only; nailing boundaries was supposed to be the extension’s job.
 
-4. **Eval dashboard to judge the skill.** Local `eval/server.py` + `eval/index.html`: time-aligned grid of captions, skill markers, and YouTube-description timestamps (`gold`). Judgments append to `eval/labels.jsonl`. First run: `eval/runs/YYW4Q1Nivg8-20260814-1248.json`.
+4. **Eval dashboard to judge the skill.** Local `eval/server.py` + `eval/index.html`: time-aligned grid of captions, skill markers, and YouTube-description timestamps (then called `gold`; now **extracted**). Judgments append to `eval/labels.jsonl`. First run: `eval/runs/YYW4Q1Nivg8-20260814-1248.json`.
 
 5. **The dashboard ate the product.** In practice we built the annotation IDE here, not on youtube.com: `j`/`k` row nav, Enter to add/edit, work / lane / tags (replacing exclusive TAKE/CONCEPT), human-added clips, layout toggle, YouTube embed. Duplicate timestamps (`j` stuck on 3:19) forced selection by **row identity**, not start time alone.
 
@@ -83,7 +83,7 @@ Something like `apps/extension`, `apps/studio` (today’s `eval/`), and a small 
 Keep load-on-watch and optional capture. Do not implement original PR 3/4 (canonical `chrome.storage`, refinement hotkeys, click-to-preview as editor, export from the panel). Supersede those PR specs or rewrite them as handoff-to-studio.
 
 **D. Promote studio from eval harness to workspace**
-Rename in the UI. Keep `labels.jsonl` / `runs/` as the first store. In-app ingest (URL → transcript/cues → run) so the skill runbook is no longer the only door. Fold attach-cues / attach-gold / fetch-transcript into that ingest path when it pays off. Gold column can stay; TAKE/CONCEPT as required `kind` can stop for new writes. Check/note/rationale → eval mode or later.
+Rename in the UI. Keep `labels.jsonl` / `runs/` as the first store. In-app ingest (URL → transcript/cues → run) so the skill runbook is no longer the only door. Fold attach-cues / attach-gold / fetch-transcript into that ingest path when it pays off. Extracted-marker column can stay (then called gold); TAKE/CONCEPT as required `kind` can stop for new writes. Check/note/rationale → eval mode or later.
 
 **E. Keep the skill as suggester, not as workflow**
 Move fetch into the app. Keep rule IDs and “over-include” as the prompt. “Suggest markers” can remain a skill invoke until ingest exists; then it’s an obvious studio action. You should be able to open a video with an empty skill column and only human clips.

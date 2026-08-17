@@ -1,5 +1,5 @@
 // Run list polling and run switching.
-import { $, escapeHtml, escapeAttr } from "./util.js";
+import { $, escapeHtml, escapeAttr, extractedList } from "./util.js";
 import { S, setSave, rememberCursor, lastRunId, cursorFor, restoreChapter, seedChapterFromRun } from "./state.js";
 import { api } from "./api.js";
 import { renderGrid, updateStats } from "./grid.js";
@@ -74,8 +74,8 @@ export async function openRun(id) {
   }
   rememberCursor();
   const run = S.current.run;
-  const goldN = (run.gold || []).length;
-  $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div><a href="${escapeAttr(run.url || "")}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a> · ${(run.markers || []).length} markers · ${S.additions.length} added · ${goldN} YT desc · ${(run.cues || []).length} cues</div>`;
+  const extractedN = extractedList(run).length;
+  $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div><a href="${escapeAttr(run.url || "")}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a> · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
   loadVideo(run.videoId, S.selectedStart);
   renderGrid();
   updateStats();

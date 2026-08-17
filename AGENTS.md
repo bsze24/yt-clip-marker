@@ -10,7 +10,7 @@ drifting.
 
 **One clipper, two surfaces.** This repo is a clip-marking tool for long-form YouTube video (music lessons), split into two clients of one clip record:
 
-- **Studio (`apps/studio/`) — the workspace.** A local Python-stdlib web app: time-aligned grid of captions, markers, and published description timestamps; keyboard-first clip creation; taxonomy (work / lane / tags); in-app ingest (URL → transcript + gaps + gold). This is where annotation, refinement, and (future) export happen. It began life as an eval dashboard for the suggester skill — do NOT treat it as disposable eval tooling; it is the product.
+- **Studio (`apps/studio/`) — the workspace.** A local Python-stdlib web app: time-aligned grid of captions, markers, and published description timestamps; keyboard-first clip creation; taxonomy (work / lane / tags); in-app ingest (URL → transcript + gaps + extracted). This is where annotation, refinement, and (future) export happen. It began life as an eval dashboard for the suggester skill — do NOT treat it as disposable eval tooling; it is the product.
 - **Extension (`apps/extension/`) — the viewing surface, frozen thin.** Manifest V3 Chrome extension loaded unpacked from `apps/extension`. Coarse `[` / `]` capture on the watch page, in-memory only. It is not a store, not an editor, and does not grow taxonomy/transcript/export features. Do not rebuild the on-YouTube IDE.
 
 The surfaces share the clip contract (`docs/clip-schema.md`), never code. Side project to media-scraper, which will consume clips via the studio's JSON export only — media-scraper never lives in this tree.
@@ -60,7 +60,7 @@ yt-clip-marker/
 │   │   └── content/          store.js, panel.js, hotkeys.js, index.js
 │   └── studio/
 │       ├── server.py         stdlib HTTP server + label-event store
-│       ├── ingest.py         yt-dlp fetch: captions, gaps, description, gold
+│       ├── ingest.py         yt-dlp fetch: captions, gaps, description, extracted
 │       ├── index.html        markup only; loads /ui/ assets
 │       ├── ui/               ES modules (served via allowlisted /ui/ route)
 │       │   ├── main.js       entry: event wiring + boot

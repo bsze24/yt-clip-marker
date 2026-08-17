@@ -37,11 +37,12 @@ def main(argv):
     except IngestError as err:
         print(f"ERROR: {err}", file=sys.stderr)
         return 1
-    gold = parse_description_timestamps(description)
+    extracted = parse_description_timestamps(description)
     run["descriptionText"] = description
-    run["gold"] = gold
+    run["extracted"] = extracted
+    run.pop("gold", None)
     run_path.write_text(json.dumps(run, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"wrote {len(gold)} description timestamps → {run_path}")
+    print(f"wrote {len(extracted)} description timestamps → {run_path}")
     return 0
 
 

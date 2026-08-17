@@ -24,7 +24,7 @@ Third PR, and a product-model pivot. The original plans for PR 3 (storage + SPA 
 **Studio promoted from eval harness to workspace:**
 
 - UI renamed to Clip Studio.
-- In-app ingest: paste a URL → server fetches captions + description via `yt-dlp`, flags silence gaps, parses gold timestamps, writes a run with an empty `markers` array, opens it. (`apps/studio/ingest.py`, `POST /api/ingest`.)
+- In-app ingest: paste a URL → server fetches captions + description via `yt-dlp`, flags silence gaps, parses extracted timestamps, writes a run with an empty `markers` array, opens it. (`apps/studio/ingest.py`, `POST /api/ingest`.)
 - Eval chrome (check/note feedback, rationales, check stats) behind an eval-mode toggle, default off.
 - `kind` (TAKE/CONCEPT) never required on new writes; taxonomy is work / lane / tags.
 - Store unchanged: `runs/` + append-only `labels.jsonl`.
@@ -36,7 +36,7 @@ Third PR, and a product-model pivot. The original plans for PR 3 (storage + SPA 
 1. Extension loads unpacked from `apps/extension`; no manifest warnings; capture still works on a watch page.
 2. `python3 apps/studio/server.py` boots; the existing run and labels load unchanged.
 3. Header shows Clip Studio + eval-mode toggle; check/note inputs and rationales appear only with it on.
-4. URL ingest produces a run with cues, `gapBefore` flags, gold, empty markers — and opens it.
+4. URL ingest produces a run with cues, `gapBefore` flags, extracted markers, empty `markers[]` — and opens it.
 5. New label events carry no required `kind`.
 6. A fresh agent reading AGENTS.md + PRD lands on the two-surface model.
 
