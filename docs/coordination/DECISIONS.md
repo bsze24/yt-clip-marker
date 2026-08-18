@@ -317,6 +317,35 @@ own rule rather than a general licence to approximate.
 **Revert signal.** Candidate count on the next video. If `R-CUE-EXACT` suppresses proposals it is
 the most visible number in the output, and reverting is one line.
 
+### D-033 — every marker reaches the output; chapters are not a goal  (Accepted 2026-08-19)
+Brian's call. The point of the tool is that a moment he marked appears in the exported
+description. Nothing may be dropped to satisfy an external constraint.
+
+Supersedes [[D-031]], which kept YouTube chapters as a goal on the false premise that compliance
+was nearly free. It is not: the only route to compliance is widening the export fold, and that
+deletes three of his descriptions (`TD-9` carries the table).
+
+**The fold window stays at 2 seconds and does not widen.** Measured on video 1: at 2s, 85
+candidates fold to 70 lines, and all 10 collapsed candidates have text *identical* to the line
+that survives — the same moment marked twice, by the skill and by hand, or already published.
+Nothing is lost. At 6s three more collapse and every one of the three carries different text.
+Two seconds is the boundary between collapsing a duplicate and deleting work.
+
+**Chapters are abandoned as a goal.** Timestamps in a description are clickable seek links
+unconditionally; chapters additionally require the whole set to pass four tests, one of which is a
+10-second minimum gap that Brian's annotation granularity does not meet and should not be bent to
+meet. If chapters ever happen for free on some video, fine — it is a side effect, never a target.
+
+**Still open, and its justification just disappeared:** `descriptionTimestampText` synthesises a
+`0:00 Start` line that matches no record, purely to satisfy the chapter rule this decision
+abandons ([[D-027]] governs where it goes). It adds a line rather than dropping one, so it does
+not violate this decision — but nothing now argues for it. Decide separately.
+
+**Worth considering, not decided:** the fold merges on time and rank, not on text. That all 10
+merges are text-identical today is a happy accident of `resolvedLabel` making an added marker
+adopt a nearby stamp's label. Merging only when the resolved labels match would make this decision
+an enforced invariant rather than an observed one.
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

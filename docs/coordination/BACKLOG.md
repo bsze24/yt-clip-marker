@@ -229,7 +229,7 @@ work as well as tags.
 
 **Trigger:** with the next taxonomy-entry work. Held out of PR 3 deliberately.
 
-### TD-9 — widening the export fold would buy chapters by deleting three labels
+### TD-9 — widening the export fold would buy chapters by deleting three labels — CLOSED, wontfix
 
 **Where:** `apps/studio/ui/util.js` — `export const MATCH = 2`, consumed by `grid.js`
 (`takeNear`, row alignment) and `export.js` (`mergeNearby`, the copy-timestamps fold).
@@ -266,7 +266,13 @@ and never against the label text. Measured 2026-08-18:
 One constant serves both callers, so raising it would also let the grid snap a marker onto a
 caption six seconds away and undo [[D-008]]. The export needs its own window.
 
-**Trigger:** a second *labelled* video. This is the one item that cannot ride along with a plain
+**CLOSED 2026-08-19, wontfix.** [[D-033]] settles it: every marker reaches the output, so the fold
+never widens and chapters are not a goal. The measurement that closed it — at 2s all 10 collapsed
+candidates are text-identical to their survivor, so nothing is lost; at 6s three carry different
+text. Two seconds is the boundary between collapsing a duplicate and deleting work. The rest of
+this entry is kept as the record of what was priced.
+
+~~**Trigger:** a second *labelled* video.~~ This is the one item that cannot ride along with a plain
 ingest — `TD-6` and [[D-032]] need only a `/yt-clipper` pass, but the fold window can only be
 judged against a real export, which needs a real annotation pass first. Scope it separately.
 
