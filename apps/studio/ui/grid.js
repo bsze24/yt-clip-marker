@@ -504,12 +504,17 @@ export function updateStats() {
     $("stats").innerHTML = `<b>${markers.length}</b> markers · <b>${S.additions.length}</b> added · <b>${extractedN}</b> YT`;
     return;
   }
-  let checks = 0, wrongs = 0, notes = 0;
+  let checks = 0, wrongs = 0, notes = 0, keeps = 0;
   markers.forEach((_, i) => {
     const t = (S.current.feedback[String(i)] || "").trim();
     if (isCheck(t)) checks += 1;
     else if (isWrong(t)) wrongs += 1;
     else if (t) notes += 1;
+    else {
+      const ann = S.annotations[String(i)] || {};
+      if ((ann.tags || []).length || ann.lane || ann.work) keeps += 1;
+    }
   });
-  $("stats").innerHTML = `<b>${checks}</b> check · <b>${wrongs}</b> wrong · <b>${notes}</b> notes · <b>${markers.length - checks - wrongs - notes}</b> blank · <b>${S.additions.length}</b> added · <b>${extractedN}</b> YT`;
+  const blanks = markers.length - checks - wrongs - notes - keeps;
+  $("stats").innerHTML = `<b>${checks}</b> check · <b>${wrongs}</b> wrong · <b>${keeps}</b> keep · <b>${notes}</b> notes · <b>${blanks}</b> blank · <b>${S.additions.length}</b> added · <b>${extractedN}</b> YT`;
 }
