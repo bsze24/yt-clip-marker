@@ -202,6 +202,8 @@ def verdict_for(text):
     lower = stripped.lower()
     if lower == "check" or lower.startswith("check:"):
         return "check"
+    if lower == "wrong" or lower.startswith("wrong:"):
+        return "wrong"
     if stripped:
         return "note"
     return "blank"
@@ -399,11 +401,13 @@ def list_runs():
         run_id = path.stem
         markers = data.get("markers") or []
         fb = fb_by_run.get(run_id, {})
-        checks = notes = 0
+        checks = wrongs = notes = 0
         for i, _m in enumerate(markers):
             v = verdict_for(fb.get(str(i), ""))
             if v == "check":
                 checks += 1
+            elif v == "wrong":
+                wrongs += 1
             elif v == "note":
                 notes += 1
         rows.append(
@@ -416,8 +420,9 @@ def list_runs():
                 "markerCount": len(markers),
                 "missCount": len(load_additions(run_id)),
                 "checkCount": checks,
+                "wrongCount": wrongs,
                 "noteCount": notes,
-                "blankCount": max(0, len(markers) - checks - notes),
+                "blankCount": max(0, len(markers) - checks - wrongs - notes),
             }
         )
     return rows

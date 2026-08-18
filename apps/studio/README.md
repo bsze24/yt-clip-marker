@@ -70,7 +70,7 @@ One JSON object per line. Every save appends; the latest event for a row identit
 | `rationale` | rule citation from the skill (eval) |
 | `ruleIds` | parsed `R-*` ids from rationale (eval) |
 | `feedback` | raw text: `check` or `check: why` = good; `wrong` or `wrong: reason` = reject; anything else = eval note |
-| `verdict` | `check` \| `note` \| `blank` \| `miss` \| `unmiss` \| `relabel` \| `annotate` |
+| `verdict` | `check` \| `wrong` \| `note` \| `blank` \| `miss` \| `unmiss` \| `relabel` \| `annotate` |
 
 `relabel` events store `originalDescription` (suggester output, never mutated on the run file) and `description` (your edit). Latest relabel for `(runId, markerIndex)` is the current label; the grid shows `original: …` under the field when they differ.
 

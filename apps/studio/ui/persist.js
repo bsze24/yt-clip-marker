@@ -5,49 +5,151 @@ import { S, setSave, rememberChapter } from "./state.js";
 import { api, saveFailed } from "./api.js";
 import { renderGrid, updateStats } from "./grid.js";
 
-export async function persistTaxonomy() {
-  if (!S.liveTax || S.liveTax.type === "none" || !S.currentId) return;
-  setSave("saving…");
+function scheduleSave(key, delay, work) {
+  const pending = S.saveTimers.get(key);
+  if (pending) clearTimeout(pending);
+  const timer = setTimeout(async () => {
+    S.saveTimers.delete(key);
+    await work();
+  }, delay);
+  S.saveTimers.set(key, timer);
+}
+
+function cancelScheduled(key) {
+  const pending = S.saveTimers.get(key);
+  if (!pending) return;
+  clearTimeout(pending);
+  S.saveTimers.delete(key);
+}
+
+export function cancelPendingMarker(index, runId = S.currentId) {
+  cancelScheduled(`${runId}:feedback:${index}`);
+  cancelScheduled(`${runId}:relabel:${index}`);
+  cancelScheduled(`${runId}:taxonomy:${index}`);
+}
+
+export function cancelPendingAddition(start, runId = S.currentId) {
+  cancelScheduled(`${runId}:miss:${Number(start)}`);
+}
+
+function isCurrentRun(runId) {
+  return Boolean(runId && S.currentId === runId);
+}
+
+function saveFailedForRun(err, runId) {
+  if (isCurrentRun(runId)) saveFailed(err);
+  else console.error(err);
+}
+
+function additionSnapshot(addition) {
+  return {
+    start: addition.start,
+    description: addition.description || "",
+    why: addition.why || "",
+    tags: [...(addition.tags || [])],
+    lane: addition.lane || "",
+    work: addition.work || "",
+    cueText: addition.cueText || "",
+    gapBefore: addition.gapBefore,
+  };
+}
+
+async function persistAddition(runId, addition) {
+  if (!runId || !addition || !(addition.description || "").trim()) return;
+  cancelPendingAddition(addition.start, runId);
+  if (isCurrentRun(runId)) setSave("saving…");
+  let res;
   try {
-    if (S.liveTax.type === "miss") {
-      const existing = S.additions.find((m) => Number(m.start) === Number(S.liveTax.id));
-      if (!existing) return;
-      const res = await api("/api/miss", "PUT", {
-        runId: S.currentId, start: existing.start,
-        description: existing.description, why: existing.why || "",
-        tags: S.liveTax.tags, lane: S.liveTax.lane, work: S.liveTax.work,
-        cueText: existing.cueText || "", gapBefore: existing.gapBefore,
-      });
-      S.additions = res.additions || [];
-      S.current.additions = S.additions;
-    } else if (S.liveTax.type === "model") {
-      const res = await api("/api/annotate", "PUT", {
-        runId: S.currentId, index: Number(S.liveTax.id),
-        tags: S.liveTax.tags, lane: S.liveTax.lane, work: S.liveTax.work,
-      });
-      S.annotations = res.annotations || S.annotations;
-      S.current.annotations = S.annotations;
-    }
-    rememberChapter(S.liveTax.lane, S.liveTax.work);
+    res = await api("/api/miss", "PUT", { runId, ...addition });
   } catch (err) {
-    saveFailed(err);
+    saveFailedForRun(err, runId);
     return;
   }
+  if (!isCurrentRun(runId)) return;
+  S.additions = res.additions || [];
+  S.current.additions = S.additions;
   setSave("saved");
 }
 
-export async function persist(index, text) {
-  S.current.feedback[String(index)] = text;
-  setSave("saving…");
-  try {
-    await api("/api/feedback", "PUT", { runId: S.currentId, index, text });
-  } catch (err) {
-    saveFailed(err);
+export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
+  if (!tax || tax.type === "none" || !runId) return;
+  const snapshot = {
+    type: tax.type,
+    id: tax.id,
+    tags: [...(tax.tags || [])],
+    lane: tax.lane || "",
+    work: tax.work || "",
+  };
+  if (snapshot.type === "miss") {
+    cancelPendingAddition(snapshot.id, runId);
+    const existing = S.additions.find((m) => Number(m.start) === Number(snapshot.id));
+    if (!existing) return;
+    existing.tags = snapshot.tags;
+    existing.lane = snapshot.lane;
+    existing.work = snapshot.work;
+    await persistAddition(runId, additionSnapshot(existing));
+  } else if (snapshot.type === "model") {
+    cancelScheduled(`${runId}:taxonomy:${snapshot.id}`);
+    if (isCurrentRun(runId)) setSave("saving…");
+    let res;
+    try {
+      res = await api("/api/annotate", "PUT", {
+        runId, index: Number(snapshot.id),
+        tags: snapshot.tags, lane: snapshot.lane, work: snapshot.work,
+      });
+    } catch (err) {
+      saveFailedForRun(err, runId);
+      return;
+    }
+    if (!isCurrentRun(runId)) return;
+    S.annotations = res.annotations || S.annotations;
+    S.current.annotations = S.annotations;
+    setSave("saved");
+  }
+  if (isCurrentRun(runId)) rememberChapter(snapshot.lane, snapshot.work);
+}
+
+export function queueTaxonomy() {
+  if (!S.liveTax || S.liveTax.type === "none" || !S.currentId) return;
+  const runId = S.currentId;
+  const snapshot = {
+    type: S.liveTax.type,
+    id: S.liveTax.id,
+    tags: [...(S.liveTax.tags || [])],
+    lane: S.liveTax.lane || "",
+    work: S.liveTax.work || "",
+  };
+  if (snapshot.type === "miss") {
+    const existing = S.additions.find((m) => Number(m.start) === Number(snapshot.id));
+    if (!existing) return;
+    existing.tags = snapshot.tags;
+    existing.lane = snapshot.lane;
+    existing.work = snapshot.work;
+    const addition = additionSnapshot(existing);
+    scheduleSave(`${runId}:miss:${Number(snapshot.id)}`, 400, () => persistAddition(runId, addition));
     return;
   }
+  scheduleSave(`${runId}:taxonomy:${snapshot.id}`, 400, () => persistTaxonomy(snapshot, runId));
+}
+
+export async function persist(index, text, runId = S.currentId) {
+  if (!runId) return;
+  cancelScheduled(`${runId}:feedback:${index}`);
+  if (isCurrentRun(runId)) {
+    S.current.feedback[String(index)] = text;
+    setSave("saving…");
+  }
+  try {
+    await api("/api/feedback", "PUT", { runId, index, text });
+  } catch (err) {
+    saveFailedForRun(err, runId);
+    return;
+  }
+  if (!isCurrentRun(runId)) return;
   setSave("saved");
   updateStats();
-  const row = document.querySelector(`tr[data-markers*="${CSS.escape(String(index))}"]`);
+  const block = document.querySelector(`[data-marker="${CSS.escape(String(index))}"]`);
+  const row = block && block.closest("tr");
   if (row) {
     row.classList.remove("good", "note", "wrong");
     const cls = fbClass(text);
@@ -57,30 +159,31 @@ export async function persist(index, text) {
 
 export function queueSave(index, text) {
   S.current.feedback[String(index)] = text;
-  clearTimeout(S.saveTimer);
-  S.saveTimer = setTimeout(() => persist(index, text), 280);
+  const runId = S.currentId;
+  scheduleSave(`${runId}:feedback:${index}`, 280, () => persist(index, text, runId));
 }
 
 export function queueWrongReason(index, text) {
   // Empty reason stays "wrong" so the reject glyph doesn't drop while typing.
   const next = formatWrong(text);
   S.current.feedback[String(index)] = next;
-  clearTimeout(S.saveTimer);
-  S.saveTimer = setTimeout(() => persist(index, next), 400);
+  const runId = S.currentId;
+  scheduleSave(`${runId}:feedback:${index}`, 400, () => persist(index, next, runId));
 }
 
-export async function persistRelabel(index, text) {
+export async function persistRelabel(index, text, runId = S.currentId) {
   const trimmed = (text || "").trim();
-  if (!trimmed) return;
-  S.edits[String(index)] = trimmed;
-  setSave("saving…");
+  if (!trimmed || !runId) return;
+  cancelScheduled(`${runId}:relabel:${index}`);
+  if (isCurrentRun(runId)) setSave("saving…");
   let res;
   try {
-    res = await api("/api/relabel", "PUT", { runId: S.currentId, index, description: trimmed });
+    res = await api("/api/relabel", "PUT", { runId, index, description: trimmed });
   } catch (err) {
-    saveFailed(err);
+    saveFailedForRun(err, runId);
     return;
   }
+  if (!isCurrentRun(runId)) return;
   S.edits = res.edits || S.edits;
   S.current.edits = S.edits;
   setSave("saved");
@@ -101,36 +204,24 @@ export async function persistRelabel(index, text) {
 }
 
 export function queueRelabel(index, text) {
-  clearTimeout(S.saveTimer);
-  S.saveTimer = setTimeout(() => persistRelabel(index, text), 400);
+  const runId = S.currentId;
+  scheduleSave(`${runId}:relabel:${index}`, 400, () => persistRelabel(index, text, runId));
 }
 
-export async function persistMissDesc(start, text) {
+export function queueMissDesc(start, text) {
   const existing = S.additions.find((m) => Number(m.start) === Number(start));
   const description = (text || "").trim();
-  if (!existing || !description) return;
-  setSave("saving…");
-  let res;
-  try {
-    res = await api("/api/miss", "PUT", {
-      runId: S.currentId, start: existing.start,
-      description, why: existing.why || "",
-      tags: existing.tags || [], lane: existing.lane || "", work: existing.work || "",
-      cueText: existing.cueText || "",
-      gapBefore: existing.gapBefore,
-    });
-  } catch (err) {
-    saveFailed(err);
-    return;
-  }
-  S.additions = res.additions || [];
-  S.current.additions = S.additions;
-  setSave("saved");
+  const runId = S.currentId;
+  if (!existing || !description || !runId) return;
+  existing.description = description;
+  const addition = additionSnapshot(existing);
+  scheduleSave(`${runId}:miss:${Number(start)}`, 400, () => persistAddition(runId, addition));
 }
 
 export async function persistUnmiss(start) {
   start = Number(start);
   if (!S.additions.some((m) => Number(m.start) === start)) return;
+  cancelPendingAddition(start);
   if (S.composer && Number(S.composer.start) === start) S.composer = null;
   setSave("saving…");
   let res;

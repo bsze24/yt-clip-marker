@@ -89,20 +89,23 @@ function mergePair(keep, other) {
   };
 }
 
-function mergeNearby(items) {
+export function mergeNearby(items) {
   const sorted = items.slice().sort((a, b) => a.start - b.start || RANK[a.source] - RANK[b.source]);
-  const out = [];
+  const clusters = [];
   for (const it of sorted) {
-    const prev = out[out.length - 1];
-    if (prev && Math.abs(it.start - prev.start) <= MATCH) {
-      const keep = RANK[it.source] < RANK[prev.source] ? it : prev;
-      const other = keep === it ? prev : it;
-      out[out.length - 1] = mergePair(keep, other);
+    const cluster = clusters[clusters.length - 1];
+    if (cluster && it.start - cluster.firstStart <= MATCH) {
+      const keep = RANK[it.source] < RANK[cluster.clip.source] ? it : cluster.clip;
+      const other = keep === it ? cluster.clip : it;
+      cluster.clip = mergePair(keep, other);
       continue;
     }
-    out.push({ ...it, tags: [...(it.tags || [])] });
+    clusters.push({
+      firstStart: it.start,
+      clip: { ...it, tags: [...(it.tags || [])] },
+    });
   }
-  return out;
+  return clusters.map((cluster) => cluster.clip);
 }
 
 function formatClip(c, sectionLane) {
@@ -140,9 +143,8 @@ export function descriptionTimestampText() {
   // YouTube chapters need a 0:00 stamp. Park it under the first work
   // header so that header isn't swallowed as the chapter title.
   if (clips[0].start > 0) {
-    const headerIdx = lines.findIndex((l) => l && !/^\d+:\d+/.test(l));
     const zero = `${ytStamp(0)} Start`;
-    if (headerIdx >= 0) lines.splice(headerIdx + 1, 0, zero);
+    if ((clips[0].work || "").trim()) lines.splice(1, 0, zero);
     else lines.unshift(zero);
   }
   return lines.join("\n");
