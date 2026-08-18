@@ -271,10 +271,16 @@ under 10s, so chapter compliance is close enough to be worth keeping rather than
 
 So: the `0:00 Start` injection stays, and [[D-027]]'s placement rule stays load-bearing.
 
-Reaching compliance is separate work, deliberately not in PR 3. Two routes were priced:
-dropping the offending lines costs three annotations outright, while widening the export's
-fold window to ~6s reaches the same 68 timestamps and loses no tag, star, lane or work —
-`mergePair` unions them onto the surviving line. Widening wins. Tracked as `TD-9`.
+Reaching compliance is separate work, deliberately not in PR 3. Tracked as `TD-9`.
+
+**Amended 2026-08-19 — this decision was taken on a false premise.** It was presented as
+"chapters are nearly free: widening the fold reaches 68 timestamps and loses nothing." The
+taxonomy does survive a widened fold, but three of Brian's own labels are deleted and replaced by
+the published wording of a nearby stamp, and at least two of those name a different moment. The
+real trade is *surrender three descriptions to gain a segmented scrubber*, which is a legitimate
+thing to want and a different question from the one that was asked. Nothing is broken either way:
+the current export is correct, and chapters are an external constraint it happens not to meet.
+Re-decide at the export freeze with the actual cost in view; `TD-9` carries the table.
 
 Caveat carried from the measurement: the 10-second rule is stated from memory and was not
 verified against YouTube's documentation, and the whole picture is one video. Confirm both by

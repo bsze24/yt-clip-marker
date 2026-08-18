@@ -229,16 +229,32 @@ work as well as tags.
 
 **Trigger:** with the next taxonomy-entry work. Held out of PR 3 deliberately.
 
-### TD-9 — the export fold shares `MATCH` with grid alignment, blocking chapter compliance
+### TD-9 — widening the export fold would buy chapters by deleting three labels
 
 **Where:** `apps/studio/ui/util.js` — `export const MATCH = 2`, consumed by `grid.js`
 (`takeNear`, row alignment) and `export.js` (`mergeNearby`, the copy-timestamps fold).
 
-**Issue:** [[D-031]] keeps YouTube chapters as a goal. Video 1's export fails only the
-10-second minimum, on four consecutive pairs. Widening the fold to ~6s fixes all four — 68
-timestamps, every gap ≥10s — and loses nothing, because `mergePair` unions tags, lane and work
-onto the surviving line; only three label texts are replaced by YouTube's published wording for
-the same moments. Measured 2026-08-18:
+**Nothing is broken.** Corrected 2026-08-19. Two earlier framings here were wrong. The fold
+window is not *for* chapters — YouTube is blind to this repo and simply reads the description
+text; chapter compliance is a downstream accident of what the window produces. And the export is
+correct as it stands: 71 timestamps faithfully reflecting what Brian marked, with four pairs close
+together because he marked two things close together.
+
+**Issue:** [[D-031]] keeps chapters as a goal, and video 1 fails only the 10-second minimum, on
+four consecutive pairs. Widening the fold to ~6s makes it qualify — 68 timestamps, every gap ≥10s
+— but it is a **trade, not a fix, and it is not free.** `mergePair` unions tags, lane and work
+onto the surviving line, so the taxonomy survives. The *labels do not*: three of Brian's
+descriptions are deleted and replaced by the published wording of a nearby stamp, and at least two
+of the three name a different moment rather than the same one.
+
+| deleted | replaced by |
+| --- | --- |
+| `54:38 Loop 4-bar chunks (backdoor ii-V)` | `54:42 Finding a few places to really nail` |
+| `55:40 *** Hearing vs executing; hand ahead of ear` | `55:43 Is the limitation hearing the line…` |
+| `1:18:52 *** Jake demo — melody, harmonized` | absorbed into `1:18:58 Freedom Demo c1` |
+
+An earlier version of this entry said widening "loses nothing". That was checked against tags only
+and never against the label text. Measured 2026-08-18:
 
 | fold window | timestamps | gaps under 10s |
 | --- | --- | --- |
