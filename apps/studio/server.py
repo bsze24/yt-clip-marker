@@ -401,7 +401,8 @@ def list_runs():
         run_id = path.stem
         markers = data.get("markers") or []
         fb = fb_by_run.get(run_id, {})
-        checks = wrongs = notes = 0
+        annotations = load_annotations(run_id)
+        checks = wrongs = notes = keeps = 0
         for i, _m in enumerate(markers):
             v = verdict_for(fb.get(str(i), ""))
             if v == "check":
@@ -410,6 +411,10 @@ def list_runs():
                 wrongs += 1
             elif v == "note":
                 notes += 1
+            else:
+                annotation = annotations.get(str(i), {})
+                if annotation.get("tags") or annotation.get("lane") or annotation.get("work"):
+                    keeps += 1
         rows.append(
             {
                 "id": run_id,
@@ -422,7 +427,8 @@ def list_runs():
                 "checkCount": checks,
                 "wrongCount": wrongs,
                 "noteCount": notes,
-                "blankCount": max(0, len(markers) - checks - wrongs - notes),
+                "keepCount": keeps,
+                "blankCount": max(0, len(markers) - checks - wrongs - notes - keeps),
             }
         )
     return rows

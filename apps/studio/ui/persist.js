@@ -246,13 +246,20 @@ function selectedTaxRow() {
 export async function toggleStar() {
   const row = selectedTaxRow();
   if (!row || row.dataset.taxType === "none") return;
-  const tags = (row.dataset.taxTags || "").split("|").filter(Boolean);
-  S.liveTax = {
+  const sameLiveTax = S.liveTax
+    && S.liveTax.type === row.dataset.taxType
+    && String(S.liveTax.id) === String(row.dataset.taxId);
+  const current = sameLiveTax ? S.liveTax : {
     type: row.dataset.taxType,
     id: row.dataset.taxId,
-    tags: tags.includes(STAR_TAG) ? tags.filter((t) => t !== STAR_TAG) : [...tags, STAR_TAG],
+    tags: (row.dataset.taxTags || "").split("|").filter(Boolean),
     lane: row.dataset.taxLane || "",
     work: row.dataset.taxWork || "",
+  };
+  const tags = [...(current.tags || [])];
+  S.liveTax = {
+    ...current,
+    tags: tags.includes(STAR_TAG) ? tags.filter((t) => t !== STAR_TAG) : [...tags, STAR_TAG],
   };
   await persistTaxonomy();
   renderGrid();
