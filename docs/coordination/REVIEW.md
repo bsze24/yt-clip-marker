@@ -1,8 +1,10 @@
 # Review
 
-Active target: **PRs 4 and 5**. Thread 1 (PR 3) closed 2026-08-18 with no open findings; its
-durable outcomes are harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is
-not kept here. Threads 2 and 3 were blocked behind it and are now open.
+Active target: **PR 7 — local video mode** (thread 4). Threads 1 and 3 are closed; thread 2
+(PR 4) is clean and waiting on Brian to merge, not on a reviewer. Thread 1's durable outcomes
+were harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is not kept here.
+
+Roles are reversed on thread 4 at Brian's instruction: Claude Code implemented, Codex reviews.
 
 > ## Concurrency protocol — read before editing
 >
@@ -30,6 +32,7 @@ not kept here. Threads 2 and 3 were blocked behind it and are now open.
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
 | 2 — video 1 store | `43c99dd` (PR 4) | **clean** — F16 fixed, F17 non-blocking | → Brian, merge |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
+| 4 — local video mode | `c4de36d` (PR 7) | **open** — no findings filed yet | → reviewer |
 
 ---
 
@@ -666,3 +669,34 @@ The thread's own scope note anticipated this: "session logs have duplicated befo
 duplicate should be deleted rather than committed and then explained." That is what happened.
 
 _No findings — the branch is obsolete rather than wrong._
+
+
+---
+
+## Thread 4 — local video mode (`c4de36d`) — OPEN
+
+**Target.** `c4de36d` on `local-video-mode`, two product commits: `4b344d5` (the mode) and
+`c4de36d` (`prefetch.py` plus two yt-dlp fixes). Verify it is on the branch before reviewing:
+`git merge-base --is-ancestor c4de36d HEAD`.
+
+**Scope.** The studio playing from disk and ingesting without network. Spec and rationale are
+in `docs/prs/pr-7-local-video-mode.md`; the acceptance criteria and the implementer's
+three-part audit are in `CURRENT.md`. The extension is untouched ([[D-006]]).
+
+**What the implementer already verified**, so the review need not re-derive it unless a
+finding depends on it: byte-range responses and their traversal guard; the transport keys and
+seeking on the local backend; the zero-transcript flow through to a `labels.jsonl` write; the
+YouTube-run auto-attach and its removal; `prefetch.py` end to end and its idempotent rerun;
+and video 1 loading unchanged on the real store. Evidence is in `CURRENT.md`'s handoff note.
+All browser writes went to a disposable copy of the store.
+
+**What nobody has checked.** Playback on an actually disconnected machine. The claim rests on
+the code path and on a local run issuing no external request, not on a disconnected test. If
+the reviewer can pull the network, that is the one gap worth closing directly.
+
+**Severity, per `README.md`.** Measure it. There is exactly one local run in existence
+(`prefetch.py` against a real video, in a scratch store), so "fires on data that exists today"
+is a low bar here — say plainly whether a finding costs Brian something on a flight, or is
+latent.
+
+_No findings yet._
