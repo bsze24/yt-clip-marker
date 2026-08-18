@@ -18,7 +18,7 @@ The V1 PRD assumed annotation happens *on the YouTube watch page*. Building the 
 
 So the product is **one clipper with two clients of one clip record**:
 
-- **Studio** (`apps/studio/`) — the annotating surface and the workspace. A local web app: time-aligned grid of captions, markers, and published YouTube-description timestamps, with keyboard-first clip creation and a taxonomy (work / lane / tags). This is where the PRD's old "refinement" and "export" jobs live.
+- **Studio** (`apps/studio/`) — the annotating surface and the workspace. A local web app: time-aligned grid of captions, skill markers, added markers, and extracted markers (published YouTube-description timestamps), with keyboard-first clip creation and a taxonomy (work / lane / tags). This is where the PRD's old "refinement" and "export" jobs live.
 - **Extension** (`apps/extension/`) — the viewing surface. A thin client on the YouTube watch page: optional coarse capture (`[` / `]`) while watching naturally. It is frozen at that scope — it is not a store, not an editor, and does not grow taxonomy, transcript, or export features.
 
 They share the **clip contract**, not code or screen:
@@ -47,22 +47,24 @@ Today's `eval/` app, promoted. Python stdlib server (`python3 apps/studio/server
 
 ### Already built (keep; this is the product)
 
-- **Time-aligned grid.** Captions, markers, and extracted markers (published YT description timestamps) share a row when starts are within 2s. Row selection is by **row identity**, not start time (duplicate timestamps broke start-keyed selection).
-- **Keyboard-first flow.** `j`/`k` row nav (selects + seeks), `Enter` add/edit clip, `Tab` then `t`/`w`/`l`/`y` for tags/work/lane/why, `x` reject a marker or delete an added clip, `f` follow, `space` play/pause.
+- **Time-aligned grid.** Captions, skill markers, and extracted markers (published YT description timestamps) share a row when starts are within 2s. Row selection is by **row identity**, not start time (duplicate timestamps broke start-keyed selection).
+- **Keyboard-first flow.** `j`/`k` row nav (selects + seeks), `Enter` add/edit clip, `Tab` then `t`/`w`/`l`/`y` for tags/work/lane/why, `x` reject a skill marker or delete an added marker, `f` follow, `space` play/pause.
 - **Taxonomy.** `work` (Song | Rendition), `lane` (chapter lane), `tags` (multi, freeform + seeded vocabulary) — replacing exclusive TAKE/CONCEPT.
 - **YouTube IFrame embed** — YouTube as *player*, never as IDE.
 - **Store.** `runs/{videoId}-{stamp}.json` (immutable model/ingest output) + `labels.jsonl` (append-only human events).
 
 ### New in this refactor
 
-- **In-app ingest.** Paste a YouTube URL in the studio → server fetches the caption track and description via `yt-dlp`, flags silence gaps, parses extracted markers from the description, writes a run file with an **empty markers array**, and opens it. The skill runbook is no longer the only door; a video can be annotated with only human clips.
+- **In-app ingest.** Paste a YouTube URL in the studio → server fetches the caption track and description via `yt-dlp`, flags silence gaps, parses extracted markers from the description, writes a run file with an **empty markers array**, and opens it. The skill runbook is no longer the only door; a video can be annotated with only added markers.
 - **Eval mode (toggle, default off).** Check/note feedback, rationales, and check/note stats are skill-eval chrome, not the annotation loop. They stay available behind a header toggle until the suggester is trusted (~5 labeled videos), then we revisit removal.
 - **`kind` optional.** `TAKE`/`CONCEPT` remains readable on old markers but is never required on new writes. Tags/lane/work carry the taxonomy.
 
 ### Next (in priority order, not this refactor)
 
+Living list: `docs/coordination/BACKLOG.md`. Snapshot at the two-surface lock:
+
 1. **End collection.** Ranges (`end`) settable from the grid — required before reel-oriented export is useful.
-2. **Export buttons.** Copy as `M:SS Title` description timestamps (end dropped); copy as JSON (the media-scraper seam). Freeze the JSON schema when this lands.
+2. **JSON export.** Copy as JSON (the media-scraper seam). Freeze the schema when this lands ([[D-015]]). Description-timestamp copy already shipped in PR 3 (`apps/studio/ui/export.js`, [[D-022]]).
 3. **Suggest-markers as a studio action** (currently a Claude-skill invoke; see below).
 
 ## Surface 2: Extension (thin client, frozen)
@@ -98,13 +100,15 @@ Invoking the skill still writes markers into a run file the studio reads. When i
 
 ## Decisions log (handoff's open questions, answered)
 
+Living ledger (don't silently revise): `docs/coordination/DECISIONS.md`. Table below is the two-surface lock; later refinements (row identity, copy-timestamps fold, eval channels) live there.
+
 | Question | Decision |
 |---|---|
 | How thin is the extension? | Keep load-on-watch + `[` `]` coarse capture (already built, zero-cost to keep); freeze there. Not handoff-only, not an editor. |
 | Suggest-markers: studio action or skill invoke? | Stays a skill invoke for now; in-app ingest lands first so runs exist without the skill. |
 | Eval chrome now or later? | Behind an eval-mode toggle, default off. Revisit removal after ~5 labeled videos. |
 | Collect `end` now? | Not in this refactor. Schema keeps `end` nullable; end collection is the studio's next feature. |
-| Extracted-marker column? (then called gold) | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
+| Extracted-marker column? (was: gold) | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
 | Rename layout? | `apps/extension/` + `apps/studio/`. No `schema/` folder until shared code exists; the contract lives in `docs/clip-schema.md`. |
 | Freeze media-scraper JSON? | Draft now, freeze when the studio export button lands. Don't block the split on it. |
 | Canonical store? | Studio: `runs/` + `labels.jsonl`. The extension stays storeless. |

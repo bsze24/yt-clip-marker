@@ -1,5 +1,10 @@
 # Two-surface clipper — handoff
 
+> **Historical.** Written 2026-08-14 as a planning packet. The product decision landed;
+> live state is `docs/coordination/` (especially `DECISIONS.md` D-001… and `CURRENT.md`).
+> Don't treat the "outstanding questions" or `eval/` paths below as current — they were
+> answered in the PRD decisions log and harvested into D-006…D-015.
+
 Context for planning and execution in Claude. This is a **suggested path**, not a locked plan. The product decision is the load-bearing part; repo layout, rename, and sequencing are open to a better plan.
 
 **Date:** 2026-08-14

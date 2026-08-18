@@ -1,54 +1,124 @@
 # AGENTS.md
 
-Shared guidance for coding agents working in this repo.
+Shared guidance for coding agents working in this repo. Process detail is not here — it is
+in `docs/coordination/README.md`, and duplicating it into this file is how the two drift.
 
-Claude Code loads these instructions through the `@AGENTS.md` import in
-`CLAUDE.md`. Keep shared project guidance here to prevent the two files from
-drifting.
+## Read first, in order
+
+1. `docs/coordination/README.md` — roles, vocabulary, handoff cycle, review loop, and the
+   audit every implementer owes before recording a SHA.
+2. `docs/coordination/CURRENT.md` — the one active task and where the baton is.
+3. `docs/coordination/REVIEW.md` — active review targets and findings.
+4. `docs/coordination/BACKLOG.md` — roadmap, deferred work, tech debt, open modeling decisions.
+5. `docs/coordination/DECISIONS.md` — durable calls (`D-001`…). Do not relitigate a decision
+   silently; supersede it with a new dated entry.
+6. The current PR spec under `docs/prs/`, if one exists for the task.
+
+Git history is the source of truth for code; those files are the source of truth for intent.
+The product why is `docs/youtube-clip-marker-prd.md`.
+
+## Repo state
+
+`main` is `5af3e13` (2026-08-18). The two-surface layout is merged: the extension lives at
+`apps/extension/`, the studio at `apps/studio/`, and the clip contract at
+`docs/clip-schema.md`. The old `content/` directory in the repo root is gone.
+
+Older branches and session logs still describe the pre-merge layout, so confirm which tree you
+are standing in before quoting a path from one of them. `docs/coordination/CURRENT.md` §0
+carries the live PR table.
+
+## Mission — two goals, both first-class
+
+1. Ship the clipper.
+2. **Grow Brian's understanding** of skills, agents, and web-app engineering. This is a
+   primary goal, not a side effect.
+
+Every agent is a mentor. Explain the why and the tradeoffs, teach while you work, flag gaps
+worth drilling, and steer toward the answer rather than silently producing it. Brian learns by
+building — operator background, not a career engineer — and works hands-on.
+
+Concretely: reviews teach rather than just listing fixes; when implementing, say what changed
+and why. When you correct a mistake, give the underlying principle ("Shadow DOM, because
+YouTube's CSS would otherwise inherit into the panel"), not just the fix. The principle
+transfers; the fix does not.
 
 ## Project context
 
-**One clipper, two surfaces.** This repo is a clip-marking tool for long-form YouTube video (music lessons), split into two clients of one clip record:
+**One clipper, two surfaces** ([[D-001]]). A tool for marking clips in long-form YouTube music
+lessons, split into two clients of one clip record:
 
-- **Studio (`apps/studio/`) — the workspace.** A local Python-stdlib web app: time-aligned grid of captions, markers, and published description timestamps; keyboard-first clip creation; taxonomy (work / lane / tags); in-app ingest (URL → transcript + gaps + extracted). This is where annotation, refinement, and (future) export happen. It began life as an eval dashboard for the suggester skill — do NOT treat it as disposable eval tooling; it is the product.
-- **Extension (`apps/extension/`) — the viewing surface, frozen thin.** Manifest V3 Chrome extension loaded unpacked from `apps/extension`. Coarse `[` / `]` capture on the watch page, in-memory only. It is not a store, not an editor, and does not grow taxonomy/transcript/export features. Do not rebuild the on-YouTube IDE.
+- **Studio — the workspace.** A local Python-stdlib web app: a time-aligned grid of captions,
+  skill markers, added markers, and extracted markers; keyboard-first clip creation; taxonomy of
+  work, lane and tags; in-app ingest from a URL. It began as an eval dashboard for the
+  `yt-clipper` skill and stayed in daily use until it *was* the product. It is not disposable
+  eval tooling.
+- **Extension — the viewing surface, frozen thin** ([[D-006]]). Manifest V3, loaded unpacked.
+  Coarse `[` / `]` capture on the watch page, in memory only. Not a store, not an editor. It
+  does not grow taxonomy, transcript, or export features. Do not rebuild the on-YouTube IDE.
 
-The surfaces share the clip contract (`docs/clip-schema.md`), never code. Side project to media-scraper, which will consume clips via the studio's JSON export only — media-scraper never lives in this tree.
+The two share the clip contract (`docs/clip-schema.md`), never code. media-scraper is a
+separate repo downstream and consumes clips through the studio's JSON export only; it never
+lives in this tree.
 
-Tech stack:
-- Studio: Python 3 stdlib server (`http.server`) + one vanilla-JS HTML page. `yt-dlp` on PATH for ingest. Store is `runs/*.json` + append-only `labels.jsonl`. No framework, no database, no npm, no build step.
-- Extension: Manifest V3, vanilla JS, Shadow DOM panel. No storage permissions.
+The clip record is video identity, `start`, a nullable `end`, and work / lane / tags. `end`
+stays nullable until range collection lands ([[D-012]]).
 
-## Context files — read before starting any task
-
-- `AGENTS.md`
-- `docs/youtube-clip-marker-prd.md` — two-surface product requirements
-- `docs/clip-schema.md` — the shared clip contract and store shapes
-- `docs/two-surface-handoff.md` — how the product model got here
-- The current PR spec under `docs/prs/` if one exists for the task
+**Vocabulary matters here.** Three kinds of marker: *skill marker* (skill proposal),
+*added marker* (human, after ingest), *extracted marker* (published description stamps).
+Do not say gold — that word collides with the `g` few-shot grade. The eval verdicts —
+`g`, `x`, taxonomy-without-`g`, `star`, blank — are five distinct channels and collapsing
+them has caused real errors. Full table in `docs/coordination/README.md`.
 
 ## Session logs
 
-See `docs/sessions/` for prior-session context; resume related work by matching the frontmatter `track:` value.
+Work-session state lives in `docs/sessions/<date>-<HHMM>-<surface>-<slug>.md` — one committed
+file per session, with a `track:` in frontmatter grouping the logs that belong to one
+workstream.
 
-## Architecture rules — studio
+To resume a thread: filter by `track:`, then open the candidates and read their "Project
+context" blocks, which name the resume head. **Do not just take the newest match** — the
+filename carries the date the log was written, not the dates it covers, and a log written
+after the fact sorts newest while pointing backwards. On `track: studio-workspace` today the
+head is `2026-08-16-1507-grok-studio-fable-lock.md`, and the newer `2026-08-17-1740-…` file
+says so itself. The folded ledger shares the track but is a data artifact, not a resume point.
 
-- **The studio is the workspace; the store is the source of truth.** `runs/{id}.json` is immutable ingest/model output; `labels.jsonl` is append-only human events. Latest event per row identity wins; deletes are tombstones (`unmiss`). Never rewrite history in place.
-- **Row identity, not start time.** Duplicate timestamps are real (two markers at 3:19). Selection and event keys use row identity (`(runId, markerIndex)` or `(runId, start)` for additions) — never assume start times are unique.
-- **`kind` (TAKE/CONCEPT) is legacy.** Readable on old data, never required on new writes. Taxonomy is work / lane / tags.
-- **Eval chrome stays behind eval mode.** Check/note feedback, rationales, and their stats are skill-eval tooling, not the annotation loop. Default off.
-- **Keyboard-first; keep keys on the page.** The grid owns `j`/`k`/`Enter`/etc. The YouTube IFrame steals focus after interactions — re-blur it (`keepKeysOnPage`) so hotkeys keep working.
-- **One keyboard dispatcher.** All global hotkeys route through the priority chain of named contexts in `ui/keys.js` (combo → composer form → desc inputs → typing guard → tab prefix → grid → player). Never add a second document-level keydown listener; add or change behavior by editing the owning context.
-- **Shared UI state lives on `S`.** Cross-module mutable state is the `S` object in `ui/state.js`; state owned by one module (player handle, suggest highlight, tab-prefix timer) stays module-local. No new top-level `let` globals.
-- **Stay stdlib.** No pip dependencies for the server, no framework for the page, until it actually hurts. `yt-dlp` is the one external tool (subprocess).
+- **Learning state** — what Brian understands, drills owed, the confusions themselves — lives
+  in these logs, never in the coordination docs.
+- **Project state** — tasks, decisions, roadmap, findings — lives in the coordination docs.
+- A real project finding that surfaces during a learning session is project state. What the
+  artifact is decides its home, not how it came up.
 
-## Architecture rules — extension
+## Standing guardrails
 
-- **Frozen at thin client.** Load on watch pages, coarse capture, in-memory marks. The original PR 3/4 plans (chrome.storage as canonical store, refinement hotkeys, panel export, SPA remount work for the on-YouTube IDE) are superseded — see `docs/prs/pr-3-two-surface-refactor.md`.
-- **All panel UI lives inside Shadow DOM.** YouTube's CSS will override anything mounted directly into the document.
-- **Input-focus guard on every keyboard listener.** Check `e.composedPath()[0]` for `INPUT`, `TEXTAREA`, or `isContentEditable === true` (`document.activeElement` can't see through shadow roots). Also guard modifiers (Cmd/Ctrl/Alt), key repeat (`e.repeat`), and IME composition (`e.isComposing`).
-- **Hotkey listener as a self-contained module.** One place to register/route hotkeys.
-- **No broad permissions or `host_permissions` unless required.**
+These override convenience. Full statements are in `DECISIONS.md`; live task state is
+`CURRENT.md` and is not copied here.
+
+- **The studio store is canonical** ([[D-002]], [[D-007]]). `runs/{id}.json` is immutable
+  ingest and model output; `labels.jsonl` is append-only. Latest event per row identity wins
+  ([[D-008]]); deletes are `unmiss` tombstones. Never rewrite history in place. The extension
+  stays storeless.
+- **The extension stays frozen** ([[D-006]]). No `chrome.storage` canonical store, no
+  refinement hotkeys, no panel export, no SPA remount for an on-page editor.
+- **Stay stdlib** ([[D-005]]). No pip dependencies for the server, no framework for the page,
+  until it actually hurts. `yt-dlp` is the one external tool.
+- **Eval chrome stays behind eval mode** ([[D-010]]). Check, note and rationale are not the
+  annotation loop. Default off, and do not collapse the eval channels ([[D-021]]).
+
+## Stack
+
+- **Studio:** Python 3 stdlib (`http.server`) plus one vanilla-JS page, served on
+  `127.0.0.1:8765`. Store is `runs/*.json` and append-only `labels.jsonl`. No framework, no
+  database, no npm, no build step. UI modules live in `apps/studio/ui/`; `keys.js` is the one
+  keyboard dispatcher ([[D-016]]) and shared UI state lives on `S` ([[D-017]]).
+- **Extension:** Manifest V3, vanilla JS, Shadow DOM panel ([[D-018]]). No storage permission.
+  The input-focus guard reads `e.composedPath()[0]`, because `document.activeElement` cannot
+  see through a shadow root.
+- **The suggester skill** lives outside the repo at `~/.claude/skills/yt-clipper/` and writes
+  runs into `apps/studio/runs/`. In-app ingest is the other door and produces empty
+  `markers[]`. Suggest-as-studio-action is backlog ([[D-011]]).
+
+`docs/two-surface-handoff.md` is historical provenance; the live decisions are `D-001`…
+`docs/prs/` holds task specs that became PRs — provenance, not a second `CURRENT.md`.
 
 ## File structure (current)
 
@@ -93,39 +163,25 @@ The suggester skill lives outside the repo at `~/.claude/skills/yt-clipper/` and
 
 ## Code style
 
-- Vanilla JS, modern (ES2022+) fine — runs in current Chrome only. Functional over class-based. Self-contained modules over scattered side effects. No sloppy code that wouldn't pass strict mode.
+- Vanilla JS, ES2022+ is fine — this runs in current Chrome only. Functional over
+  class-based. Self-contained modules over scattered side effects. Nothing that would fail
+  strict mode.
 - Python: stdlib style, small pure functions, no dependencies.
 
 ## Git workflow
 
-- Never commit to `main`.
-- Always pull latest `main` before creating a new branch.
-- Always create a NEW branch for each change (never reuse old names).
-- One PR per change, even small ones.
-- Don't push new commits while BugBot is mid-review (wait or the review restarts).
-- Commit messages: concise single-line title with PR number prefix (e.g. `PR 1: skeleton extension with shadow-DOM panel`), plus an optional body for context, bullet points, or rationale. Title stays single-line; body is free-form.
-
-## Session prompt audit
-
-If this session was driven by a session prompt (`.md` file), do NOT commit until completing this audit:
-
-1. **Task verification.** Compare every task in the prompt against what was built. For each task, confirm it was done with specific evidence (function name, file, line) or flag what's missing/different.
-2. **Assumptions.** List any assumptions made that weren't explicit in the prompt — places where two reasonable implementations were possible and you picked one. Explain why.
-3. **Skips & divergences.** List anything from the prompt you intentionally skipped or interpreted differently, and why.
+- Never commit to `main`. Pull latest `main` before creating a branch.
+- A new branch per change; never reuse a branch name. One PR per change, even a small one.
+- **Never `git add -A`.** Run data and session logs are not the product PR.
+- Do not push while BugBot is mid-review — the review restarts.
+- Commit messages: a single-line title prefixed with the PR number (`PR 1: skeleton extension
+  with shadow-DOM panel`), plus an optional free-form body.
 
 ## Before committing
 
-- Scan changed files for:
-  - Missing try/catch around async operations (fetch in the studio page, `chrome.*` APIs)
-  - Missing error/empty states in UI (no runs, ingest failure, missing video element)
-  - Edge cases (empty marks/markers array, null `videoId`, null `end`, duplicate start times, no pending start)
-  - Unguarded keyboard listeners (input-focus guard, modifier-key guard, repeat guard)
-- When fixing a bug, check for similar issues elsewhere in the file.
-- Batch related fixes in one commit (reduces BugBot round-trips).
-- Verify no API keys, tokens, or secrets in committed code.
-- Studio: `python3 apps/studio/server.py` boots, existing runs load, a label save round-trips.
-- Extension: still loads unpacked from `apps/extension` — `chrome://extensions` shows no warnings, console clean on a watch page.
+Run the pre-SHA checklist in `docs/coordination/README.md` — it is the one copy. If the
+session was driven by a prompt file, the same three-part audit (acceptance criteria with
+evidence, assumptions, skips and divergences) applies before you commit.
 
-## Communication style
-
-When correcting a mistake or changing approach, briefly explain *why* (e.g. "Shadow DOM because YouTube's CSS would otherwise inherit"). I'm using this project to learn — explain the underlying principle, not just the fix.
+There is no test suite. The floor is: the studio boots and a label save round-trips; the
+extension still loads unpacked with a clean console on a watch page.
