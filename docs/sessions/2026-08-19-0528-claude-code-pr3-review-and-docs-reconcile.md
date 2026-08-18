@@ -1,6 +1,7 @@
 ---
 date: 2026-08-19
 time: "05:28"
+revised: 2026-08-19 05:50
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: two-surface-land
@@ -67,6 +68,8 @@ and roughly half the session went to fixing that.
   before seeing it demonstrated. Correct, and sharper than the example I had.
 - Asked for the retro after noticing your model of merge-readiness had drifted from mine for
   several turns.
+- "I was always confused why PR 5 existed" — the confusion was correct. PR 5 and PR 6 froze
+  snapshots of documents that were still being written, and both died the same way.
 
 ## Concepts touched
 - [concept] displayed-time vs stored identity — solid — you predicted the F7 boundary split from
@@ -79,6 +82,9 @@ and roughly half the session went to fixing that.
   "unverified"; F7 was filed blocking and never fired once on real data.
 - [concept] one-name-per-thing — emerging — new. "The exporter / the code / the copy-timestamps
   function" for one function, and "item 6" beside "F6", both broke comprehension.
+- [concept] pr-as-container-vs-live-document — emerging — new. PRs 5 and 6 both froze live
+  working documents and both closed unmerged; the newest copies of five files sat outside git
+  for three days as a result.
 
 ## Coaching hooks
 - **Mode confusion, mine not yours.** A readiness question got answered as a recommendation:
@@ -92,21 +98,32 @@ and roughly half the session went to fixing that.
   wrong", never as "repeat it slower".
 
 ## Next / open threads
-- Threads 2 and 3 in `REVIEW.md` — PR 4 (`43c99dd`) and PR 5 (`949cb7b`) have no recorded
-  verdict. Thread 2 already carries reviewer evidence from this session; thread 3 carries the
-  starting point.
-- PR 5 lands a folded ledger written in the retired `gold` vocabulary, and `main` now has that
-  file at `docs/reference/` in corrected wording. Rival copy — decide before merging. `TD-5`.
+- **PR 4 is the only open PR and the clear next step.** Thread 2 has one question left: shapes
+  field-by-field against `docs/clip-schema.md`. Everything else is verified in-thread. Merging it
+  also restores run 1 — see the blocker below.
 - `TD-9`: give `export.js` its own fold window so chapters can qualify. Pick the number from a
   second video, not from video 1.
-- The `brian.md` style edit is drafted and unapplied.
+- **Two work items exist nowhere.** (1) Revising the skill from run 1's corpus — `g` is called
+  "the positive training signal" in three places and nothing schedules using it. (2) Importing a
+  transcript the tool did not fetch. Both need a sentence from Brian before they can be written.
+- **Video 2 unlocks three items at once** — `TD-6`, `TD-9`'s window, and the `R-NEIGHBORHOOD`
+  decision all say "measure a second video." Highest-leverage single move available.
+- `TD-4` blocks the skill revision: 121 of run 1's `note` events are actually rejects, and any
+  scoring pass reading `labels.jsonl` will miscount them.
+- Not on Brian's own list and absent from this thread: end collection ([[D-012]]) and JSON export
+  ([[D-015]]), which the backlog ranks #1 and #2.
 - Copy-timestamps has never been pressed in a browser. Studio still up on `127.0.0.1:8766` in a
   scratch worktree.
+- ~~The `brian.md` style edit is drafted and unapplied.~~ Applied 05:31.
 
 ## Open questions / blockers
 - The YouTube 10-second chapter rule is stated from memory, unverified — and [[D-031]] rests on
   it. Paste a real description and look at the progress bar.
 - `0/64` markers drifting and the `6s` fold window are both one-video numbers. `TD-6`, `TD-9`.
+- **Run 1's annotation data — three days of labeling — exists only on PR 4's branch and in a
+  temp worktree. It is on no permanent branch.** Merging PR 4 is what fixes this.
+- Offered but unanswered: record "live documents go straight to `main`; PRs are for changes that
+  end" as a decision. It is the rule that would have prevented PRs 5 and 6.
 
 ## Chronology (the record)
 - **11:35** — Asked whether I had enough state to review Codex's work in `REVIEW.md`. Read the
@@ -173,6 +190,31 @@ and roughly half the session went to fixing that.
   `AGENTS.md` before pushing caught four false claims in it.
 - **05:24–05:28** — You pushed. Closed PR 6, deleted three branches, cleaned the checkout,
   preserved Grok's backup.
+- **05:31** — Reconciled PR 5 and closed it as superseded. Both files it adds are older copies of
+  files `main` already carries under different names — same session log at a later `revised:`
+  stamp, and the folded ledger with 40 `gold` hits against `main`'s zero. Applied the `brian.md`
+  style edit. Committed `02c2d3c`.
+- **05:31** — Clobber check across open PRs, and I nearly reported it backwards.
+  `git diff main..branch` showed PR 5 deleting `attach_extracted.py`, restoring `attach_gold.py`,
+  and reverting every F6-F15 fix across sixteen files. All an artifact of its base `a051667`. A
+  merge applies only what a branch changed since its merge-base, which for PR 5 is two files and
+  for PR 4 is two data files. **No open PR clobbers any document.** Method written into `TD-5`.
+- **05:40** — You asked why PR 5 ever existed. Traced it: created 2026-08-16 17:07 to hold two
+  session artifacts out of PR 3's diff. Both files kept being edited as untracked files for two
+  more days — the log renamed `claude` → `grok` and revised a day later, the ledger rewritten and
+  moved to `docs/reference/`. Neither edit touched PR 5's branch. `git log --all` shows both of
+  `main`'s copies first entering git only at `69ff615`.
+- **05:45** — What PR 4 substantively is: the run file plus 553 append-only events spanning
+  2026-08-14 13:05 to 2026-08-16 15:12, all 64 markers touched. Reconciled the added-marker
+  counts: 5 `unmiss` events but 4 tombstones, because `200.0` was deleted twice and nothing was
+  ever re-added. Ledger's "21 live, 4 tombstoned" is exact.
+- **05:48** — "Where is run 1's data stored, and how do I load it back?" Found the sharp edge:
+  it is on **no branch but PR 4**, and switching the checkout to `main` removed it locally. There
+  is no load step — `server.py` globs `runs/*.json` and reads `labels.jsonl` at fixed paths, so
+  loading is the file being on disk. Two doors in: the studio's Add video (empty `markers[]`) and
+  the skill (populated `markers[]`). Neither can take a transcript the tool did not fetch.
+- **05:50** — Logged. Recommended finishing thread 2 here rather than in a new session, since its
+  evidence is already in this log.
 
 ## Banked artifacts
 
