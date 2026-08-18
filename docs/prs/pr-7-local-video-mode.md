@@ -14,6 +14,9 @@ One module gained a second backend; nothing else learned about it.
 - `apps/studio/local.py` (new) — build a run from a media file plus whatever sidecars
   share its stem: `.json3` / `.vtt` / `.srt` for cues, `.info.json` for real YouTube
   identity, title, description and `extracted[]`. Zero sidecars is a supported outcome.
+- `apps/studio/prefetch.py` (new) — `prefetch.py <url>` downloads the video, its
+  captions and its metadata, then ensures a run exists. The offline path assumes
+  yt-dlp is the door, so the door is one command rather than a memorised flag soup.
 - `apps/studio/server.py` — `/media/<name>` with byte-range support, `/api/media`,
   `media` on the `/api/run` payload, `source` and `hasMedia` on `/api/runs`, and
   `/api/ingest` branching to the local path when its input is a file reference.
@@ -66,11 +69,37 @@ Driven in a browser against a disposable copy of the store, so the real
   to the run record; removing the file restored the embed.
 - Regression: video 1 still loads on the real store with a clean console — 64 markers,
   21 added, 24 extracted, 1464 cues, counts matching `CURRENT.md`.
+- `prefetch.py` end to end against a real YouTube video: media, `en` captions and
+  `.info.json` down, run built with the real video id, real title, real watch URL,
+  6 cues and 3 extracted markers, playing in the browser from `/media/`. The rerun
+  took the already-exists branch and wrote nothing.
 
 **Found and fixed during verification:** deferring the IFrame API load until a
 YouTube run opens widened the window in which the 250ms follow poll calls
 `getDuration()` before any player exists. `getDuration`, `seekRaw` and `toggleMute`
 now guard on readiness the way the local branch already did.
+
+## Two yt-dlp findings, both fixed in `prefetch.py`
+
+Neither is a defect in this repo, but the offline path depends on both and they cost
+an hour to find.
+
+1. **`--sub-langs "en.*,en"` over-fetches.** On a real lesson the only tracks are
+   `en-orig` and `en`; the wildcard also pulled auto-translated `en-en` and `en-de`,
+   and a 429 on the third of them failed the entire download. Narrowed to
+   `en-orig,en`, and success is now judged by whether the media file landed rather
+   than by yt-dlp's exit code — one failed subtitle track must not discard a video
+   that downloaded fine. `ingest.py` carries the same wildcard but is unaffected: it
+   checks for the file rather than the return code, and never downloads media.
+2. **The default player client 403s.** `android_vr` lists every format and then
+   returns URLs that answer 403 Forbidden for the stream itself. `web_embedded`
+   offers the same format list and works; `mweb` works but only offers 360p. Pinned
+   as `PLAYER_CLIENTS`, with the re-derivation recipe in the comment, because this
+   will rot.
+
+Separately, and outside the repo: yt-dlp installed via Homebrew has no `curl_cffi`,
+so it cannot impersonate a browser. Installing one *in the supported range* fixes
+it — 0.16 is silently ignored and reported as `(unsupported)` only under `--verbose`.
 
 ## Not in scope
 

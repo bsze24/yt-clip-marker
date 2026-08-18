@@ -119,15 +119,29 @@ is sanitised. `/media/` serves bare filenames from that one directory only.
 **Preparing for an offline session**, while you still have network:
 
 ```
-yt-dlp -f "bv*[height<=1080][vcodec^=avc1]+ba[acodec^=mp4a]/b[ext=mp4]" \
-  --merge-output-format mp4 \
-  --write-auto-subs --write-subs --sub-langs "en.*,en" --sub-format "json3/vtt" \
-  --write-info-json \
-  -o "apps/studio/media/%(id)s.%(ext)s" "<url>"
+python3 apps/studio/prefetch.py <url-or-id> [<url-or-id> ...]
 ```
 
-The codec filter matters: Chrome seeks H.264/AAC in MP4 far more reliably than the
-VP9 or AV1 streams yt-dlp otherwise prefers.
+Per video that downloads the media, its `en-orig`/`en` captions as `.json3`, and
+`.info.json`, then makes sure a run exists — building one only if no run for that
+video id is already in `runs/`, since an existing run picks the file up by id on its
+own. Rerunning it is cheap and idempotent.
+
+Two flags in there are load-bearing rather than cosmetic:
+
+- **Format.** `avc1` + `mp4a` in MP4. Chrome seeks H.264/AAC far more reliably than
+  the VP9 or AV1 streams yt-dlp otherwise prefers, and seeking is the whole job.
+- **Player client.** `web_embedded,mweb`. On 2026-08-19 yt-dlp's default choice
+  (`android_vr`) listed every format and then answered **403 Forbidden** for the
+  actual stream. This is cat-and-mouse and will rot; `PLAYER_CLIENTS` in
+  `prefetch.py` carries the note on how to re-derive it, and updating yt-dlp is the
+  real fix.
+
+If media downloads fail with 403 even so, check that yt-dlp can impersonate a
+browser — `yt-dlp --list-impersonate-targets`. A Homebrew install ships without
+`curl_cffi`, and yt-dlp silently ignores a version outside the range it supports
+(`0.5.10`, or `0.10.x` through `0.15.x` as of 2026.07.04), reporting it as
+`(unsupported)` under `--verbose`.
 
 **Zoom.** Only *cloud* recordings produce a transcript, and only on a paid plan with
 "Create audio transcript" enabled; local recordings have none unless "Save closed

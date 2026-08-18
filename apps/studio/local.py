@@ -60,7 +60,9 @@ def looks_like_media_path(s):
 
 def resolve_media(spec, media_dir):
     """A user-typed path or bare name -> an existing media file Path."""
-    spec = (spec or "").strip().strip('"').strip("'")
+    # Accepts a Path as readily as a typed string — prefetch.py hands over the
+    # file it just downloaded, the HTTP route hands over user text.
+    spec = str(spec or "").strip().strip('"').strip("'")
     if not spec:
         raise IngestError("no media file given")
     media_dir = Path(media_dir)
@@ -137,8 +139,16 @@ def find_sidecars(path):
         elif sibling.suffix == ".description":
             description = sibling
         elif sibling.suffix.lower() in SUB_EXT:
-            # Rank: json3 over vtt over srt, English-tagged over anything else.
-            rank = (SUB_EXT.index(sibling.suffix.lower()), 0 if ".en" in rest else 1)
+            # Rank: json3 over vtt over srt; then "English (Original)" over the
+            # auto-generated English track, over anything else. yt-dlp writes
+            # both as `{stem}.en-orig.json3` and `{stem}.en.json3`.
+            if "en-orig" in rest:
+                lang_rank = 0
+            elif ".en" in rest:
+                lang_rank = 1
+            else:
+                lang_rank = 2
+            rank = (SUB_EXT.index(sibling.suffix.lower()), lang_rank)
             subs.append((rank, sibling))
     subs.sort(key=lambda item: item[0])
     return [s for _rank, s in subs], info, description

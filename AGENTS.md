@@ -132,6 +132,7 @@ yt-clip-marker/
 │       ├── server.py         stdlib HTTP server + label-event store
 │       ├── ingest.py         yt-dlp fetch: captions, gaps, description, extracted
 │       ├── local.py          offline ingest: media file + sidecar subs/info.json
+│       ├── prefetch.py       CLI: yt-dlp video + captions + run, for offline use
 │       ├── index.html        markup only; loads /ui/ assets
 │       ├── ui/               ES modules (served via allowlisted /ui/ route)
 │       │   ├── main.js       entry: event wiring + boot
