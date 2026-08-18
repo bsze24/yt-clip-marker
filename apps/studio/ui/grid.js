@@ -181,6 +181,23 @@ export function buildRows() {
     usedM.add(m.index);
   });
 
+  // A video with no transcript and no markers yet has no rows at all, so the
+  // composer would have nowhere to render. Give it one. Same for a mark taken
+  // at a playhead position that falls between cues.
+  if (S.composer && S.composer.mode === "add") {
+    const at = Number(S.composer.start);
+    if (Number.isFinite(at) && !rows.some((r) => Number(r.start) === at)) {
+      rows.push({
+        rowId: `composer:${at}`,
+        start: at,
+        caption: "",
+        gapBefore: null,
+        markers: [],
+        extracted: [],
+      });
+    }
+  }
+
   rows.sort((a, b) => a.start - b.start);
   return rows.filter((r) => {
     const keep = r.gapBefore || r.markers.length || r.extracted.length ||

@@ -16,7 +16,7 @@
 //   5. typing guard     — any other text field keeps all keys
 //   6. tabPrefixKeys    — Tab arms a 900ms prefix; then t/w/l/y edits
 //                         tags/work/lane/why
-//   7. gridKeys         — j/k rows, J/K marker rows, Enter/s/g/x/h/f/v/Escape
+//   7. gridKeys         — j/k rows, J/K marker rows, Enter/n/s/g/x/h/f/v/Escape
 //                         (work before player loads)
 //   8. playerKeys       — arrows/space/Home/End/m/digits/</>/ (need a ready player)
 import { typingInField, normalizeTag } from "./util.js";
@@ -30,7 +30,7 @@ import {
   bumpSuggest, acceptSuggest, hideSuggest, addTag, resetSuggestHi,
   removeTag, comboSelectedTags, finishComboEdit, editRowField, renderSuggest,
 } from "./suggest.js";
-import { submitComposer, onEnter, editWhy } from "./composer.js";
+import { submitComposer, onEnter, editWhy, addAtPlayhead } from "./composer.js";
 import { toggleStar, toggleCheck, rejectOrDelete } from "./persist.js";
 import { closeFillerModal, saveFillerWords, toggleHideFiller } from "./filler.js";
 
@@ -238,6 +238,7 @@ function gridKeys(e) {
     onEnter();
     return true;
   }
+  if (key === "n" || key === "N") { e.preventDefault(); addAtPlayhead(); return true; }
   if (key === "s") { e.preventDefault(); toggleStar(); return true; }
   if (key === "g") { e.preventDefault(); toggleCheck(); return true; }
   if (key === "x") { e.preventDefault(); rejectOrDelete(); return true; }

@@ -10,7 +10,8 @@ It began as an eval harness for the yt-clipper skill; the skill-scoring chrome (
 python3 apps/studio/server.py
 ```
 
-Open http://127.0.0.1:8765. Ingest needs `yt-dlp` on PATH.
+Open http://127.0.0.1:8765. Ingesting a YouTube URL needs `yt-dlp` on PATH and network.
+Ingesting a file already on disk needs neither — see **Local video mode** below.
 
 ## Layout
 
@@ -18,6 +19,7 @@ Open http://127.0.0.1:8765. Ingest needs `yt-dlp` on PATH.
 apps/studio/
   server.py                             HTTP server + label-event store
   ingest.py                             URL → captions, gaps, description, extracted → run file
+  local.py                              file on disk + sidecars → run file (no network)
   index.html                            markup only; loads /ui/ assets
   ui/                                   ES modules + stylesheet, served via the
                                         allowlisted /ui/ route (no build step)
@@ -28,13 +30,14 @@ apps/studio/
     suggest.js                          taxonomy vocab, dropdown, tag chips
     composer.js                         add-clip form logic
     persist.js                          all server writes + debounces
-    player.js                           YouTube IFrame wrapper, focus management
+    player.js                           YouTube embed + local <video>, one interface
     runs.js                             run list polling + switching
     api.js                              fetch wrapper + save-failure surface
     util.js                             pure helpers, constants
     styles.css
   runs/{videoId}-{YYYYMMDD-HHMM}.json   ingest/model output + caption cues (immutable)
   labels.jsonl                          append-only human judgments
+  media/                                video/audio files for offline playback (gitignored)
   attach_cues.py                        CLI: merge a fetch_transcript.py dump into a run
   attach_extracted.py                   CLI: attach or migrate YT description timestamps
 ```
@@ -81,3 +84,52 @@ One JSON object per line. Every save appends; the latest event for a row identit
 `annotate` stamps `tags` / `lane` / `work` on a marker (`markerIndex`). Latest wins. Added clips store those fields on the `miss` event.
 
 Each line is a standalone example. You do not need the run file to score it.
+
+## Local video mode
+
+Playback falls back from the YouTube embed to a plain `<video>` element fed by the
+studio's own `/media/` route, so a session works with no network at all. Nothing
+switches modes by hand: a run plays locally when a matching file sits in `media/`,
+and plays from YouTube when it does not.
+
+**Attaching a file to an existing YouTube run.** Name it after the video id and drop
+it in — `media/YYW4Q1Nivg8.mp4` is the whole step. The match is computed on every
+read of `/api/run`; the run file is never rewritten, so an immutable ingest record
+stays immutable (D-002) and removing the file simply restores the embed.
+
+**Ingesting a file that has no YouTube run.** Paste a path (or a bare name already in
+`media/`) into the same header field the URL goes in. `local.py` picks up sidecars
+that share the file's stem:
+
+| Sidecar | Comes from | Becomes |
+|---|---|---|
+| `.json3` | `yt-dlp --sub-format json3` | `cues[]` with `gapBefore` flags |
+| `.vtt` | yt-dlp, or a Zoom **cloud** recording | same, parsed from WebVTT |
+| `.srt` | anything | same |
+| `.info.json` | `yt-dlp --write-info-json` | real `videoId`, title, description, `extracted[]` |
+
+With no `.info.json` the video id is synthesised from the filename and the run
+records `source: "local"`. With no subtitle sidecar the run has zero cues — a
+supported state, not a failure: press `n` to drop a marker at the playhead, since
+there are no caption rows to press Enter on.
+
+Files outside `media/` are symlinked into it rather than copied, and the symlink name
+is sanitised. `/media/` serves bare filenames from that one directory only.
+
+**Preparing for an offline session**, while you still have network:
+
+```
+yt-dlp -f "bv*[height<=1080][vcodec^=avc1]+ba[acodec^=mp4a]/b[ext=mp4]" \
+  --merge-output-format mp4 \
+  --write-auto-subs --write-subs --sub-langs "en.*,en" --sub-format "json3/vtt" \
+  --write-info-json \
+  -o "apps/studio/media/%(id)s.%(ext)s" "<url>"
+```
+
+The codec filter matters: Chrome seeks H.264/AAC in MP4 far more reliably than the
+VP9 or AV1 streams yt-dlp otherwise prefers.
+
+**Zoom.** Only *cloud* recordings produce a transcript, and only on a paid plan with
+"Create audio transcript" enabled; local recordings have none unless "Save closed
+caption as a VTT file" was on. Plan on the zero-cue path for anything recorded to
+your own disk.

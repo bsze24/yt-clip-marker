@@ -14,15 +14,32 @@ import traceback
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import ingest
+import local
 
 APP_DIR = Path(__file__).resolve().parent
 RUNS_DIR = APP_DIR / "runs"
 UI_DIR = APP_DIR / "ui"
 LABELS_PATH = APP_DIR / "labels.jsonl"
+MEDIA_DIR = APP_DIR / "media"
 PORT = 8765
+
+# /media/ serves only bare filenames from MEDIA_DIR. No slashes and no "..",
+# so a symlinked gigabyte file inside the directory is reachable while nothing
+# outside it is. Files here are often symlinks — never resolve() before the
+# check, or a legitimate link would read as an escape.
+MEDIA_FILE = re.compile(r"^[A-Za-z0-9._-]+$")
+MEDIA_TYPES = {
+    ".mp4": "video/mp4", ".m4v": "video/mp4", ".mov": "video/quicktime",
+    ".webm": "video/webm", ".mkv": "video/x-matroska",
+    ".m4a": "audio/mp4", ".mp3": "audio/mpeg", ".ogg": "audio/ogg",
+    ".oga": "audio/ogg", ".opus": "audio/ogg", ".wav": "audio/wav",
+    ".flac": "audio/flac",
+}
+# Streamed in chunks so a 2 GB lesson never lands in memory.
+STREAM_CHUNK = 256 * 1024
 
 # /ui/ serves only bare .js/.css filenames — no dots in the stem, so no "..",
 # no subdirectories, no traversal.
@@ -70,6 +87,7 @@ def normalize_tags(raw):
 
 def ensure_dirs():
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
     if not LABELS_PATH.exists():
         LABELS_PATH.write_text("", encoding="utf-8")
 
@@ -382,6 +400,71 @@ def append_annotate(run_id, run, index, payload):
     return load_annotations(run_id)
 
 
+def media_file(name):
+    """MEDIA_DIR/name if that name is servable and present, else None."""
+    if not name or not MEDIA_FILE.match(name):
+        return None
+    path = MEDIA_DIR / name
+    if not path.is_file():
+        return None
+    if path.suffix.lower() not in MEDIA_TYPES:
+        return None
+    return path
+
+
+def resolve_run_media(run):
+    """Local playback source for a run, computed fresh on every read.
+
+    Deliberately not written back into the run file: `runs/{id}.json` is
+    immutable ingest output (D-002). A run gains offline playback the moment a
+    matching file appears in media/ and loses it when the file goes away, with
+    no history rewritten either way.
+
+    Two doors. A local run names its file. A YouTube run is matched by video id,
+    so downloading `{videoId}.mp4` into media/ is the whole attach step.
+    """
+    if not isinstance(run, dict):
+        return None
+    path = media_file(run.get("media") or "")
+    if path is None:
+        video_id = run.get("videoId") or ""
+        if MEDIA_FILE.match(video_id or ""):
+            for ext in MEDIA_TYPES:
+                candidate = MEDIA_DIR / f"{video_id}{ext}"
+                if candidate.is_file():
+                    path = candidate
+                    break
+    if path is None:
+        return None
+    kind = "audio" if MEDIA_TYPES[path.suffix.lower()].startswith("audio/") else "video"
+    return {
+        "name": path.name,
+        "url": "/media/" + quote(path.name),
+        "kind": kind,
+        "type": MEDIA_TYPES[path.suffix.lower()],
+    }
+
+
+def list_media():
+    """Files in media/, newest first, flagged with whether a run points at one."""
+    ensure_dirs()
+    claimed = set()
+    for path in RUNS_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        found = resolve_run_media(data)
+        if found:
+            claimed.add(found["name"])
+    rows = []
+    for path in sorted(MEDIA_DIR.iterdir(), key=_mtime, reverse=True):
+        if not path.is_file() or path.suffix.lower() not in MEDIA_TYPES:
+            continue
+        rows.append({"name": path.name, "used": path.name in claimed})
+    return rows
+
+
 def _mtime(path):
     try:
         return path.stat().st_mtime
@@ -422,6 +505,8 @@ def list_runs():
                 "url": data.get("url") or "",
                 "title": data.get("title") or run_id,
                 "createdAt": data.get("createdAt") or "",
+                "source": data.get("source") or "youtube",
+                "hasMedia": bool(resolve_run_media(data)),
                 "markerCount": len(markers),
                 "missCount": len(load_additions(run_id)),
                 "checkCount": checks,
@@ -435,6 +520,11 @@ def list_runs():
 
 
 class Handler(BaseHTTPRequestHandler):
+    # Keep-alive. Seeking a local video fires a burst of range requests, and
+    # HTTP/1.0 would open a fresh connection for each one. Safe because every
+    # response on every route sets Content-Length.
+    protocol_version = "HTTP/1.1"
+
     def log_message(self, fmt, *args):
         print(f"[studio] {self.address_string()} {fmt % args}")
 
@@ -464,6 +554,102 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, code, obj):
         self._send(code, json.dumps(obj), "application/json; charset=utf-8")
 
+    def _parse_range(self, header, size):
+        """`Range: bytes=…` -> (start, end) inclusive, or None to send it whole.
+
+        Raises ValueError when the range is syntactically fine but unsatisfiable,
+        which is a 416. A header we don't understand is not an error — the spec
+        says ignore it and send 200.
+        """
+        header = (header or "").strip()
+        if not header.lower().startswith("bytes="):
+            return None
+        spec = header[6:].split(",")[0].strip()
+        if "-" not in spec:
+            return None
+        first, _, last = spec.partition("-")
+        try:
+            if not first:
+                # bytes=-N — the trailing N bytes.
+                n = int(last)
+                if n <= 0:
+                    raise ValueError("empty suffix range")
+                return max(0, size - n), size - 1
+            start = int(first)
+            end = int(last) if last else size - 1
+        except ValueError:
+            return None
+        if start >= size or start > end:
+            raise ValueError("unsatisfiable range")
+        return start, min(end, size - 1)
+
+    def _send_media(self, path, head_only=False):
+        """Serve a media file with byte-range support.
+
+        Chrome will happily *play* a 200 response, but it can only seek inside
+        what it has already buffered — on an hour-long lesson that makes the
+        timeline useless. 206 responses are what make seeking instant, so this
+        route exists instead of reusing _send.
+        """
+        content_type = MEDIA_TYPES[path.suffix.lower()]
+        try:
+            size = path.stat().st_size
+        except OSError:
+            self._json(404, {"error": "not found"})
+            return
+        try:
+            span = self._parse_range(self.headers.get("Range"), size)
+        except ValueError:
+            self.send_response(416)
+            self.send_header("Content-Range", f"bytes */{size}")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+
+        if span is None:
+            start, end = 0, size - 1
+            code = 200
+        else:
+            start, end = span
+            code = 206
+        length = end - start + 1
+        self.send_response(code)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Content-Length", str(length))
+        if code == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        if head_only:
+            return
+        # Seeking aborts in-flight range requests constantly; a dropped client
+        # is normal here, not a fault. handle_one_request swallows the reset.
+        with path.open("rb") as fh:
+            fh.seek(start)
+            remaining = length
+            while remaining > 0:
+                chunk = fh.read(min(STREAM_CHUNK, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
+
+    def _media_for_request(self, path):
+        name = unquote(path[len("/media/"):])
+        return media_file(name)
+
+    def do_HEAD(self):
+        parsed = urlparse(self.path)
+        if parsed.path.startswith("/media/"):
+            found = self._media_for_request(parsed.path)
+            if found is None:
+                self._json(404, {"error": "not found"})
+                return
+            self._send_media(found, head_only=True)
+            return
+        self._json(404, {"error": "not found"})
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -479,6 +665,16 @@ class Handler(BaseHTTPRequestHandler):
                 return
             body = file_path.read_text(encoding="utf-8")
             self._send(200, body, UI_TYPES[file_path.suffix])
+            return
+        if path.startswith("/media/"):
+            found = self._media_for_request(path)
+            if found is None:
+                self._json(404, {"error": "not found"})
+                return
+            self._send_media(found)
+            return
+        if path == "/api/media":
+            self._json(200, list_media())
             return
         if path == "/api/runs":
             self._json(200, list_runs())
@@ -499,6 +695,7 @@ class Handler(BaseHTTPRequestHandler):
                     "edits": load_edits(run_id),
                     "annotations": load_annotations(run_id),
                     "warnings": run_warnings(run_id, run),
+                    "media": resolve_run_media(run),
                 },
             )
             return
@@ -527,8 +724,15 @@ class Handler(BaseHTTPRequestHandler):
         if not (1.0 <= gap <= 600.0):
             self._json(400, {"error": "gapSeconds out of range (1-600)"})
             return
+        # One input field, two doors. The local branch is tried first because a
+        # path is unambiguous, while an 11-char stem could parse as a video id.
+        # Local ingest never touches the network — that is the whole point.
+        notes = []
         try:
-            run_id, run = ingest.create_run(url, RUNS_DIR, gap)
+            if local.looks_like_media_path(url):
+                run_id, run, notes = local.create_local_run(url, RUNS_DIR, MEDIA_DIR, gap)
+            else:
+                run_id, run = ingest.create_run(url, RUNS_DIR, gap)
         except ingest.IngestError as err:
             self._json(502, {"error": str(err)})
             return
@@ -538,6 +742,8 @@ class Handler(BaseHTTPRequestHandler):
             "id": run_id,
             "cueCount": len(run["cues"]),
             "extractedCount": n,
+            "source": run.get("source") or "youtube",
+            "notes": notes,
         })
 
     def do_PUT(self):

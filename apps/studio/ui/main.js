@@ -70,11 +70,15 @@ $("ingestForm").addEventListener("submit", async (e) => {
   const url = $("ingestUrl").value.trim();
   if (!url) return;
   $("ingestBtn").disabled = true;
-  $("ingestState").textContent = "ingesting… (fetching captions, ~30s)";
+  $("ingestState").textContent = url.includes("/") || /\.[a-z0-9]{2,5}$/i.test(url)
+    ? "reading local file…"
+    : "ingesting… (fetching captions, ~30s)";
   try {
     const data = await api("/api/ingest", "POST", { url });
     $("ingestUrl").value = "";
-    $("ingestState").textContent = `${data.cueCount} cues · ${data.extractedCount} YT desc`;
+    const notes = (data.notes || []).join(" · ");
+    $("ingestState").textContent =
+      `${data.cueCount} cues · ${data.extractedCount} YT desc${notes ? " · " + notes : ""}`;
     await refreshRuns();
     await openRun(data.id);
     renderRunSelect();

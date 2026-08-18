@@ -1,13 +1,23 @@
-// YouTube IFrame player: owns the player handle and its ready/pending state.
-// Nothing outside this module touches the YT API directly.
+// The player: one module, two backends behind one interface.
+//
+// Backend A is the YouTube IFrame embed. Backend B is a plain <video> element
+// fed by the studio's own /media/ route, for when there is no network — a
+// downloaded lesson or a Zoom recording. Every consumer (keys.js, grid.js,
+// timeline.js, composer.js) calls the same exported functions and never learns
+// which one is running; that is why adding backend B touched no other module's
+// logic. Nothing outside this file touches the YT API or the media element.
 import { $, typingInField } from "./util.js";
 
 const LAYOUT_KEY = "yt-clipper-eval-player-layout";
 const RATE_KEY = "yt-clipper-studio-rate";
 const DEFAULT_RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-let player = null;
-let playerReady = false;
+let mode = "yt";              // "yt" | "local"
+let player = null;            // YT.Player handle
+let playerReady = false;      // YT backend only
+let media = null;             // <video> element, created on first local run
+let mediaReady = false;
+let ytApiRequested = false;
 let pendingSeek = null;
 let pendingCue = { videoId: null, start: 0 };
 let desiredRate = 1;
@@ -18,6 +28,18 @@ try {
 
 export function initPlayer() {
   syncRateLabel();
+  try {
+    if (localStorage.getItem(LAYOUT_KEY) === "left") applyLayout("left");
+  } catch (_) {}
+  window.addEventListener("resize", syncPlayerSize);
+}
+
+// The IFrame API is fetched the first time a YouTube-backed run is opened, not
+// at boot. Offline that request would only fail and log; a local-only session
+// never makes it.
+function ensureYouTubeApi() {
+  if (ytApiRequested) return;
+  ytApiRequested = true;
   // Must live on window: the IFrame API calls it by global name.
   window.onYouTubeIframeAPIReady = function () {
     const wrap = $("playerWrap");
@@ -45,16 +67,51 @@ export function initPlayer() {
       }
     });
   };
-
-  try {
-    if (localStorage.getItem(LAYOUT_KEY) === "left") applyLayout("left");
-  } catch (_) {}
-
-  window.addEventListener("resize", syncPlayerSize);
-
   const tag = document.createElement("script");
   tag.src = "https://www.youtube.com/iframe_api";
+  tag.addEventListener("error", () => {
+    console.warn("YouTube IFrame API unreachable — local runs still play");
+  });
   document.head.appendChild(tag);
+}
+
+function ensureMediaEl() {
+  if (media) return media;
+  media = document.createElement("video");
+  media.id = "localVideo";
+  media.playsInline = true;
+  media.preload = "metadata";
+  // No native controls: the .player-catcher overlay owns click-to-play and the
+  // timeline rail owns scrubbing, exactly as with the embed.
+  media.addEventListener("loadedmetadata", () => {
+    mediaReady = true;
+    applyDesiredRate();
+    if (pendingSeek != null) {
+      media.currentTime = clampTime(pendingSeek);
+      pendingSeek = null;
+    } else if (pendingCue.start > 0) {
+      media.currentTime = clampTime(pendingCue.start);
+    }
+    keepKeysOnPage();
+  });
+  media.addEventListener("ratechange", syncRateLabel);
+  media.addEventListener("error", () => {
+    const err = media.error;
+    console.error("local media failed to load", err && err.code, media.currentSrc);
+  });
+  $("playerWrap").insertBefore(media, $("playerCatcher"));
+  return media;
+}
+
+function clampTime(seconds) {
+  const value = Number(seconds) || 0;
+  const dur = media && Number.isFinite(media.duration) ? media.duration : 0;
+  if (!dur) return Math.max(0, value);
+  return Math.min(dur, Math.max(0, value));
+}
+
+function ready() {
+  return mode === "local" ? mediaReady : playerReady;
 }
 
 function playerLayout() {
@@ -76,7 +133,10 @@ export function togglePlayerLayout() {
   applyLayout(playerLayout() === "top" ? "left" : "top");
 }
 
+// Only the embed needs pixel sizes pushed at it; the <video> element is sized
+// by the same CSS rules as the #player box.
 export function syncPlayerSize() {
+  if (mode === "local") return;
   if (!playerReady || !player.setSize) return;
   const wrap = $("playerWrap");
   const w = wrap.clientWidth || 640;
@@ -88,7 +148,8 @@ export function syncPlayerSize() {
 }
 
 // The iframe steals focus after any interaction with it; blur it and hand
-// focus back to the grid so the keyboard keeps working.
+// focus back to the grid so the keyboard keeps working. A <video> element
+// never takes focus on click, so in local mode this is only the grid refocus.
 export function keepKeysOnPage() {
   const active = document.activeElement;
   if (typingInField(active)) return;
@@ -106,35 +167,81 @@ export function keepKeysOnPage() {
 
 // Open-editor seek: land paused so fields don't run away.
 export function seek(seconds) {
-  if (!playerReady) {
+  if (!ready()) {
     pendingSeek = seconds;
     return;
   }
-  player.seekTo(seconds, true);
-  player.pauseVideo();
+  if (mode === "local") {
+    media.currentTime = clampTime(seconds);
+    media.pause();
+  } else {
+    player.seekTo(seconds, true);
+    player.pauseVideo();
+  }
   keepKeysOnPage();
 }
 
 export function nudge(delta) {
-  if (!playerReady) return;
-  const duration = player.getDuration() || 0;
-  const next = Math.min(duration, Math.max(0, player.getCurrentTime() + delta));
-  player.seekTo(next, true);
+  if (!ready()) return;
+  const duration = getDuration();
+  const next = Math.min(duration || Infinity, Math.max(0, getCurrentTime() + delta));
+  seekRaw(next);
   keepKeysOnPage();
 }
 
 export function togglePlay() {
-  if (!playerReady) return;
-  const state = player.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) player.pauseVideo();
-  else player.playVideo();
+  if (!ready()) return;
+  if (mode === "local") {
+    if (media.paused) {
+      const p = media.play();
+      if (p && p.catch) p.catch(() => {});
+    } else {
+      media.pause();
+    }
+  } else {
+    const state = player.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+    else player.playVideo();
+  }
   keepKeysOnPage();
 }
 
-export function loadVideo(videoId, startSeconds) {
+// Called on every run switch. `mediaSource` is the /api/run `media` object when
+// the run has a playable file on disk; it wins over the embed, so a downloaded
+// video plays locally without any mode switch to remember.
+export function loadVideo(videoId, startSeconds, mediaSource) {
   pendingCue = { videoId: videoId || null, start: Number(startSeconds) || 0 };
+  pendingSeek = null;
+  if (mediaSource && mediaSource.url) {
+    switchMode("local");
+    const el = ensureMediaEl();
+    if (el.getAttribute("src") !== mediaSource.url) {
+      mediaReady = false;
+      el.pause();
+      el.setAttribute("src", mediaSource.url);
+      el.load();
+    } else if (mediaReady) {
+      el.currentTime = clampTime(pendingCue.start);
+    }
+    return;
+  }
+  switchMode("yt");
+  ensureYouTubeApi();
   if (!playerReady || !pendingCue.videoId) return;
   applyCue();
+}
+
+function switchMode(next) {
+  mode = next;
+  const ytBox = $("player");
+  const local = next === "local";
+  if (ytBox) ytBox.hidden = local;
+  if (media) media.hidden = !local;
+  if (local && playerReady && player.pauseVideo) {
+    try { player.pauseVideo(); } catch (_) {}
+  }
+  if (!local && media) media.pause();
+  document.body.classList.toggle("local-media", local);
 }
 
 function applyCue() {
@@ -146,6 +253,7 @@ function applyCue() {
 }
 
 function availableRates() {
+  if (mode === "local") return DEFAULT_RATES;
   const rates = playerReady && player.getAvailablePlaybackRates
     ? player.getAvailablePlaybackRates()
     : null;
@@ -164,6 +272,11 @@ function syncRateLabel() {
 }
 
 function applyDesiredRate() {
+  if (mode === "local") {
+    if (media) media.playbackRate = desiredRate;
+    syncRateLabel();
+    return;
+  }
   if (!playerReady || !player.setPlaybackRate) return;
   try { player.setPlaybackRate(desiredRate); } catch (_) {}
   syncRateLabel();
@@ -171,11 +284,11 @@ function applyDesiredRate() {
 
 // YouTube's own keys: Shift+, slower / Shift+. faster. The embed never
 // receives them (we keep focus on the grid), so the page owns the same
-// gesture via the IFrame API.
+// gesture for both backends.
 export function bumpPlaybackRate(dir) {
-  if (!playerReady) return;
+  if (!ready()) return;
   const rates = availableRates();
-  const current = player.getPlaybackRate ? player.getPlaybackRate() : desiredRate;
+  const current = getPlaybackRate();
   let i = rates.findIndex((r) => Math.abs(r - current) < 0.001);
   if (i < 0) i = rates.findIndex((r) => r >= current);
   if (i < 0) i = rates.length - 1;
@@ -186,26 +299,62 @@ export function bumpPlaybackRate(dir) {
   keepKeysOnPage();
 }
 
+function getPlaybackRate() {
+  if (mode === "local") return media ? media.playbackRate : desiredRate;
+  return player && player.getPlaybackRate ? player.getPlaybackRate() : desiredRate;
+}
+
 // Primitives for the key dispatcher's player context. seekRaw deliberately
 // does not play or re-focus — matching the original Home/End/digit behavior.
-export function isPlayerReady() { return playerReady; }
+export function isPlayerReady() { return ready(); }
+
 export function isPlaying() {
+  if (mode === "local") return Boolean(media && !media.paused && !media.ended);
   return playerReady && player && player.getPlayerState() === YT.PlayerState.PLAYING;
 }
+
 export function getCurrentTime() {
+  if (mode === "local") return media ? media.currentTime || 0 : 0;
   return playerReady && player ? player.getCurrentTime() : 0;
 }
-export function seekRaw(seconds) { player.seekTo(seconds, true); }
+
+export function seekRaw(seconds) {
+  if (mode === "local") {
+    if (mediaReady) media.currentTime = clampTime(seconds);
+    return;
+  }
+  if (!playerReady || !player) return;
+  player.seekTo(seconds, true);
+}
+
 export function scrubTo(seconds) {
-  if (!playerReady) {
+  if (!ready()) {
     pendingSeek = seconds;
     return;
   }
-  player.seekTo(seconds, true);
+  seekRaw(seconds);
   keepKeysOnPage();
 }
-export function getDuration() { return player.getDuration() || 0; }
+
+// A webm or mkv without a duration index reports Infinity; callers treat 0 as
+// "unknown" and fall back to the last cue, so normalise it here.
+export function getDuration() {
+  if (mode === "local") {
+    const d = media ? media.duration : 0;
+    return Number.isFinite(d) ? d : 0;
+  }
+  if (!playerReady || !player || !player.getDuration) return 0;
+  return player.getDuration() || 0;
+}
+
 export function toggleMute() {
+  if (mode === "local") {
+    if (media) media.muted = !media.muted;
+    return;
+  }
+  if (!playerReady || !player) return;
   if (player.isMuted()) player.unMute();
   else player.mute();
 }
+
+export function playerMode() { return mode; }
