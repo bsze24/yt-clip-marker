@@ -35,6 +35,20 @@ The studio store is the source of truth (the extension holds marks in memory onl
 - `apps/studio/runs/{videoId}-{YYYYMMDD-HHMM}.json` — immutable ingest/model output per video: `videoId`, `url`, `title`, `createdAt`, `markers[]` (suggester output; may be empty), `cues[]` (caption track, `gapBefore` = seconds of silence before the cue), `descriptionText` + `extracted[]` (published YT description timestamps). A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`.
 - `apps/studio/labels.jsonl` — append-only human events keyed by `(runId, markerIndex)` for skill markers and `(runId, start)` for added markers. Latest event wins; deletes are tombstones (`unmiss`). Full event field list: `apps/studio/README.md`.
 
+**Reading `verdict` across the 2026-08-18 vocabulary change.** `wrong` became a verdict on
+2026-08-18. Events written before that date record a rejected marker as `verdict: "note"` with
+`feedback` beginning `wrong` or `wrong:`; events after record `verdict: "wrong"`. History is not
+backfilled. Video 1's store is entirely pre-change: 121 of its 193 `note` events are rejects, and
+none carries `verdict: "wrong"`.
+
+So any reader outside the studio must derive the channel from `feedback` text, not from the
+stored `verdict`. The studio itself already does — `list_runs` recomputes with `verdict_for()` on
+every read, which is why its counts are right on old data. `schemaVersion` tells you which regime
+a line is in: `1` means derive from text, `2` means the stored `verdict` is authoritative.
+
+**And "latest" means the last matching line, not the largest `recordedAt`.** See the file-order
+note in `apps/studio/README.md`.
+
 A "current clip set" for a video is a fold over the run file plus its label events. Don't over-specify this store — it's JSONL until it hurts.
 
 ## Exports (future studio buttons)

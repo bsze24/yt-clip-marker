@@ -216,7 +216,7 @@ def append_label(run_id, run, index, text):
     original = marker.get("description") or ""
     current_label = load_edits(run_id).get(str(index)) or original
     event = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
         "videoId": run.get("videoId"),
@@ -256,7 +256,7 @@ def append_miss(run_id, run, payload):
     if kind not in ("TAKE", "CONCEPT"):
         kind = None
     event = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
         "videoId": run.get("videoId"),
@@ -291,7 +291,7 @@ def append_unmiss(run_id, run, payload):
     if existing is None:
         return load_additions(run_id)
     event = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
         "videoId": run.get("videoId"),
@@ -327,7 +327,7 @@ def append_relabel(run_id, run, index, description):
     if not description:
         raise ValueError("description required")
     event = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
         "videoId": run.get("videoId"),
@@ -358,7 +358,7 @@ def append_annotate(run_id, run, index, payload):
     lane = payload.get("lane") if isinstance(payload.get("lane"), str) else ""
     work = payload.get("work") if isinstance(payload.get("work"), str) else ""
     event = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
         "videoId": run.get("videoId"),

@@ -136,10 +136,12 @@ In video 1's store, 121 of 193 `note` events are actually rejects; nothing in th
 where the turnover happened. Recovering them means parsing `feedback` text for `wrong` /
 `wrong: …`, which is the ambiguity the change was meant to end.
 
-**Trigger:** before anything consumes `labels.jsonl` other than the studio itself — the
-auto-mark training pass or a skill-scoring run. Two ways out: bump to `2` at the write sites
-and record the turnover date, or leave the version alone and state the rule in
-`docs/clip-schema.md`. Do not backfill the old events ([[D-002]]).
+**Resolved 2026-08-19.** Both halves done, and they were not alternatives. The necessary half
+is the rule now written into `docs/clip-schema.md`: pre-2026-08-18 events record a reject as
+`verdict: "note"` with `feedback` beginning `wrong`, so an outside reader must derive the channel
+from text. The optional half marks the regime machine-readably — new writes carry
+`schemaVersion: 2`, so `1` means derive from text and `2` means trust `verdict`. History is not
+backfilled ([[D-002]]); video 1 stays entirely version 1.
 
 ### TD-5 — four shared documents exist in divergent copies across the open PRs
 
@@ -184,9 +186,14 @@ clock, and only human-typed description stamps drift.
 That is one video. The conclusion that `R-NEIGHBORHOOD`'s approximate-time licence is never
 exercised rests entirely on it.
 
-**Trigger:** the next video ingested. Compare `marker.start` against the `cues[]` start set and
-record the result in the note. Cheap, and it either promotes the finding or reopens it. The
-modelling choice that follows is parked under open modeling decisions below.
+**Re-pointed 2026-08-19.** The modelling choice it fed is decided — [[D-032]] replaced
+`R-NEIGHBORHOOD` with `R-CUE-EXACT`. So the question is no longer "does the skill happen to land
+on caption starts"; it is "does the new instruction hold". Same one-line check, different meaning.
+
+**Trigger:** the next `/yt-clipper` run. Compare `marker.start` against the `cues[]` start set. A
+non-caption start now means the rule is being ignored, which is a finding rather than a curiosity.
+Watch candidate count at the same time — that is [[D-032]]'s revert signal. **No labelling
+needed**; the ingest and skill pass alone answer this.
 
 ### TD-7 — selection jumps to the top when the selected row is filtered out
 
@@ -243,9 +250,14 @@ the same moments. Measured 2026-08-18:
 One constant serves both callers, so raising it would also let the grid snap a marker onto a
 caption six seconds away and undo [[D-008]]. The export needs its own window.
 
-**Trigger:** after PRs 3-5 merge. Give `export.js` a separate constant, leave `MATCH` at 2 for
-the grid, and pick the window from a second video rather than fitting it to this one — 6s is the
-smallest value that works on video 1, which is exactly the kind of number that overfits.
+**Trigger:** a second *labelled* video. This is the one item that cannot ride along with a plain
+ingest — `TD-6` and [[D-032]] need only a `/yt-clipper` pass, but the fold window can only be
+judged against a real export, which needs a real annotation pass first. Scope it separately.
+
+Then: give `export.js` a separate constant, leave `MATCH` at 2 for the grid, and pick the window
+from the second video rather than fitting it to this one. 6s is the smallest value that works on
+video 1, which is exactly the kind of number that overfits. Do not make the code change before
+the number is decided — a separate constant still set to 2 is churn.
 
 **Known property that widening makes worse.** The fold anchors each cluster at the time it
 opened, so a cluster spans at most one window and "within the window" does not reliably mean
@@ -312,15 +324,6 @@ resolving the bound decision is part of the task, and the resolution becomes a d
 
 - **media-scraper JSON freeze — decide at: the JSON export button ([[D-015]]).**
   The draft is `docs/clip-schema.md`. Do not freeze it from a conversation.
-
-- **`R-NEIGHBORHOOD` slop for concept markers — decide at: the next skill-rules pass.**
-  On video 1 the skill emitted a caption start for all 64 markers, so the approximate-time rule
-  cost nothing there. One video is not proof it never drifts. Options: (a) leave it and teach
-  the trap, (b) make the skill copy `cue.start` for concepts so stored equals displayed for that
-  class, (c) snap on ingest, which mutates the skill's proposal and would hide drift from any
-  future eval. Takes and extracted stamps keep their own clocks under all three. Do not decide
-  this from one run — measure a second video first. Raised in
-  `docs/reference/2026-08-18-1217-stored-vs-displayed.md`.
 
 - **Suggest-markers runtime — decide at: in-app suggest ([[D-011]]).**
   Skill invoke in chat, a studio button that shells out, or something hosted. Constraint: stay

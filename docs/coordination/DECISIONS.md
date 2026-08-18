@@ -280,6 +280,37 @@ Caveat carried from the measurement: the 10-second rule is stated from memory an
 verified against YouTube's documentation, and the whole picture is one video. Confirm both by
 pasting a real description before treating chapter compliance as achieved.
 
+### D-032 — the skill copies caption start times exactly  (Accepted 2026-08-19)
+`R-NEIGHBORHOOD` ("Approximate timestamps; clip-marker nailing is downstream") is retired and
+replaced in `~/.claude/skills/yt-clipper/SKILL.md` by:
+
+> `R-CUE-EXACT` — Use the caption's exact start time — never a time between captions. Nailing the
+> clip boundary is downstream work in the studio.
+
+Same intent, stated positively. The old rule's effort-allocation message was good and survives in
+the second sentence; what is gone is the permission to place a marker between two captions.
+
+Three reasons, after Brian argued for keeping the old rule:
+
+- **The replacement asks for less judgement, not more.** "Use the caption's start" removes a
+  decision; "approximate is fine" leaves the model to choose where inside a caption the moment
+  falls. The worry that demanding exactness would make the skill propose fewer candidates
+  (against `R-COPIOUS`) had it backwards.
+- **The old text pointed the wrong way.** Read literally it licenses inventing a time between
+  captions, which is the one behaviour that breaks auditing a marker against its caption.
+- **Today's safety is accidental.** All 64 of video 1's markers sit exactly on caption starts
+  only because `fetch_transcript.py` discards YouTube's per-segment timing and keeps the block
+  start. If anyone ever wants finer granularity, the model gains a finer clock and the old rule
+  immediately licenses using it.
+
+Unchanged: extracted stamps keep their own clock and must never be snapped — they have to match
+what is published. Takes ride the caption clock because `build_cues` pins a silence gap to the
+following cue; if gap detection ever reports the middle of the silence instead, that needs its
+own rule rather than a general licence to approximate.
+
+**Revert signal.** Candidate count on the next video. If `R-CUE-EXACT` suppresses proposals it is
+the most visible number in the output, and reverting is one line.
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the
