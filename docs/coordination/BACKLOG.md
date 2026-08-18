@@ -162,8 +162,14 @@ coordination-pointing rewrite won and main's `## File structure` tree was ported
 `## Architecture rules` sections being restatements of `D-002`, `D-005`, `D-007`-`D-010`,
 `D-016` and `D-017` that the rewrite deliberately replaced with citations.
 
-**Still open:** PR 5 and PR 6 each carry their own copies of files this reconciliation touched.
-Rebase or close them rather than merging a rival version.
+**Fully resolved 2026-08-19.** PR 6 closed; PR 5 closed as superseded (`REVIEW.md` thread 3).
+Re-checked what the remaining open PR would actually apply, using each branch's merge-base
+rather than a tree diff against `main`: **PR 4 touches no `.md` file at all** — it applies
+`apps/studio/labels.jsonl` and one run JSON, nothing else. No open PR can now clobber a document.
+
+Method worth reusing, because the naive check reads alarmingly wrong: `git diff main..branch`
+shows tree differences and made PR 5 look like it reverted all of `apps/studio/`. What a merge
+applies is `git diff $(git merge-base main branch) branch`.
 
 ### TD-6 — stored-vs-displayed: measured on one video, needs a second
 

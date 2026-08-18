@@ -29,7 +29,7 @@ not kept here. Threads 2 and 3 were blocked behind it and are now open.
 | --- | --- | --- | --- |
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
 | 2 — video 1 store | `43c99dd` (PR 4) | open, partially verified | → reviewer |
-| 3 — session write-head | `949cb7b` (PR 5) | open, unreviewed | → reviewer |
+| 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 
 ---
 
@@ -601,6 +601,27 @@ after the rename in the dead words. Decide which it is — rewrite the source co
 `extracted`, or date both files as pre-rename artifacts in their own opening lines — and record
 the choice. The ledger's numbers are correct either way; only its vocabulary is stale.
 
-**Verification:** none recorded.
+**Verdict — 2026-08-19: superseded. Close PR 5 rather than merging it.**
 
-_No findings yet._
+Both files it adds are older copies of files `main` already carries under different names, so a
+merge would not conflict — it would silently duplicate.
+
+- `docs/sessions/2026-08-16-1507-claude-studio-eval-handoff.md` is the **same session log** as
+  `main`'s `docs/sessions/2026-08-16-1507-grok-studio-fable-lock.md`: same date, same `15:07`,
+  same `surface: grok`, same `commit: 56fac83`, same `track`, same 101 chronology beats. The
+  only differences are `revised:` — PR 5 has `2026-08-16 16:34`, `main` has `2026-08-17 17:45` —
+  and the vocabulary. `main` carries the later revision.
+- `docs/sessions/2026-08-16-YYW4Q1Nivg8-folded-ledger.md` is the pre-rename folded ledger, 40
+  hits on the retired word across 238 differing lines: a `gold` source column, `| marker |` for
+  what is now `| skill |`, and "Reject this **marker**" for "Reject this **skill marker**".
+  `main` carries the corrected copy at `docs/reference/`, with zero hits.
+
+Checked what a merge would actually apply, not what `git diff main..branch` shows — PR 5's
+merge-base is `a051667`, so the branch's apparent reversion of `apps/studio/` (re-adding
+`attach_gold.py`, undoing every F6-F15 fix) is an artifact of the base, not something a merge
+would do. It would apply exactly the two files above.
+
+The thread's own scope note anticipated this: "session logs have duplicated before, and a
+duplicate should be deleted rather than committed and then explained." That is what happened.
+
+_No findings — the branch is obsolete rather than wrong._

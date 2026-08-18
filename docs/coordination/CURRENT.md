@@ -1,8 +1,9 @@
 # Current task
 
-**Review the two-surface land — PRs 3, 4, 5.** Baton: **→ reviewer**, on `43c99dd` (PR 4)
-and `949cb7b` (PR 5). Thread 1 (PR 3) closed 2026-08-18 with no open findings, so the two
-threads stacked behind it are open.
+**Review the two-surface land — PRs 3, 4, 5.** Baton: **→ reviewer**, on `43c99dd` (PR 4) —
+the only one left. Thread 1 (PR 3) closed 2026-08-18 and merged at `5af3e13`. Thread 3 (PR 5)
+closed 2026-08-19 as superseded: both files it adds are older copies of files `main` already
+carries, so it is closed rather than merged.
 
 The code is written and pushed. Nothing here asks anyone to rebuild the studio, re-land
 `apps/`, or re-move `content/`. The only open question is whether what sits on those three
@@ -16,7 +17,7 @@ branches is right.
 | --- | --- | --- | --- | --- |
 | **3** ✅ **merged** `5af3e13` | `codex/pr-3-two-surface-product` | `eea83b8` | `main` | Studio, extension move to `apps/extension/`, two-surface PRD, `docs/clip-schema.md`, copy-timestamps ([[D-022]]), strict `extracted[]` reader + visible deprecated-key fault ([[D-023]]), review fixes F6-F11 and F14-F15 |
 | **4** | `codex/pr-4-video-1-store` | `43c99dd` | PR 3 | Video 1 `runs/*.json` + `labels.jsonl`; run key migrated to `extracted[]`; non-force merge of reviewed PR 3 |
-| **5** | `codex/pr-5-session-write-head` | `949cb7b` | PR 3 | Session log + folded ledger |
+| **5** ❌ **closed, superseded** | `codex/pr-5-session-write-head` | `949cb7b` | PR 3 | Session log + folded ledger — both already on `main` in corrected vocabulary |
 | **6** | `docs/coordination-write-head` | `e158710` | `main` | Coordination write-head + `AGENTS.md` |
 
 `main` is `5af3e13` as of 2026-08-18 — PRs 1, 2 and **3** merged. The extension now lives at
