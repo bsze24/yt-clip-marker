@@ -8,7 +8,8 @@ import {
   removeTag, pickSuggest, renderSuggest, hideSuggest, resetSuggestHi,
 } from "./suggest.js";
 import {
-  persistUnmiss, queueSave, queueWrongReason, queueRelabel, persistMissDesc, persistTaxonomy,
+  persistUnmiss, queueSave, queueWrongReason, queueRelabel, queueMissDesc, persistTaxonomy,
+  queueTaxonomy,
 } from "./persist.js";
 import { submitComposer, openEditor } from "./composer.js";
 import { refreshRuns, openRun, renderRunSelect } from "./runs.js";
@@ -141,23 +142,19 @@ $("tbody").addEventListener("input", (e) => {
   }
   if (e.target.matches("input[data-desc]")) queueRelabel(Number(e.target.dataset.desc), e.target.value);
   if (e.target.matches("input[data-miss-desc]")) {
-    clearTimeout(S.saveTimer);
     const start = Number(e.target.dataset.missDesc);
-    const value = e.target.value;
-    S.saveTimer = setTimeout(() => persistMissDesc(start, value), 400);
+    queueMissDesc(start, e.target.value);
   }
   if (e.target.dataset.combo) {
     resetSuggestHi();
     renderSuggest(e.target.dataset.combo, e.target);
     if (S.liveTax && e.target.dataset.combo === "lane") {
       S.liveTax.lane = e.target.value;
-      clearTimeout(S.saveTimer);
-      S.saveTimer = setTimeout(() => persistTaxonomy(), 400);
+      queueTaxonomy();
     }
     if (S.liveTax && e.target.dataset.combo === "work") {
       S.liveTax.work = e.target.value;
-      clearTimeout(S.saveTimer);
-      S.saveTimer = setTimeout(() => persistTaxonomy(), 400);
+      queueTaxonomy();
     }
   }
 });

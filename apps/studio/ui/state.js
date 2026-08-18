@@ -35,9 +35,9 @@ export const S = {
   evalMode: false,
   follow: true,
   followPinned: false,
-  // Shared debounce handle. Feedback, relabel, miss-description, and taxonomy
-  // debounces deliberately cancel each other — only the latest edit lands.
-  saveTimer: null,
+  // Debounces are keyed by persistence record. Unrelated rows and event
+  // streams must never cancel each other's pending writes.
+  saveTimers: new Map(),
 };
 
 try { S.evalMode = localStorage.getItem(EVAL_KEY) === "1"; } catch (_) {}

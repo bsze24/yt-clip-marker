@@ -7,7 +7,7 @@ import { S, setSave, rememberChapter } from "./state.js";
 import { api, saveFailed } from "./api.js";
 import { seek } from "./player.js";
 import { renderGrid, updateStats, scrollToActive, displayMarkers, buildRows, rowKey } from "./grid.js";
-import { persist } from "./persist.js";
+import { cancelPendingAddition, cancelPendingMarker, persist } from "./persist.js";
 
 function inheritChapter(start) {
   const markers = displayMarkers()
@@ -24,7 +24,7 @@ function selectMarkerRow(marker) {
   S.selectedStart = Number(marker.start);
   const rows = buildRows();
   const i = rows.findIndex((r) => r.markers.some((m) => String(m.index) === String(marker.index)));
-  S.selectedKey = i >= 0 ? rowKey(rows[i], i) : null;
+  S.selectedKey = i >= 0 ? rowKey(rows[i]) : null;
 }
 
 export function openComposer(start, fromGap, cueText, gapBefore, extractedLabel) {
@@ -88,6 +88,7 @@ export function readComposerFields() {
 
 async function submitModelEdit(description, tags, lane, work, why) {
   const index = Number(S.composer.index);
+  cancelPendingMarker(index);
   setSave("saving…");
   try {
     const relabel = await api("/api/relabel", "PUT", {
@@ -136,6 +137,7 @@ export async function submitComposer() {
     return;
   }
   const start = S.composer.start;
+  cancelPendingAddition(start);
   setSave("saving…");
   let res;
   try {

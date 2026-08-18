@@ -139,8 +139,9 @@ export function buildRows() {
   const usedE = new Set();
   const rows = [];
 
-  cues.forEach((cue) => {
+  cues.forEach((cue, cueIndex) => {
     rows.push({
+      rowId: `cue:${cueIndex}`,
       start: cue.start,
       caption: cue.text,
       gapBefore: cue.gapBefore || null,
@@ -157,6 +158,7 @@ export function buildRows() {
   extracted.forEach((item) => {
     if (usedE.has(item.eid)) return;
     rows.push({
+      rowId: `extracted:${item.eid}`,
       start: item.start,
       caption: "",
       gapBefore: null,
@@ -169,6 +171,7 @@ export function buildRows() {
   markers.forEach((m) => {
     if (usedM.has(m.index)) return;
     rows.push({
+      rowId: `marker:${String(m.index)}`,
       start: m.start,
       caption: "",
       gapBefore: null,
@@ -189,10 +192,8 @@ export function buildRows() {
   });
 }
 
-export function rowKey(row, i) {
-  const ids = (row.markers || []).map((m) => m.index).join("-");
-  const extracted = (row.extracted[0] && row.extracted[0].label) || "";
-  return [i, row.start, ids, row.caption || "", extracted, row.gapBefore || ""].join("||");
+export function rowKey(row) {
+  return row.rowId || `row:${Number(row.start)}`;
 }
 
 function composerOnMarker(m) {
@@ -382,11 +383,11 @@ function syncLiveTax(rowEl) {
 export function renderGrid() {
   if (!S.current) return;
   const rows = buildRows();
-  $("tbody").innerHTML = rows.map((row, i) => {
+  $("tbody").innerHTML = rows.map((row) => {
     const markerIds = row.markers.map((m) => m.index).join(",");
     const fromGap = Boolean(row.gapBefore);
     const tax = taxonomyOf(row);
-    const key = rowKey(row, i);
+    const key = rowKey(row);
     const selected = S.selectedKey ? key === S.selectedKey : Number(row.start) === Number(S.selectedStart);
     return `<tr class="${rowClass(row)}" data-start="${row.start}" data-row-key="${escapeAttr(key)}" data-markers="${escapeAttr(markerIds)}"
         data-tax-type="${tax.type}" data-tax-id="${escapeAttr(tax.id)}" data-tax-tags="${escapeAttr((tax.tags || []).join("|"))}" data-tax-lane="${escapeAttr(tax.lane)}" data-tax-work="${escapeAttr(tax.work)}"
@@ -488,7 +489,7 @@ export function activateMarker(index, seconds) {
   S.selectedStart = Number(seconds);
   const rows = buildRows();
   const i = rows.findIndex((r) => r.markers.some((m) => Number(m.index) === Number(index)));
-  S.selectedKey = i >= 0 ? rowKey(rows[i], i) : null;
+  S.selectedKey = i >= 0 ? rowKey(rows[i]) : null;
   rememberCursor();
   seek(seconds);
   renderGrid();
