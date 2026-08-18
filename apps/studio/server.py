@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 import threading
 import traceback
 from datetime import datetime
@@ -181,6 +182,15 @@ def load_run(run_id):
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
+
+
+def run_warnings(run_id, run):
+    """Nonfatal store faults that must stay visible while the run remains usable."""
+    if "gold" not in run:
+        return []
+    message = f"run {run_id} has deprecated gold[]; rename gold[] → extracted[]"
+    print(f"[studio] ERROR: {message}", file=sys.stderr)
+    return [{"code": "deprecated-run-key", "key": "gold", "message": message}]
 
 
 def load_feedback(run_id):
@@ -477,6 +487,7 @@ class Handler(BaseHTTPRequestHandler):
                     "additions": load_additions(run_id),
                     "edits": load_edits(run_id),
                     "annotations": load_annotations(run_id),
+                    "warnings": run_warnings(run_id, run),
                 },
             )
             return
@@ -510,11 +521,12 @@ class Handler(BaseHTTPRequestHandler):
         except ingest.IngestError as err:
             self._json(502, {"error": str(err)})
             return
+        n = len(ingest.extracted_markers(run))
         self._json(200, {
             "ok": True,
             "id": run_id,
             "cueCount": len(run["cues"]),
-            "goldCount": len(run["gold"]),
+            "extractedCount": n,
         })
 
     def do_PUT(self):

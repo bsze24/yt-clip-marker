@@ -1,7 +1,7 @@
 // The time-aligned grid: row building, alignment, selection, rendering, stats.
 // Selection is by row identity (rowKey), never start time alone — duplicate
 // timestamps are real.
-import { $, hms, fbClass, evalMark, isWrong, isCheck, feedbackWhy, isBackchannel, escapeHtml, escapeAttr, missId, MATCH, typingInField, resolvedLabel } from "./util.js";
+import { $, hms, fbClass, evalMark, isWrong, isCheck, feedbackWhy, isBackchannel, escapeHtml, escapeAttr, missId, MATCH, typingInField, resolvedLabel, extractedList } from "./util.js";
 import { S, rememberCursor, FOLLOW_KEY } from "./state.js";
 import { seek, scrubTo, keepKeysOnPage, isPlaying, getCurrentTime } from "./player.js";
 import { renderSuggest, resetSuggestHi } from "./suggest.js";
@@ -60,7 +60,7 @@ export function moveRow(delta) {
 }
 
 // Shift+j/k: jump to the next/previous row that has a marker or added clip,
-// skipping bare caption and gold-only rows. data-markers is the row's
+// skipping bare caption and extracted-only rows. data-markers is the row's
 // marker-id list — empty string means none. Stays put if there is no
 // populated row in that direction.
 export function moveMarkerRow(delta) {
@@ -80,14 +80,14 @@ export function moveMarkerRow(delta) {
 }
 
 export function displayMarkers() {
-  const gold = S.current.run.gold || [];
+  const extracted = extractedList(S.current.run);
   const model = (S.current.run.markers || []).map((m, index) => {
     const original = m.description || "";
     const edited = S.edits[String(index)];
     return {
       ...m, index, source: "model",
       originalDescription: original,
-      description: resolvedLabel(gold, m.start, edited || original),
+      description: resolvedLabel(extracted, m.start, edited || original),
       tags: (S.annotations[String(index)] || {}).tags || [],
       lane: (S.annotations[String(index)] || {}).lane || "",
       work: (S.annotations[String(index)] || {}).work || "",
@@ -96,7 +96,7 @@ export function displayMarkers() {
   });
   const added = S.additions.map((m) => ({
     start: m.start, end: m.end, kind: m.kind,
-    description: resolvedLabel(gold, m.start, m.description),
+    description: resolvedLabel(extracted, m.start, m.description),
     rationale: m.why ? "MISS. " + m.why : "MISS.",
     index: missId(m.start), source: "miss",
     tags: m.tags || [],
@@ -133,10 +133,10 @@ function takeNear(items, t, used, idFn) {
 
 export function buildRows() {
   const cues = S.current.run.cues || [];
-  const gold = (S.current.run.gold || []).map((g, i) => ({ ...g, gid: "g" + i }));
+  const extracted = extractedList(S.current.run).map((item, i) => ({ ...item, eid: "e" + i }));
   const markers = displayMarkers();
   const usedM = new Set();
-  const usedG = new Set();
+  const usedE = new Set();
   const rows = [];
 
   cues.forEach((cue) => {
@@ -145,25 +145,25 @@ export function buildRows() {
       caption: cue.text,
       gapBefore: cue.gapBefore || null,
       markers: takeExact(markers, cue.start, usedM, (m) => m.index),
-      gold: takeExact(gold, cue.start, usedG, (g) => g.gid),
+      extracted: takeExact(extracted, cue.start, usedE, (item) => item.eid),
     });
   });
   const cueCount = rows.length;
   for (let i = 0; i < cueCount; i++) {
     rows[i].markers.push(...takeNear(markers, rows[i].start, usedM, (m) => m.index));
-    rows[i].gold.push(...takeNear(gold, rows[i].start, usedG, (g) => g.gid));
+    rows[i].extracted.push(...takeNear(extracted, rows[i].start, usedE, (item) => item.eid));
   }
 
-  gold.forEach((g) => {
-    if (usedG.has(g.gid)) return;
+  extracted.forEach((item) => {
+    if (usedE.has(item.eid)) return;
     rows.push({
-      start: g.start,
+      start: item.start,
       caption: "",
       gapBefore: null,
-      markers: takeNear(markers, g.start, usedM, (m) => m.index),
-      gold: [g],
+      markers: takeNear(markers, item.start, usedM, (m) => m.index),
+      extracted: [item],
     });
-    usedG.add(g.gid);
+    usedE.add(item.eid);
   });
 
   markers.forEach((m) => {
@@ -173,14 +173,14 @@ export function buildRows() {
       caption: "",
       gapBefore: null,
       markers: [m],
-      gold: takeNear(gold, m.start, usedG, (g) => g.gid),
+      extracted: takeNear(extracted, m.start, usedE, (item) => item.eid),
     });
     usedM.add(m.index);
   });
 
   rows.sort((a, b) => a.start - b.start);
   return rows.filter((r) => {
-    const keep = r.gapBefore || r.markers.length || r.gold.length ||
+    const keep = r.gapBefore || r.markers.length || r.extracted.length ||
       (S.composer && Number(S.composer.start) === Number(r.start));
     if (keep) return true;
     if (!S.showAllCues) return false;
@@ -191,8 +191,8 @@ export function buildRows() {
 
 export function rowKey(row, i) {
   const ids = (row.markers || []).map((m) => m.index).join("-");
-  const gold = (row.gold[0] && row.gold[0].label) || "";
-  return [i, row.start, ids, row.caption || "", gold, row.gapBefore || ""].join("||");
+  const extracted = (row.extracted[0] && row.extracted[0].label) || "";
+  return [i, row.start, ids, row.caption || "", extracted, row.gapBefore || ""].join("||");
 }
 
 function composerOnMarker(m) {
@@ -267,7 +267,7 @@ function markerCell(row) {
             changed ? `<div class="desc-orig">original: ${escapeHtml(orig)}</div>` : ""
           }${m.why && !S.evalMode ? `<div class="why-note">${escapeHtml(m.why)}</div>` : ""}`;
     const feedback = miss
-      ? `<div class="miss-actions"><div class="miss-tag">ADDED CLIP</div><button type="button" data-unmiss="${m.start}">delete</button></div>`
+      ? `<div class="miss-actions"><div class="miss-tag">ADDED MARKER</div><button type="button" data-unmiss="${m.start}">delete</button></div>`
       : S.evalMode && !isWrong(fb)
         ? `<div class="fb">
           <input data-i="${m.index}" value="${escapeAttr(fb)}" placeholder="note" />
@@ -296,7 +296,7 @@ function evalCell(row) {
 }
 
 function isDescOnly(row) {
-  return !(row.caption || "").trim() && row.gold.length > 0;
+  return !(row.caption || "").trim() && row.extracted.length > 0;
 }
 
 function captionCell(row) {
@@ -390,14 +390,14 @@ export function renderGrid() {
     const selected = S.selectedKey ? key === S.selectedKey : Number(row.start) === Number(S.selectedStart);
     return `<tr class="${rowClass(row)}" data-start="${row.start}" data-row-key="${escapeAttr(key)}" data-markers="${escapeAttr(markerIds)}"
         data-tax-type="${tax.type}" data-tax-id="${escapeAttr(tax.id)}" data-tax-tags="${escapeAttr((tax.tags || []).join("|"))}" data-tax-lane="${escapeAttr(tax.lane)}" data-tax-work="${escapeAttr(tax.work)}"
-        data-add-start="${row.start}" data-add-text="${escapeAttr(row.caption)}" data-add-gold="${escapeAttr((row.gold[0] && row.gold[0].label) || "")}" data-add-gap="${fromGap ? "1" : ""}" data-add-gapbefore="${row.gapBefore || ""}">
+        data-add-start="${row.start}" data-add-text="${escapeAttr(row.caption)}" data-add-extracted="${escapeAttr((row.extracted[0] && row.extracted[0].label) || "")}" data-add-gap="${fromGap ? "1" : ""}" data-add-gapbefore="${row.gapBefore || ""}">
       <td class="sticky"><span class="time" data-seek="${row.start}">${hms(row.start)}</span></td>
       <td class="sticky2 caption">${captionCell(row)}</td>
       <td class="gap">${row.gapBefore ? "GAP " + row.gapBefore + "s" : ""}</td>
       ${evalCell(row)}
       <td class="markers">${markerCell(row)}</td>
       ${taxonomyCells(row, selected)}
-      <td class="gold">${row.gold.map((g) => `<div class="g">${escapeHtml(g.label)}</div>`).join("")}</td>
+      <td class="extracted">${row.extracted.map((item) => `<div class="extracted-label">${escapeHtml(item.label)}</div>`).join("")}</td>
     </tr>`;
   }).join("");
   restoreSelection();
@@ -498,9 +498,9 @@ export function activateMarker(index, seconds) {
 export function updateStats() {
   if (!S.current) return;
   const markers = S.current.run.markers;
-  const goldN = (S.current.run.gold || []).length;
+  const extractedN = extractedList(S.current.run).length;
   if (!S.evalMode) {
-    $("stats").innerHTML = `<b>${markers.length}</b> markers · <b>${S.additions.length}</b> added · <b>${goldN}</b> YT`;
+    $("stats").innerHTML = `<b>${markers.length}</b> markers · <b>${S.additions.length}</b> added · <b>${extractedN}</b> YT`;
     return;
   }
   let checks = 0, wrongs = 0, notes = 0;
@@ -510,5 +510,5 @@ export function updateStats() {
     else if (isWrong(t)) wrongs += 1;
     else if (t) notes += 1;
   });
-  $("stats").innerHTML = `<b>${checks}</b> check · <b>${wrongs}</b> wrong · <b>${notes}</b> notes · <b>${markers.length - checks - wrongs - notes}</b> blank · <b>${S.additions.length}</b> added · <b>${goldN}</b> YT`;
+  $("stats").innerHTML = `<b>${checks}</b> check · <b>${wrongs}</b> wrong · <b>${notes}</b> notes · <b>${markers.length - checks - wrongs - notes}</b> blank · <b>${S.additions.length}</b> added · <b>${extractedN}</b> YT`;
 }

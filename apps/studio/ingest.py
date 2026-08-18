@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Ingest a YouTube video into a studio run: caption track (with silence-gap
-flags), title, description, and parsed description timestamps (gold).
+flags), title, description, and parsed description timestamps (extracted).
 
 Shells out to yt-dlp (must be on PATH: pip install yt-dlp). Needs network
 egress to YouTube. Ported from the yt-clipper skill's fetch_transcript.py and
-attach_gold.py so the skill runbook is no longer the only door to a run file.
+attach_extracted.py so the skill runbook is no longer the only door to a run file.
 """
 from __future__ import annotations
 
@@ -118,7 +118,7 @@ def fetch_title_and_description(video_id):
 
 
 def parse_description_timestamps(text):
-    """`M:SS label` / `H:MM:SS label` lines from a description -> gold entries."""
+    """`M:SS label` / `H:MM:SS label` lines from a description -> extracted entries."""
     marks = []
     for raw in (text or "").splitlines():
         match = STAMP_RE.match(raw.strip())
@@ -128,6 +128,12 @@ def parse_description_timestamps(text):
         seconds = parts[-1] + parts[-2] * 60 + (parts[-3] * 3600 if len(parts) == 3 else 0)
         marks.append({"start": float(seconds), "label": match.group(2).strip()})
     return marks
+
+
+def extracted_markers(run):
+    """Return description timestamps from the one supported data key."""
+    extracted = run.get("extracted")
+    return extracted if isinstance(extracted, list) else []
 
 
 def create_run(url_or_id, runs_dir, gap_seconds=DEFAULT_GAP_SECONDS):
@@ -150,7 +156,7 @@ def create_run(url_or_id, runs_dir, gap_seconds=DEFAULT_GAP_SECONDS):
         "markers": [],
         "cues": cues,
         "descriptionText": description,
-        "gold": parse_description_timestamps(description),
+        "extracted": parse_description_timestamps(description),
     }
 
     runs_dir = Path(runs_dir)
@@ -179,4 +185,4 @@ if __name__ == "__main__":
     except IngestError as err:
         print(f"ERROR: {err}", file=sys.stderr)
         raise SystemExit(1)
-    print(f"wrote run {rid}: {len(r['cues'])} cues, {len(r['gold'])} gold")
+    print(f"wrote run {rid}: {len(r['cues'])} cues, {len(r['extracted'])} extracted")

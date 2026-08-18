@@ -17,7 +17,7 @@ Open http://127.0.0.1:8765. Ingest needs `yt-dlp` on PATH.
 ```
 apps/studio/
   server.py                             HTTP server + label-event store
-  ingest.py                             URL → captions, gaps, description, gold → run file
+  ingest.py                             URL → captions, gaps, description, extracted → run file
   index.html                            markup only; loads /ui/ assets
   ui/                                   ES modules + stylesheet, served via the
                                         allowlisted /ui/ route (no build step)
@@ -36,14 +36,14 @@ apps/studio/
   runs/{videoId}-{YYYYMMDD-HHMM}.json   ingest/model output + caption cues (immutable)
   labels.jsonl                          append-only human judgments
   attach_cues.py                        CLI: merge a fetch_transcript.py dump into a run
-  attach_gold.py                        CLI: attach YT description timestamps to a run
+  attach_extracted.py                   CLI: attach or migrate YT description timestamps
 ```
 
 UI files are read from disk on every request and sent with `Cache-Control: no-store`, so HTML/JS/CSS edits show on a browser refresh — only `server.py`/`ingest.py` changes need a server restart.
 
 The durable record is git-tracked JSON here. Commit `runs/` and `labels.jsonl` to back up work. The append-only labels can later score a new skill version against `check` labels, or train auto-mark from `(videoId, start, description, verdict)`.
 
-A run's `cues` array is the YouTube caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `gold` is timestamps parsed from the public YouTube description. The grid time-aligns all three: caption, marker, and gold share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
+A run's `cues` array is the YouTube caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `extracted[]` holds timestamps parsed from the public YouTube description. A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`. The grid time-aligns all three: caption, marker, and extracted share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
 
 Runs come from two doors:
 

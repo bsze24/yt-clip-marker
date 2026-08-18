@@ -47,7 +47,7 @@ Today's `eval/` app, promoted. Python stdlib server (`python3 apps/studio/server
 
 ### Already built (keep; this is the product)
 
-- **Time-aligned grid.** Captions, markers, and gold (published YT description timestamps) share a row when starts are within 2s. Row selection is by **row identity**, not start time (duplicate timestamps broke start-keyed selection).
+- **Time-aligned grid.** Captions, markers, and extracted markers (published YT description timestamps) share a row when starts are within 2s. Row selection is by **row identity**, not start time (duplicate timestamps broke start-keyed selection).
 - **Keyboard-first flow.** `j`/`k` row nav (selects + seeks), `Enter` add/edit clip, `Tab` then `t`/`w`/`l`/`y` for tags/work/lane/why, `x` reject a marker or delete an added clip, `f` follow, `space` play/pause.
 - **Taxonomy.** `work` (Song | Rendition), `lane` (chapter lane), `tags` (multi, freeform + seeded vocabulary) — replacing exclusive TAKE/CONCEPT.
 - **YouTube IFrame embed** — YouTube as *player*, never as IDE.
@@ -55,7 +55,7 @@ Today's `eval/` app, promoted. Python stdlib server (`python3 apps/studio/server
 
 ### New in this refactor
 
-- **In-app ingest.** Paste a YouTube URL in the studio → server fetches the caption track and description via `yt-dlp`, flags silence gaps, parses gold timestamps, writes a run file with an **empty markers array**, and opens it. The skill runbook is no longer the only door; a video can be annotated with only human clips.
+- **In-app ingest.** Paste a YouTube URL in the studio → server fetches the caption track and description via `yt-dlp`, flags silence gaps, parses extracted markers from the description, writes a run file with an **empty markers array**, and opens it. The skill runbook is no longer the only door; a video can be annotated with only human clips.
 - **Eval mode (toggle, default off).** Check/note feedback, rationales, and check/note stats are skill-eval chrome, not the annotation loop. They stay available behind a header toggle until the suggester is trusted (~5 labeled videos), then we revisit removal.
 - **`kind` optional.** `TAKE`/`CONCEPT` remains readable on old markers but is never required on new writes. Tags/lane/work carry the taxonomy.
 
@@ -85,7 +85,7 @@ What exists after PR 2, kept as is:
 
 `~/.claude/skills/yt-clipper` keeps one job: **propose candidate markers** (the rule IDs, "over-include", label-in-user-vocabulary prompt). The engineering it used to carry moves into the app:
 
-- Transcript fetch / gap flagging / gold attachment → studio ingest.
+- Transcript fetch / gap flagging / extracted-marker attachment → studio ingest.
 - Eval bookkeeping (`check`/`note`, rationales) → studio eval mode.
 
 Invoking the skill still writes markers into a run file the studio reads. When ingest is trusted, "Suggest markers" becomes a studio action and the skill file remains the prompt/rules source.
@@ -104,7 +104,7 @@ Invoking the skill still writes markers into a run file the studio reads. When i
 | Suggest-markers: studio action or skill invoke? | Stays a skill invoke for now; in-app ingest lands first so runs exist without the skill. |
 | Eval chrome now or later? | Behind an eval-mode toggle, default off. Revisit removal after ~5 labeled videos. |
 | Collect `end` now? | Not in this refactor. Schema keeps `end` nullable; end collection is the studio's next feature. |
-| Gold column? | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
+| Extracted-marker column? (then called gold) | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
 | Rename layout? | `apps/extension/` + `apps/studio/`. No `schema/` folder until shared code exists; the contract lives in `docs/clip-schema.md`. |
 | Freeze media-scraper JSON? | Draft now, freeze when the studio export button lands. Don't block the split on it. |
 | Canonical store? | Studio: `runs/` + `labels.jsonl`. The extension stays storeless. |
@@ -121,6 +121,6 @@ Invoking the skill still writes markers into a run file the studio reads. When i
 1. Repo layout is `apps/extension/` + `apps/studio/`; extension still loads unpacked from `apps/extension` with no manifest warnings.
 2. `python3 apps/studio/server.py` boots the studio; existing runs and labels load unchanged.
 3. Studio UI says studio, not eval; check/note/rationale visible only with eval mode on.
-4. Pasting a YouTube URL into the studio creates and opens a run (cues + gaps + gold, empty markers) with no CLI steps.
+4. Pasting a YouTube URL into the studio creates and opens a run (cues + gaps + extracted markers, empty `markers[]`) with no CLI steps.
 5. New label events never require `kind`.
 6. AGENTS.md, README, and PR specs describe the two-surface model — a fresh agent session would not rebuild the on-YouTube IDE.

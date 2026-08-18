@@ -73,7 +73,7 @@ $("ingestForm").addEventListener("submit", async (e) => {
   try {
     const data = await api("/api/ingest", "POST", { url });
     $("ingestUrl").value = "";
-    $("ingestState").textContent = `${data.cueCount} cues · ${data.goldCount} YT desc`;
+    $("ingestState").textContent = `${data.cueCount} cues · ${data.extractedCount} YT desc`;
     await refreshRuns();
     await openRun(data.id);
     renderRunSelect();
