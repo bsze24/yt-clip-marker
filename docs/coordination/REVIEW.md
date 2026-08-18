@@ -28,7 +28,7 @@ not kept here. Threads 2 and 3 were blocked behind it and are now open.
 | Thread | Target | Status | Baton |
 | --- | --- | --- | --- |
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
-| 2 — video 1 store | `43c99dd` (PR 4) | open, partially verified | → reviewer |
+| 2 — video 1 store | `43c99dd` (PR 4) | **clean** — F16 fixed, F17 non-blocking | → Brian, merge |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 
 ---
@@ -571,11 +571,48 @@ that is already answered.
 - Tombstones are honoured: 5 `unmiss` events fold out of `load_additions` rather than deleting
   anything.
 
-**Still open in this thread:** shapes field-by-field against `docs/clip-schema.md`; the 21 live
-and 4 tombstoned added-marker counts; whether every event carries the row identity [[D-007]]
-requires. Nothing found so far contradicts them.
+**Verdict — 2026-08-19: clean. Merge.** All three scope questions answered.
 
-_No findings yet._
+**Shapes match `docs/clip-schema.md`.** Run file: all 8 documented keys, no extras, no `gold`,
+11-char `videoId`, ISO-8601 `createdAt`, every array ascending. `labels.jsonl`: 553/553 lines
+parse; every event carries all 7 required fields; every `verdict` is in the contract's set;
+`markerIndex` in range on marker events and `null` on every `miss`/`unmiss`; all tags lowercase
+and deduped; one `runId` and one `videoId`, both matching the run file. `end` is null on all 553
+events and all 64 markers, per [[D-012]]. Legacy `kind` present and readable per [[D-009]].
+
+**Row identity and tombstones hold** ([[D-007]], [[D-002]]). Nothing is rewritten in place. 5
+`unmiss` events fold to 4 tombstones because `200.0` was deleted twice; nothing was re-added.
+
+**Counts reconcile with the folded ledger exactly** — 64 markers as `g` 23 · `x` 24 · keep 14 ·
+note 3 · blank 0, 21 live added markers, 4 tombstoned, 24 extracted.
+
+### F16 — the standing trap overstates that added markers never drift — non-blocking · fixed
+
+**Finding.** `README.md`'s standing trap claimed added markers inherit a caption time "by
+construction". Three of video 1's 21 do not: `1:19:27`, `1:19:54`, `1:23:04`, all sitting exactly
+on extracted stamps with an empty `cueText`. They were created by pressing Enter on a
+description-only row — the "YT overview / not a caption" rows the grid builds for a stamp with no
+caption within 2s.
+
+Not a defect in PR 4. PR 4's data is correct and is what exposed it; the wrong claim was written
+into `main` on 2026-08-18 by the reviewer. Fixed in the same commit as this verdict.
+
+### F17 — three duplicate writes leave file order and timestamp order disagreeing — non-blocking · open
+
+**Finding.** Lines 75/76, 131/132 and 160/161 are byte-identical except `recordedAt`, written
+1.7-2.5 ms apart, and in each pair the earlier timestamp is written second. `append_label` and
+friends stamp `datetime.now()` while building the event, then `append_event` acquires
+`LABELS_LOCK` — so two rapid writes can stamp in one order and land in the other.
+
+Measured severity: none today. The server folds in file order everywhere
+(`read_label_events` → last wins), so its answer is deterministic, and the pairs are identical,
+so both orderings agree. The hazard is a reader that sorts by `recordedAt` — the obvious thing to
+do, and what a skill-scoring pass would do — meeting a future pair that *does* differ. Pairs with
+different content are the case to worry about; there are none in this store.
+
+Two ways out, neither urgent: stamp inside the lock, or state in `apps/studio/README.md` that
+file order is authoritative and `recordedAt` is descriptive. The second is free. Related to
+`TD-4`, which is the other reason an external reader of this log can go wrong.
 
 ---
 

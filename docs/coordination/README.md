@@ -67,8 +67,11 @@ Measured on video 1, 2026-08-18:
   at 280, the nearest are 278 and 279, so it renders on the `4:39` row. Export writes `4:40`.
 - **Skill markers never do** — 0 of 64. The suggester is only ever shown the caption list, one
   timestamp per caption block, so whatever it proposes is already a caption time.
-- **Added markers never do** — you create them with Enter on a grid row, so they inherit that
-  row's caption time by construction.
+- **Added markers usually do not** — 18 of 21 on video 1. You create them with Enter on a grid
+  row, so they inherit that row's time. The exception is a **description-only row**: when an
+  extracted stamp has no caption within 2s the grid gives it its own row, marked "YT overview /
+  not a caption", and an added marker created there inherits the *stamp's* time. Video 1 has
+  three — `1:19:27`, `1:19:54`, `1:23:04` — each with an empty `cueText`, which is the tell.
 - **Labels cross records.** An extracted stamp within 2s also wins the row's label, so the text
   you read can belong to a record stored at a different second than the time beside it. At
   `1:18:57` the added marker stored at `4737` displays "Freedom Demo c1" — the label of the
