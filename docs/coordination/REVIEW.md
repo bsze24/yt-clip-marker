@@ -610,9 +610,13 @@ so both orderings agree. The hazard is a reader that sorts by `recordedAt` — t
 do, and what a skill-scoring pass would do — meeting a future pair that *does* differ. Pairs with
 different content are the case to worry about; there are none in this store.
 
-Two ways out, neither urgent: stamp inside the lock, or state in `apps/studio/README.md` that
-file order is authoritative and `recordedAt` is descriptive. The second is free. Related to
-`TD-4`, which is the other reason an external reader of this log can go wrong.
+**Actions taken 2026-08-19.** The file-order rule is now stated in `apps/studio/README.md`, which
+protects the reader actually at risk. The cause — a duplicate write — is `TD-10`: the add-clip
+form's guard is a check that a form is open, and the form does not close until after the server
+replies, so a second submit inside that window passes. The taxonomy half of this was already
+fixed by [[D-024]]. Stamping inside the lock was considered and rejected: it would make the
+duplicate pair look correctly ordered, hiding the only visible symptom. Related to `TD-4`, the
+other reason an external reader of this log can go wrong.
 
 ---
 

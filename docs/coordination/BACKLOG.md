@@ -257,6 +257,29 @@ window, so it never fires today. A wider window gives boundaries more places to 
 this again against real data before settling on a number, and check whether any near pair ends
 up split.
 
+### TD-10 — the add-clip form can submit twice before it closes
+
+**Where:** `apps/studio/ui/composer.js` — `submitComposer`, and the model-edit branch above it.
+
+**Issue:** the guard against a second submit is a check that a form is open. The form is not
+closed until *after* the server replies, so for the length of that round trip the guard still
+sees an open form and a second submit passes. The result is two identical events in
+`labels.jsonl`.
+
+Found in the PR 4 review (`REVIEW.md` F17). Video 1's store carries three duplicate pairs written
+1.7-2.5 ms apart, byte-identical apart from `recordedAt`. Two came from the taxonomy path and are
+already fixed by [[D-024]] — a direct `persistTaxonomy` now cancels the queued duplicate. The
+third came from this path, which is unchanged.
+
+Harmless so far: the store is append-only and the fold takes the last matching line, so a
+duplicate of an identical event changes no count. It stops being harmless if a duplicate ever
+carries different content.
+
+**Trigger:** with the next composer work. Close the form before awaiting the write and restore it
+if the write fails, or hold a separate in-flight flag. **Do not** fix this by moving the timestamp
+inside the write lock — that only makes the duplicate pair look correctly ordered, which hides
+the symptom that revealed it. See the file-order note in `apps/studio/README.md`.
+
 ## Parking lot
 
 - Voice input; YouTube Data API write-back; sync; mobile and in-car; Shorts, playlists,

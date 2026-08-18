@@ -54,6 +54,8 @@ Runs come from two doors:
 
 One JSON object per line. Every save appends; the latest event for a row identity — `(runId, markerIndex)` for markers, `(runId, start)` for added clips — is current. History is kept so revisions are recoverable.
 
+**"Latest" means the last matching line in the file, not the largest `recordedAt`.** The server folds in file order everywhere and never sorts by time. `recordedAt` is stamped while the event is built, before the write lock is taken, so two events written within a few milliseconds can land in the opposite order from their timestamps — video 1's store has three such pairs. Anything reading this log from outside the studio, such as a skill-scoring pass, must read top to bottom and take the last match. Sorting by `recordedAt` will eventually pick the wrong record.
+
 | Field | Point |
 |---|---|
 | `schemaVersion` | `1` |
