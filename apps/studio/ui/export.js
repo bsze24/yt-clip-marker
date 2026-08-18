@@ -5,7 +5,7 @@
 import { MATCH, STAR_TAG, isCheck, isWrong, resolvedLabel, ytStamp, extractedList } from "./util.js";
 import { S, setSave } from "./state.js";
 
-const RANK = { extracted: 0, gold: 0, miss: 1, skill: 2 };
+const RANK = { extracted: 0, miss: 1, skill: 2 };
 
 function keepSkill(index) {
   const text = ((S.current.feedback || {})[String(index)] || "");

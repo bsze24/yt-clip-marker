@@ -7,6 +7,21 @@ import { loadVideo } from "./player.js";
 
 let offline = false;
 
+function showRunWarnings(payload, id) {
+  const warnings = Array.isArray(payload.warnings) ? payload.warnings : [];
+  const apiWarning = warnings.find((warning) => warning && warning.code === "deprecated-run-key");
+  const directFault = payload.run && Object.prototype.hasOwnProperty.call(payload.run, "gold");
+  const message = apiWarning && apiWarning.message
+    ? apiWarning.message
+    : directFault
+      ? `run ${id} has deprecated gold[]; rename gold[] → extracted[]`
+      : "";
+  const el = $("runWarning");
+  el.textContent = message;
+  el.hidden = !message;
+  if (message) console.error(message);
+}
+
 export function renderRunSelect() {
   const select = $("runSelect");
   const prev = select.value;
@@ -59,8 +74,10 @@ export async function openRun(id) {
     $("meta").textContent = `could not load run ${id}: ${err.message}`;
     $("tbody").innerHTML = "";
     $("stats").textContent = "";
+    showRunWarnings({ run: null, warnings: [] }, id);
     return;
   }
+  showRunWarnings(S.current, id);
   S.additions = S.current.additions || [];
   S.edits = S.current.edits || {};
   S.annotations = S.current.annotations || {};

@@ -76,7 +76,7 @@ yt-clip-marker/
 │       │   ├── util.js       pure helpers, constants
 │       │   └── styles.css
 │       ├── attach_cues.py    CLI: merge a transcript dump into a run
-│       ├── attach_gold.py    CLI: attach description timestamps to a run
+│       ├── attach_extracted.py CLI: attach or migrate description timestamps
 │       ├── runs/             {videoId}-{stamp}.json
 │       ├── labels.jsonl      append-only human judgments
 │       └── README.md         store/event schema details

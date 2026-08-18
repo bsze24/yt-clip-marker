@@ -104,7 +104,7 @@ Invoking the skill still writes markers into a run file the studio reads. When i
 | Suggest-markers: studio action or skill invoke? | Stays a skill invoke for now; in-app ingest lands first so runs exist without the skill. |
 | Eval chrome now or later? | Behind an eval-mode toggle, default off. Revisit removal after ~5 labeled videos. |
 | Collect `end` now? | Not in this refactor. Schema keeps `end` nullable; end collection is the studio's next feature. |
-| Extracted-marker column? (was: gold) | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
+| Extracted-marker column? (then called gold) | Keep — published YT description timestamps as a reference lane (and eval target while eval mode exists). |
 | Rename layout? | `apps/extension/` + `apps/studio/`. No `schema/` folder until shared code exists; the contract lives in `docs/clip-schema.md`. |
 | Freeze media-scraper JSON? | Draft now, freeze when the studio export button lands. Don't block the split on it. |
 | Canonical store? | Studio: `runs/` + `labels.jsonl`. The extension stays storeless. |

@@ -28,9 +28,9 @@ Context for planning and execution in Claude. This is a **suggested path**, not 
 
 - **YouTube is a hostile editor.** It owns `j`/`k`/`space`, CSS fights injected UI, SPA nav remounts content scripts. A dense taxonomy + transcript grid does not belong there. An embed still uses YouTube as *player*, not as *IDE*.
 - **Share the clip, not the screen.** Contract is `{ videoId, start, end, description, work, lane, tags }`. Do not share panel/hotkey/grid code between extension and studio.
-- **The skill bundled three jobs.** (1) Fetch transcript — engineering, belongs in the app. (2) Propose candidates — still an LLM pass; keep `SKILL.md` as rules/prompt. (3) Write eval JSON + gold + `check`/`note` — harness, not the product loop.
-- **You still want a first-pass scrape.** An empty 90-minute grid is the old linear watch. Ingest can happen without the skill; suggest-markers should not stay a chat-only runbook (write JSON path → attach cues → attach gold → boot server).
-- **Eval chrome is leftover product-shape.** “Gold” as skill-eval target, `kind: TAKE|CONCEPT`, rationales as the main loop — useful while scoring the suggester; they should not define the studio UX.
+- **The skill bundled three jobs.** (1) Fetch transcript — engineering, belongs in the app. (2) Propose candidates — still an LLM pass; keep `SKILL.md` as rules/prompt. (3) Write eval JSON + extracted timestamps (then called gold) + `check`/`note` — harness, not the product loop.
+- **You still want a first-pass scrape.** An empty 90-minute grid is the old linear watch. Ingest can happen without the skill; suggest-markers should not stay a chat-only runbook (write JSON path → attach cues → attach extracted markers → boot server).
+- **Eval chrome is leftover product-shape.** Extracted markers (then called gold) as a skill-eval target, `kind: TAKE|CONCEPT`, rationales as the main loop — useful while scoring the suggester; they should not define the studio UX.
 - **Canonical store has not been chosen.** Extension PRD says `chrome.storage.local`. Studio already uses `labels.jsonl` + `runs/`. If studio is the workspace, JSONL (or whatever replaces it) is the source of truth; the extension should not become a second store.
 
 ---
@@ -43,7 +43,7 @@ Worth deciding in planning, not assumed:
 - **When does “Suggest markers” become a studio action** vs staying a Claude skill invoke? Ingest-in-app can land first either way.
 - **Eval mode:** hide check/note/rationale now, or keep visible until ~5 labeled videos exist?
 - **`end` on clips:** skill markers are often start-only; PRD wanted ranges. Does studio collect ends now or later?
-- **Gold column:** keep as “published YT description timestamps” (useful) — any other role?
+- **Extracted-marker column (then called gold):** keep as published YT description timestamps (useful) — any other role?
 - **Rename `eval/` → `studio/` (or `apps/studio`)** now vs after a layout plan? Naming in AGENTS.md matters so the next agent doesn’t treat the dashboard as disposable eval.
 - **media-scraper JSON:** freeze a schema soon, or wait until studio export exists? Don’t block the split on it.
 - **Uncommitted eval work** is the real studio. Don’t plan as if `eval/` weren’t the product.
@@ -59,7 +59,7 @@ Loads on `youtube.com/watch`. Shadow DOM panel + `[` `]` capture (PR 2). In-memo
 Working local app: `python3 eval/server.py` → http://127.0.0.1:8765. Keyboard grid, taxonomy, additions, YouTube IFrame, row-key selection fix. Data: `eval/runs/*.json`, `eval/labels.jsonl`. README still says “dev-only annotation set for the clipper skill. Not part of the Chrome extension runtime.”
 
 **Skill**
-Still the ingest path: fetch transcript, write a run file under `eval/runs/`, `attach_cues.py` / `attach_gold.py`, then open the dashboard.
+Still the ingest path: fetch transcript, write a run file under `eval/runs/`, `attach_cues.py` / `attach_extracted.py`, then open the dashboard.
 
 **Docs**
 PRD + `AGENTS.md` still describe a Chrome-only product: no server, `chrome.storage`, annotation on the watch page. They will fight any agent that doesn’t get this handoff.
@@ -83,7 +83,7 @@ Something like `apps/extension`, `apps/studio` (today’s `eval/`), and a small 
 Keep load-on-watch and optional capture. Do not implement original PR 3/4 (canonical `chrome.storage`, refinement hotkeys, click-to-preview as editor, export from the panel). Supersede those PR specs or rewrite them as handoff-to-studio.
 
 **D. Promote studio from eval harness to workspace**
-Rename in the UI. Keep `labels.jsonl` / `runs/` as the first store. In-app ingest (URL → transcript/cues → run) so the skill runbook is no longer the only door. Fold attach-cues / attach-gold / fetch-transcript into that ingest path when it pays off. Extracted-marker column can stay (then called gold); TAKE/CONCEPT as required `kind` can stop for new writes. Check/note/rationale → eval mode or later.
+Rename in the UI. Keep `labels.jsonl` / `runs/` as the first store. In-app ingest (URL → transcript/cues → run) so the skill runbook is no longer the only door. Fold attach-cues / attach-extracted / fetch-transcript into that ingest path when it pays off. Extracted-marker column can stay (then called gold); TAKE/CONCEPT as required `kind` can stop for new writes. Check/note/rationale → eval mode or later.
 
 **E. Keep the skill as suggester, not as workflow**
 Move fetch into the app. Keep rule IDs and “over-include” as the prompt. “Suggest markers” can remain a skill invoke until ingest exists; then it’s an obvious studio action. You should be able to open a video with an empty skill column and only human clips.

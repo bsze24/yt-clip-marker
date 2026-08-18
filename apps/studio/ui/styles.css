@@ -8,6 +8,7 @@
   --note-bg: #2a2414;
   --accent: #c8c4b8;
   --gap: #3a3d46;
+  --bad: #f0c8c8;
   --gold: #2a2618;
   --gold-text: #e6d7a8;
 }
@@ -322,3 +323,8 @@ tr.desc-only .extracted .extracted-label { font-weight: 600; }
 }
 .ingest button:disabled { color: var(--muted); cursor: default; }
 .ingest-state { color: var(--muted); max-width: 320px; }
+.run-warning {
+  flex-basis: 100%;
+  color: var(--bad);
+  font-weight: 700;
+}

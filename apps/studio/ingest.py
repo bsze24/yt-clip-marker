@@ -4,7 +4,7 @@ flags), title, description, and parsed description timestamps (extracted).
 
 Shells out to yt-dlp (must be on PATH: pip install yt-dlp). Needs network
 egress to YouTube. Ported from the yt-clipper skill's fetch_transcript.py and
-attach_gold.py so the skill runbook is no longer the only door to a run file.
+attach_extracted.py so the skill runbook is no longer the only door to a run file.
 """
 from __future__ import annotations
 
@@ -131,10 +131,9 @@ def parse_description_timestamps(text):
 
 
 def extracted_markers(run):
-    """Description timestamps. Prefer `extracted`; fall back to deprecated `gold`."""
-    if run.get("extracted") is not None:
-        return run["extracted"]
-    return run.get("gold") or []
+    """Return description timestamps from the one supported data key."""
+    extracted = run.get("extracted")
+    return extracted if isinstance(extracted, list) else []
 
 
 def create_run(url_or_id, runs_dir, gap_seconds=DEFAULT_GAP_SECONDS):

@@ -112,12 +112,11 @@ export function escapeAttr(s) { return escapeHtml(s); }
 
 export function missId(start) { return "miss:" + Number(start); }
 
-// Description timestamps on a run. New writes use `extracted`; old run files
-// still have `gold`. Prefer the new key.
+// Description timestamps on a run. The load boundary reports deprecated keys;
+// this pure reader only consumes the supported field.
 export function extractedList(run) {
   if (!run) return [];
-  if (Array.isArray(run.extracted)) return run.extracted;
-  return run.gold || [];
+  return Array.isArray(run.extracted) ? run.extracted : [];
 }
 
 // Published YT-description stamp nearest this time. The human title on the
