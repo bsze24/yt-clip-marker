@@ -1,6 +1,7 @@
 # Current task
 
-**Review PR 7 — local video mode.** Baton: **→ reviewer**, on `c4de36d`.
+**Review PR 7 — local video mode.** Baton: **→ reviewer**, on `fced73f` — round 2, after F18
+and F19.
 
 Roles are reversed for this round at Brian's instruction: Claude Code implemented, Codex
 reviews. The code is written and committed on `local-video-mode`; nothing here asks anyone to
@@ -12,17 +13,18 @@ rebuild it.
 
 | Item | Where | Status |
 | --- | --- | --- |
-| **PR 7 — local video mode** | `local-video-mode`, `c4de36d` | **under review**, this task |
+| **PR 7 — local video mode** | `local-video-mode`, `fced73f` | **under review**, this task |
 | PR 4 — video 1 store | `codex/pr-4-video-1-store`, `43c99dd` | review clean → **Brian, merge** |
 | PR 3 | merged `5af3e13` | closed |
 | PR 5 | `949cb7b` | closed, superseded — do not merge |
 | PR 6 + `docs/remove-coordination-md` | `e158710` | **close, do not merge** — ~1,000 lines stale |
 
-`main` is `15571f9`. PR 7 branches from it and carries two commits, `4b344d5` then `c4de36d`,
+`main` is `15571f9`. PR 7 branches from it and carries three commits, `4b344d5`, `c4de36d`,
+then `fced73f` (F18/F19),
 with two session-log commits interleaved by Brian. Verify before reviewing:
 
 ```bash
-git merge-base --is-ancestor c4de36d HEAD
+git merge-base --is-ancestor fced73f HEAD
 ```
 
 **Why this exists.** Brian is flying and the annotation loop is otherwise complete. The only
@@ -30,7 +32,7 @@ two things in the studio that needed the internet were the player and the ingest
 
 ## 1. The task
 
-Review `c4de36d` per the `README.md` review loop. `docs/prs/pr-7-local-video-mode.md` is the
+Review `fced73f` per the `README.md` review loop. `docs/prs/pr-7-local-video-mode.md` is the
 spec and carries the design rationale; this file carries the baton and the audit.
 
 **Where to look hard.** Places this change could plausibly be wrong, not a generic checklist:
@@ -76,7 +78,8 @@ copy-timestamps fold ([[D-022]]), and the two items filed as `TD-11` and `TD-12`
 
 ## 3. Baton
 
-**→ reviewer**, on `c4de36d`. Findings go in `REVIEW.md` thread 4.
+**→ reviewer**, on `fced73f`. F18 and F19 are `addressed` in `REVIEW.md` thread 4, awaiting a
+re-review verdict.
 
 ---
 
@@ -128,5 +131,45 @@ copy-timestamps fold ([[D-022]]), and the two items filed as `TD-11` and `TD-12`
   claim rests on the code path (a local run never calls `ensureYouTubeApi`) plus the observed
   fact that a local run's playback issues no external request, not on a disconnected test.
 
+### 2026-08-19 — implementer, PR 7 review findings F18-F19 (`fced73f`)
+
+- **Acceptance criteria and evidence.** Both findings fixed in one commit. F18: `find_sidecars`
+  now requires the remainder after the media stem to begin with `.`; on the reported
+  reproduction `create_local_run("Lesson 1.mp4")` yields its own `Lesson-1` id, 0 cues and 0
+  extracted rather than the adjacent recording's identity, while real sidecars still resolve in
+  json3-first order. F19: `do_HEAD` runs the same dispatch as `do_GET` behind a per-request flag;
+  six routes probed over raw TCP each returned the GET's status and `Content-Length` with zero
+  body bytes, and the following request on the same connection began with a status line. Ranges
+  still 206, studio clean in a fresh tab, video 1 unchanged at 64 · 21 · 23 · 24 · 14.
+- **Assumptions.** F19 was fixed wider than the finding asked. `HEAD` was equally wrong on `/`,
+  `/ui/` and every `/api/` route, and one flag read where bodies are actually written beats a
+  parameter plus a branch condition that can drift apart. The flag resets at the start of a
+  request rather than in a `finally`, so a failed `HEAD`'s 500 stays bodyless and no state leaks
+  across a keep-alive connection.
+- **Skips and divergences.** None. Both diagnoses were correct as filed and neither fix touched
+  a decision. The prefix glob in `prefetch.fetch` was left alone deliberately — it only gates a
+  printed hint, so a false positive costs a suppressed note and nothing else.
+
 Each turn appends here: role, surface, SHA, what was verified, assumptions made, anything
 skipped. See `README.md`, "Before recording a SHA".
+
+### 2026-08-19 — reviewer, PR 7 local video mode (`c4de36d`)
+
+- **Anchor and scope.** Confirmed `c4de36d` is an ancestor of this
+  `local-video-mode` checkout (`6fbbb0a`); reviewed only PR 7 code plus its spec and active
+  coordination thread. No product code or store data changed.
+- **Verified independently.** In a disposable archive of `c4de36d`, compiled all four Python
+  modules and syntax-checked the changed JS modules. Exercised `/media/` with full, explicit,
+  open-ended, suffix and multi-range requests: each returned the expected 200/206 body and
+  `Content-Range`; an unsatisfiable range returned 416; encoded traversal, double-encoded
+  traversal and a non-media sibling each returned 404. A temporary `{videoId}.mp4` made the
+  existing YouTube run report local media, then its removal restored `media: null`; the run
+  file's SHA-256 was unchanged throughout. Local ingest with no sidecars produced a zero-cue
+  local run, and a `miss` at 27.0 round-tripped to the disposable `labels.jsonl`.
+- **Findings.** F18 and F19 are both non-blocking because the real `media/` directory currently
+  has no local files, but each is a real local-mode edge case reproduced in the disposable
+  copy. They need an implementer response before a clean verdict.
+- **Not re-verified.** I did not drive a browser or re-run yt-dlp against the network. The
+  implementer's browser receipts cover local transport, `n`, the YouTube regression and the
+  real `prefetch.py` download; an actually disconnected-machine playback test remains the
+  explicit gap recorded in `REVIEW.md`.
