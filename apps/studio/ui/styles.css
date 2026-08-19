@@ -69,6 +69,13 @@ body.player-left .player-col {
 #player { width: 100%; aspect-ratio: 16 / 9; background: #000; }
 body.player-top #player { max-height: 52vh; }
 body.player-left #player { max-height: none; }
+/* Local backend. object-fit keeps a 4:3 or portrait Zoom recording from being
+   stretched into the 16:9 box the embed dictates. */
+#localVideo { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; object-fit: contain; }
+#localVideo[hidden] { display: none; }
+body.player-top #localVideo { max-height: 52vh; }
+body.player-left #localVideo { max-height: none; }
+.src-local { color: #7bb0ff; }
 .player-meta { display: flex; min-width: 0; }
 body.player-top .player-meta {
   gap: 20px; align-items: baseline; flex-wrap: wrap;

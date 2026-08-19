@@ -26,9 +26,10 @@ export function renderRunSelect() {
   const select = $("runSelect");
   const prev = select.value;
   select.innerHTML = S.runs.map((r) => {
+    const offlineMark = r.hasMedia ? "⏏ " : "";
     const label = S.evalMode
-      ? `${r.title} · ${r.markerCount} markers · ${r.checkCount} check`
-      : `${r.title} · ${r.markerCount} markers · ${r.missCount} added`;
+      ? `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.checkCount} check`
+      : `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.missCount} added`;
     return `<option value="${escapeAttr(r.id)}">${escapeHtml(label)}</option>`;
   }).join("");
   if (S.currentId && S.runs.some((r) => r.id === S.currentId)) select.value = S.currentId;
@@ -92,8 +93,16 @@ export async function openRun(id) {
   rememberCursor();
   const run = S.current.run;
   const extractedN = extractedList(run).length;
-  $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div><a href="${escapeAttr(run.url || "")}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a> · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
-  loadVideo(run.videoId, S.selectedStart);
+  // A local run has no watch URL, and an empty href would link to this page.
+  const idHtml = run.url
+    ? `<a href="${escapeAttr(run.url)}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a>`
+    : escapeHtml(run.videoId || "");
+  const media = S.current.media || null;
+  const sourceHtml = media
+    ? ` · <span class="src-local" title="${escapeAttr(media.name)}">local file</span>`
+    : "";
+  $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div>${idHtml}${sourceHtml} · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
+  loadVideo(run.videoId, S.selectedStart, media);
   renderGrid();
   updateStats();
 }

@@ -314,6 +314,36 @@ if the write fails, or hold a separate in-flight flag. **Do not** fix this by mo
 inside the write lock — that only makes the duplicate pair look correctly ordered, which hides
 the symptom that revealed it. See the file-order note in `apps/studio/README.md`.
 
+### TD-11 — `ingest.py` carries the same over-broad caption-language wildcard
+
+**Where:** `apps/studio/ingest.py` — `fetch_captions`, `--sub-langs "en.*,en"`.
+
+**Issue:** the wildcard matches auto-translated tracks (`en-en`, `en-de`) as well as the two
+that matter (`en-orig`, `en`). Each is an extra request. In `prefetch.py` on 2026-08-19 that
+extra traffic drew a 429 on the third track; the same pattern here would do the same.
+
+Not currently harmful: `fetch_captions` picks the first `.json3` in the temp directory and
+judges success by whether a file exists, not by yt-dlp's return code, so a failed redundant
+track cannot fail the ingest. It is the *only* reason this is latent rather than live.
+
+**Trigger:** with the next `ingest.py` change, or the first time an online ingest fails on a
+subtitle 429. Narrow to `en-orig,en` to match `prefetch.py`. Note that `en-orig` sorts before
+`en` in the glob, which is the preference we want — but `fetch_captions` currently relies on
+sort order rather than saying so, unlike `local.py`'s `find_sidecars`, which ranks explicitly.
+
+### TD-12 — audio-only local files render in a `<video>` element
+
+**Where:** `apps/studio/ui/player.js` — `ensureMediaEl`.
+
+**Issue:** a `.m4a` or `.mp3` run plays correctly but shows a black 16:9 box. `/api/run`
+already returns `media.kind` as `"audio"`; nothing reads it.
+
+Cosmetic, and only reachable by ingesting an audio-only file, which nothing does today —
+a Zoom recording's `.m4a` is the plausible route.
+
+**Trigger:** if audio-only recordings become a real input. Swap the element on `kind`, or
+collapse the player column and let the grid have the width.
+
 ## Parking lot
 
 - Voice input; YouTube Data API write-back; sync; mobile and in-car; Shorts, playlists,

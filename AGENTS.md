@@ -131,6 +131,8 @@ yt-clip-marker/
 │   └── studio/
 │       ├── server.py         stdlib HTTP server + label-event store
 │       ├── ingest.py         yt-dlp fetch: captions, gaps, description, extracted
+│       ├── local.py          offline ingest: media file + sidecar subs/info.json
+│       ├── prefetch.py       CLI: yt-dlp video + captions + run, for offline use
 │       ├── index.html        markup only; loads /ui/ assets
 │       ├── ui/               ES modules (served via allowlisted /ui/ route)
 │       │   ├── main.js       entry: event wiring + boot
@@ -140,13 +142,14 @@ yt-clip-marker/
 │       │   ├── suggest.js    taxonomy vocab, dropdown, tag chips
 │       │   ├── composer.js   add-clip form logic
 │       │   ├── persist.js    all server writes + debounces
-│       │   ├── player.js     YouTube IFrame wrapper, focus management
+│       │   ├── player.js     YouTube embed + local <video> behind one interface
 │       │   ├── runs.js       run list polling + switching
 │       │   ├── api.js        fetch wrapper + save-failure surface
 │       │   ├── util.js       pure helpers, constants
 │       │   └── styles.css
 │       ├── attach_cues.py    CLI: merge a transcript dump into a run
 │       ├── attach_extracted.py CLI: attach or migrate description timestamps
+│       ├── media/            local video/audio for offline playback (gitignored)
 │       ├── runs/             {videoId}-{stamp}.json
 │       ├── labels.jsonl      append-only human judgments
 │       └── README.md         store/event schema details

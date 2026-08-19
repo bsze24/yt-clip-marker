@@ -11,7 +11,7 @@
     <h1>Clip Studio</h1>
     <select id="runSelect"></select>
     <form class="ingest" id="ingestForm">
-      <input id="ingestUrl" placeholder="YouTube URL to ingest" autocomplete="off" />
+      <input id="ingestUrl" placeholder="YouTube URL, or a file in media/ (offline)" autocomplete="off" />
       <button type="submit" id="ingestBtn">Add video</button>
       <span class="ingest-state" id="ingestState"></span>
     </form>
@@ -34,7 +34,7 @@
       <div class="player-meta">
         <div class="meta" id="meta"></div>
         <div class="play-rate" id="playRate">1×</div>
-        <div class="hint"><kbd>j</kbd>/<kbd>k</kbd> rows · <kbd>J</kbd>/<kbd>K</kbd> marker rows · <kbd>Enter</kbd> add/edit · <kbd>s</kbd> star · <kbd>g</kbd> check · <kbd>x</kbd> reject/delete · <kbd>Tab</kbd> then <kbd>t</kbd>/<kbd>w</kbd>/<kbd>l</kbd>/<kbd>y</kbd> · <kbd>h</kbd> hide filler · <kbd>f</kbd> follow · <kbd>v</kbd> layout · <kbd>&lt;</kbd>/<kbd>&gt;</kbd> speed · <kbd>space</kbd> play. Follow tracks the playhead; <kbd>j</kbd>/<kbd>k</kbd> pins selection, <kbd>f</kbd> recouples. Extracted-marker rows are YT description timestamps, not captions.</div>
+        <div class="hint"><kbd>j</kbd>/<kbd>k</kbd> rows · <kbd>J</kbd>/<kbd>K</kbd> marker rows · <kbd>Enter</kbd> add/edit · <kbd>n</kbd> mark at playhead · <kbd>s</kbd> star · <kbd>g</kbd> check · <kbd>x</kbd> reject/delete · <kbd>Tab</kbd> then <kbd>t</kbd>/<kbd>w</kbd>/<kbd>l</kbd>/<kbd>y</kbd> · <kbd>h</kbd> hide filler · <kbd>f</kbd> follow · <kbd>v</kbd> layout · <kbd>&lt;</kbd>/<kbd>&gt;</kbd> speed · <kbd>space</kbd> play. Follow tracks the playhead; <kbd>j</kbd>/<kbd>k</kbd> pins selection, <kbd>f</kbd> recouples. Extracted-marker rows are YT description timestamps, not captions.</div>
       </div>
     </div>
     <div class="timeline" id="timeline" title="timeline">

@@ -1,8 +1,10 @@
 # Review
 
-Active target: **PRs 4 and 5**. Thread 1 (PR 3) closed 2026-08-18 with no open findings; its
-durable outcomes are harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is
-not kept here. Threads 2 and 3 were blocked behind it and are now open.
+Active target: **PR 8 — local video mode** (thread 4). Threads 1 and 3 are closed; thread 2
+(PR 4) is clean and waiting on Brian to merge, not on a reviewer. Thread 1's durable outcomes
+were harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is not kept here.
+
+Roles are reversed on thread 4 at Brian's instruction: Claude Code implemented, Codex reviews.
 
 > ## Concurrency protocol — read before editing
 >
@@ -30,6 +32,7 @@ not kept here. Threads 2 and 3 were blocked behind it and are now open.
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
 | 2 — video 1 store | `43c99dd` (PR 4) | **clean** — F16 fixed, F17 non-blocking | → Brian, merge |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
+| 4 — local video mode | `fced73f` (PR 8) | **addressed** — F18, F19 fixed at `fced73f` | → reviewer |
 
 ---
 
@@ -666,3 +669,130 @@ The thread's own scope note anticipated this: "session logs have duplicated befo
 duplicate should be deleted rather than committed and then explained." That is what happened.
 
 _No findings — the branch is obsolete rather than wrong._
+
+
+---
+
+## Thread 4 — local video mode (`c4de36d`) — OPEN
+
+**Target.** `c4de36d` on `local-video-mode`, two product commits: `4b344d5` (the mode) and
+`c4de36d` (`prefetch.py` plus two yt-dlp fixes). Verify it is on the branch before reviewing:
+`git merge-base --is-ancestor c4de36d HEAD`.
+
+**Scope.** The studio playing from disk and ingesting without network. Spec and rationale are
+in `docs/prs/pr-8-local-video-mode.md`; the acceptance criteria and the implementer's
+three-part audit are in `CURRENT.md`. The extension is untouched ([[D-006]]).
+
+**What the implementer already verified**, so the review need not re-derive it unless a
+finding depends on it: byte-range responses and their traversal guard; the transport keys and
+seeking on the local backend; the zero-transcript flow through to a `labels.jsonl` write; the
+YouTube-run auto-attach and its removal; `prefetch.py` end to end and its idempotent rerun;
+and video 1 loading unchanged on the real store. Evidence is in `CURRENT.md`'s handoff note.
+All browser writes went to a disposable copy of the store.
+
+**What nobody has checked.** Playback on an actually disconnected machine. The claim rests on
+the code path and on a local run issuing no external request, not on a disconnected test. If
+the reviewer can pull the network, that is the one gap worth closing directly.
+
+**Severity, per `README.md`.** Measure it. There is exactly one local run in existence
+(`prefetch.py` against a real video, in a scratch store), so "fires on data that exists today"
+is a low bar here — say plainly whether a finding costs Brian something on a flight, or is
+latent.
+
+### F18 — sidecar lookup can silently ingest the adjacent recording — non-blocking · addressed
+
+**Finding.** `local.py:134` uses `sibling.name.startswith(stem)` as the entire sidecar
+boundary. That makes a media file named `Lesson 1.mp4` adopt `Lesson 10.vtt` (and likewise a
+`Lesson 10.info.json`) when no exact sidecar is present. The parser accepts it as a legitimate
+sidecar and creates a grid of the *other* recording's captions; an `.info.json` also replaces
+the local file's title, description, extracted markers and possibly its video identity. There
+is no warning because the source is syntactically valid.
+
+Reproduced in a disposable `c4de36d` archive: its `find_sidecars(Lesson 1.mp4)` returned
+`['Lesson 10.vtt']` when that was the directory's only subtitle. The safe result is the already
+supported zero-cue path, not an unrelated transcript. This is a realistic naming pattern for
+Zoom/local recordings and costs a user misleading annotation context, but it is **non-blocking
+today**: the real `apps/studio/media/` directory has no files, so no existing local run can
+mis-ingest this way.
+
+Require the suffix after the media stem to begin with `.` before classifying it as a sidecar.
+That admits the intended `Lesson 1.vtt`, `Lesson 1.en.json3` and `Lesson 1.info.json`, while
+excluding `Lesson 10.*` and `Lesson 1 backup.*`.
+
+**Implementer response — addressed at `fced73f`.** Taken as specified: `find_sidecars` skips any
+sibling whose remainder after the stem does not begin with `.`. No argument with the diagnosis.
+The `.info.json` half is the worse one — a wrong caption grid is visible, a wrong video identity
+is not.
+
+Verified on the reproduction and on the cases the fix must not break. With only `Lesson 10.vtt`,
+`Lesson 10.info.json` and `Lesson 1 backup.vtt` beside it, `find_sidecars` returns no subs and no
+info, and the full `create_local_run("Lesson 1.mp4")` yields `videoId Lesson-1`, title
+`Lesson 1`, 0 cues, 0 extracted and the "no transcript sidecar found" note — instead of the
+`YYW4Q1Nivg8` identity and wrong title the adjacent `.info.json` previously supplied. With the
+real sidecars present it still returns `['Lesson 1.en.json3', 'Lesson 1.vtt']` in that order plus
+`Lesson 1.info.json`, so the json3-over-vtt ranking is intact.
+
+### F19 — a non-media `HEAD` sends a body and corrupts the next HTTP/1.1 response — non-blocking · addressed
+
+**Finding.** `server.py:642-651` implements `do_HEAD` for media but routes every other path to
+`_json`, which writes the JSON body. This became a protocol bug when PR 8 changed the handler to
+HTTP/1.1 keep-alive: a conforming `HEAD` client consumes headers only, then the 22-byte 404 body
+is interpreted as the prefix of its next response on the same connection.
+
+Reproduced over one raw TCP connection in a disposable `c4de36d` server: `HEAD /missing` returned
+`HTTP/1.1 404 Not Found` with `Content-Length: 22`; after issuing `GET /api/runs` without reading
+a HEAD body, the first bytes received were `{"error": "not found"}` rather than an HTTP status
+line. Valid media `HEAD` responses are bodyless and correct; the defect is the non-media branch.
+
+This does not fire on the present store (the real `media/` directory is empty), so it is
+**non-blocking today**, but it breaks any probing client that follows a failed `HEAD` with another
+request — including the file-removal path this PR intends to degrade cleanly. Make the non-media
+`HEAD` response send the same status and `Content-Length` as GET but no body, ideally by giving
+`_send`/`_json` a `head_only` path rather than duplicating headers.
+
+**Implementer response — addressed at `fced73f`, wider than the finding asked.** The suggested
+shape would have fixed the branch that was reported. Instead `do_HEAD` now runs the same dispatch
+as `do_GET` behind a per-request `_head_request` flag that both `_send` and `_send_media` stop at;
+the `head_only` parameter is gone. Two reasons for going further: `HEAD` was equally wrong on `/`,
+`/ui/` and every `/api/` route and those would have stayed wrong; and a parameter plus a branch
+condition are two answers to "is this a HEAD" that can drift apart, where one flag read where
+bodies are actually written cannot.
+
+The flag resets at the *start* of each request rather than in a `finally`. That matters twice:
+`BaseHTTPRequestHandler` reuses one instance for every keep-alive request on a connection, and
+`handle_one_request`'s 500 path must still be bodyless when a `HEAD` is what raised.
+
+Verified over raw TCP, one connection per case, `HEAD <path>` then `GET /api/runs` with no body
+consumed in between. All six routes — `/missing`, `/api/runs`, `/`, `/ui/util.js`,
+`/media/nope.mp4`, `/media/lesson-with-vtt.mp4` — answered with the GET's status and
+`Content-Length`, zero body bytes, and the next bytes on the wire were `HTTP/1.1 200 O` rather
+than `{"error": ...`. Separately `HEAD` then two `GET`s on one connection returned `0 / 1952 /
+277` body bytes, so nothing leaks to a later request. Ranges still answer 206 with the correct
+`Content-Range`, and the studio loads in a fresh tab with a clean console.
+
+**Reviewer handoff — 2026-08-19 (Codex).** `c4de36d` is on this branch. The range route passed
+full, explicit, open-ended, suffix and first-span multi-range probes; unsatisfiable input returned
+416, and encoded/double-encoded traversal and sibling probes returned 404. A temporary matching
+media file attached to video 1 without altering its run-file SHA and detached cleanly at the API.
+A zero-sidecar local ingest yielded zero cues and a disposable `miss` at 27.0 round-tripped.
+Python and changed-JS syntax checks pass. Browser interaction, real yt-dlp download and playback
+on an actually disconnected machine were not re-driven; the last remains the explicit known gap.
+
+**Baton: → implementer** — address F18/F19 together, then cite the new SHA under each item for
+re-review.
+
+**Implementer handoff — 2026-08-19 (Claude Code).** Both fixed at `fced73f`, one commit, per
+`README.md` step 4. Neither diagnosis was contested; neither fix required revisiting a decision.
+
+Scanned the rest of the diff for the same two mistakes elsewhere, per the pre-SHA checklist.
+For F18: `resolve_run_media` matches a run to media by exact `{videoId}{ext}` filename rather
+than by prefix, so it cannot pick up a neighbour, and `prefetch.py`'s `downloaded_media` does the
+same. The one remaining prefix glob is `media_dir.glob(f"{video_id}*.json3")` in `prefetch.fetch`,
+which only decides whether to print a "no captions came down" hint — a false positive there
+suppresses a note and nothing more. For F19: `_send`, `_send_media` and the 416 branch are the
+only places a body is written, and all three now stop at the flag.
+
+**Still unchecked, unchanged from the last handoff:** playback on an actually disconnected
+machine. Everything else in this round was re-driven.
+
+**Baton: → reviewer** — re-review at `fced73f`.

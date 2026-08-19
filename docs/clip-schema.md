@@ -32,7 +32,7 @@ Legacy: `kind` (`TAKE` \| `CONCEPT`) appears on old markers and old label events
 
 The studio store is the source of truth (the extension holds marks in memory only):
 
-- `apps/studio/runs/{videoId}-{YYYYMMDD-HHMM}.json` — immutable ingest/model output per video: `videoId`, `url`, `title`, `createdAt`, `markers[]` (suggester output; may be empty), `cues[]` (caption track, `gapBefore` = seconds of silence before the cue), `descriptionText` + `extracted[]` (published YT description timestamps). A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`.
+- `apps/studio/runs/{videoId}-{YYYYMMDD-HHMM}.json` — immutable ingest/model output per video: `videoId`, `url`, `title`, `createdAt`, `markers[]` (suggester output; may be empty), `cues[]` (caption track, `gapBefore` = seconds of silence before the cue), `descriptionText` + `extracted[]` (published YT description timestamps). A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`. A run ingested from a file on disk carries two more keys — `source: "local"` and `media` (the file name under `apps/studio/media/`) — and its `videoId` is a filename-derived id rather than an 11-char YouTube one whenever no `.info.json` sidecar supplied a real one. Readers that need to know which they hold should test `source`, not the shape of `videoId`.
 - `apps/studio/labels.jsonl` — append-only human events keyed by `(runId, markerIndex)` for skill markers and `(runId, start)` for added markers. Latest event wins; deletes are tombstones (`unmiss`). Full event field list: `apps/studio/README.md`.
 
 **Reading `verdict` across the 2026-08-18 vocabulary change.** `wrong` became a verdict on

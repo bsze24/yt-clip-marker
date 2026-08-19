@@ -5,7 +5,7 @@
 import { $, missId, feedbackWhy, withWhy, resolvedLabel, extractedList } from "./util.js";
 import { S, setSave, rememberChapter } from "./state.js";
 import { api, saveFailed } from "./api.js";
-import { seek } from "./player.js";
+import { seek, getCurrentTime } from "./player.js";
 import { renderGrid, updateStats, scrollToActive, displayMarkers, buildRows, rowKey } from "./grid.js";
 import { cancelPendingAddition, cancelPendingMarker, persist } from "./persist.js";
 
@@ -213,4 +213,14 @@ export function editWhy() {
     row.dataset.addGapbefore,
     row.dataset.addExtracted || "",
   );
+}
+
+// `n`: open the add form at the current playhead, rounded to the second.
+// This is the only way to create a clip in a run with no transcript and no
+// markers — there is no row to press Enter on. openComposer pauses on the way
+// in, which is what you want before typing a label.
+export function addAtPlayhead() {
+  if (!S.current) return;
+  const t = Math.max(0, Math.round(getCurrentTime()));
+  openComposer(t, false, "", null, "");
 }

@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "05:28"
-revised: 2026-08-19 05:50
+revised: 2026-08-19 07:06
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: two-surface-land
@@ -70,6 +70,13 @@ and roughly half the session went to fixing that.
   several turns.
 - "I was always confused why PR 5 existed" — the confusion was correct. PR 5 and PR 6 froze
   snapshots of documents that were still being written, and both died the same way.
+- "Fixes all 4 what? Nothing seemed broken about the setup." Two words of mine were doing damage:
+  "fixes" implied a defect that did not exist, and it sent me to check the label text, which I had
+  never done. That check overturned my "loses nothing" claim.
+- "You didn't step back a change just because I questioned it?" — the right question to ask a
+  reviewer who has just agreed with you three times.
+- "We want every marker to reach the output, that's a main point of the tool." Stated as a
+  principle, not a preference, which is what made it a decision rather than a setting.
 
 ## Concepts touched
 - [concept] displayed-time vs stored identity — solid — you predicted the F7 boundary split from
@@ -85,6 +92,9 @@ and roughly half the session went to fixing that.
 - [concept] pr-as-container-vs-live-document — emerging — new. PRs 5 and 6 both froze live
   working documents and both closed unmerged; the newest copies of five files sat outside git
   for three days as a result.
+- [concept] stated-principle-vs-enforced-invariant — emerging — new. [[D-033]] says every marker
+  reaches the output; the fold merges on time and rank and never compares label text, so the
+  principle holds on video 1 by luck rather than by construction.
 
 ## Coaching hooks
 - **Mode confusion, mine not yours.** A readiness question got answered as a recommendation:
@@ -96,6 +106,14 @@ and roughly half the session went to fixing that.
   Three prose attempts failed first. Reach for the runnable demonstration earlier.
 - **You say "still not following" rather than guessing.** Treat that as "the explanation is
   wrong", never as "repeat it slower".
+- **Agreeing three times in a row is a signal, not a virtue.** On "orthogonal" I took Brian's
+  framing wholesale when the accurate answer was narrower. He caught it by asking directly whether
+  I was capitulating. Distinguish "you are right" from "you are right about a smaller thing".
+- **Check the thing you are about to call free.** "Loses nothing" was verified against tags and
+  never against label text — the field that actually carries Brian's work.
+- **Third instance this session of critical work living only in a working tree**: coordination
+  docs, the review record, then the local video player. Ask "is this in a commit?" before ranking
+  anything else.
 
 ## Next / open threads
 - **PR 4 is the only open PR and the clear next step.** Thread 2 has one question left: shapes
@@ -215,6 +233,44 @@ and roughly half the session went to fixing that.
   the skill (populated `markers[]`). Neither can take a transcript the tool did not fetch.
 - **05:50** — Logged. Recommended finishing thread 2 here rather than in a new session, since its
   evidence is already in this log.
+- **05:55** — Reviewed PR 4 against the contract. Clean on every check. Two findings, both
+  non-blocking: `F16`, the standing trap I wrote yesterday claims added markers never drift and
+  three of 21 do — they sit on extracted stamps, created from description-only rows, each with an
+  empty `cueText`; and `F17`, three duplicate writes ~2 ms apart where file order and timestamp
+  order disagree. Measured `F17`'s severity rather than assuming: the pairs are byte-identical, the
+  server folds in file order, no count is affected. Fixed `F16` on `main` in the same commit.
+- **06:05** — Merged PR 4 and got it wrong. Its base was `codex/pr-3-two-surface-product`, not
+  `main`, so `gh pr merge 4` put run 1's data on a dead branch. Recovered with a second merge,
+  `d16383d`. `CURRENT.md`'s own table said the base was "PR 3" — I wrote that line and did not
+  check it before merging.
+- **06:10** — PR 7 turned out to be Codex's implementer-side session log, same track, reusing two
+  concept names from the trail rather than coining synonyms. Brian had already committed it
+  straight to `main`, so the PR was redundant.
+- **06:20** — `F17` follow-through. Wrote the file-order rule into `apps/studio/README.md` and
+  backlogged the cause as `TD-10`: the add-clip form's guard is a check that a form is open, and
+  the form does not close until after the server replies. Recorded *not* to fix it by moving the
+  timestamp inside the lock, which would hide the duplicate rather than stop it.
+- **06:35** — Argued `R-NEIGHBORHOOD` both ways at Brian's request. He found my steelman
+  persuasive; on re-reading it was wrong — the replacement asks for *less* judgement, not more
+  precision, so it cannot suppress candidates. Retired it for `R-CUE-EXACT` ([[D-032]]). Also
+  resolved `TD-4` — both halves, which were never alternatives.
+- **06:50** — "Fixes all 4 what? Nothing seemed broken." Correct on both counts. There was no
+  defect; I had called a trade a fix. And checking the label text — which I had never done —
+  showed widening the fold deletes three of Brian's descriptions, not "nothing". Corrected `TD-9`
+  and amended [[D-031]], which he had decided on that false premise.
+- **06:55** — "You didn't step back a change just because I questioned it?" No code was reverted.
+  But I had over-agreed on "orthogonal": YouTube is blind to the studio, yet the chain
+  markers → export → description → chapters is real, so the window does decide whether chapters
+  form. The narrow correction was that the window is not a *chapter feature*.
+- **07:00** — [[D-033]]: every marker reaches the output. Measured first — at the current 2s
+  window all 10 collapsed candidates are text-identical to their survivor, so nothing is lost;
+  at 6s three carry different text. Two seconds is the boundary between collapsing a duplicate
+  and deleting work. `TD-9` closed wontfix, chapters abandoned.
+- **07:06** — Pre-flight triage. Found the local video player sitting as 448 uncommitted lines
+  across nine files plus an untracked `local.py` — the third time this session that critical work
+  lived only in a working tree. Brian committed it as `4b344d5` while I was checking. It also
+  closes the transcript-import gap raised at 05:48: `local.py` builds a run from a file on disk
+  using yt-dlp's sidecars, no network.
 
 ## Banked artifacts
 
