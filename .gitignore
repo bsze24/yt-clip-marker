@@ -5,7 +5,11 @@ node_modules/
 __pycache__/
 apps/studio/media/
 
-# Raw recording exports kept locally for reference — hundreds of MB, not product.
-docs/reference/sample_video/*.mp4
-docs/reference/sample_video/*.m4a
-docs/reference/sample_video/*.mkv
+# Raw recording exports kept locally for reference — hundreds of MB each, not
+# product. Matches any export folder under docs/reference/, not just the first
+# one: a per-folder rule silently stops covering the next drop.
+docs/reference/**/*.mp4
+docs/reference/**/*.m4a
+docs/reference/**/*.mkv
+docs/reference/**/*.mov
+.aider*
