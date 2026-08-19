@@ -1,6 +1,6 @@
 # Review
 
-Active target: **PR 7 — local video mode** (thread 4). Threads 1 and 3 are closed; thread 2
+Active target: **PR 8 — local video mode** (thread 4). Threads 1 and 3 are closed; thread 2
 (PR 4) is clean and waiting on Brian to merge, not on a reviewer. Thread 1's durable outcomes
 were harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is not kept here.
 
@@ -32,7 +32,7 @@ Roles are reversed on thread 4 at Brian's instruction: Claude Code implemented, 
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
 | 2 — video 1 store | `43c99dd` (PR 4) | **clean** — F16 fixed, F17 non-blocking | → Brian, merge |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
-| 4 — local video mode | `fced73f` (PR 7) | **addressed** — F18, F19 fixed at `fced73f` | → reviewer |
+| 4 — local video mode | `fced73f` (PR 8) | **addressed** — F18, F19 fixed at `fced73f` | → reviewer |
 
 ---
 
@@ -680,7 +680,7 @@ _No findings — the branch is obsolete rather than wrong._
 `git merge-base --is-ancestor c4de36d HEAD`.
 
 **Scope.** The studio playing from disk and ingesting without network. Spec and rationale are
-in `docs/prs/pr-7-local-video-mode.md`; the acceptance criteria and the implementer's
+in `docs/prs/pr-8-local-video-mode.md`; the acceptance criteria and the implementer's
 three-part audit are in `CURRENT.md`. The extension is untouched ([[D-006]]).
 
 **What the implementer already verified**, so the review need not re-derive it unless a
@@ -735,7 +735,7 @@ real sidecars present it still returns `['Lesson 1.en.json3', 'Lesson 1.vtt']` i
 ### F19 — a non-media `HEAD` sends a body and corrupts the next HTTP/1.1 response — non-blocking · addressed
 
 **Finding.** `server.py:642-651` implements `do_HEAD` for media but routes every other path to
-`_json`, which writes the JSON body. This became a protocol bug when PR 7 changed the handler to
+`_json`, which writes the JSON body. This became a protocol bug when PR 8 changed the handler to
 HTTP/1.1 keep-alive: a conforming `HEAD` client consumes headers only, then the 22-byte 404 body
 is interpreted as the prefix of its next response on the same connection.
 

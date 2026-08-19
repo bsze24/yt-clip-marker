@@ -1,4 +1,10 @@
-# PR 7 — Local video mode
+# PR 8 — Local video mode
+
+> **On the number.** GitHub assigned this **#8**; #7 went to a Codex session-log PR that was
+> closed as redundant. The three product commits on this branch are titled `PR 7:` because they
+> were written before the PR existed. They are pushed, and rewriting published history to fix a
+> label is not worth a force-push — the docs are the corrected reference, the commit titles are
+> not.
 
 **Goal.** The studio works with no network. Playback falls back from the YouTube embed
 to a `<video>` element served by the studio itself, and a run can be built from a file

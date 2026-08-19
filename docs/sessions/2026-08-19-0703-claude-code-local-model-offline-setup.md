@@ -16,7 +16,7 @@ task: docs/coordination/CURRENT.md
   process transcripts 2–5 and polish UX. This session set up a local model to stand in
   for Claude. `CURRENT.md` at this commit still points at the PR 3/4/5 review; that thread
   is untouched here.
-- A parallel session landed **PR 7 (`4b344d5`)** on this branch mid-conversation — local
+- A parallel session landed **PR 8 (`4b344d5`)** on this branch mid-conversation — local
   video mode, a `<video>` backend behind `player.js`'s existing interface plus a
   range-capable `/media/` route and `local.py`. It is not this session's work and has no
   log of its own. It closes the offline-player blocker named below.
@@ -26,7 +26,7 @@ task: docs/coordination/CURRENT.md
 - Installed: `ollama` (brew), `aider-chat` 0.86.2 (uv, pinned to Python 3.12).
 - Pulled: `qwen3-coder:30b` (18 GB) and `qwen3:30b-a3b` (18 GB).
 - Wrote `~/flight-local-llm.md` — offline cheatsheet, outside the repo, banked below.
-- Landed in parallel, not by this session: `4b344d5` PR 7 local video mode.
+- Landed in parallel, not by this session: `4b344d5` PR 8 local video mode.
 
 ## Decisions
 - **Local model stack is ollama + `qwen3-coder:30b` for code, `qwen3:30b-a3b` for
@@ -74,9 +74,9 @@ task: docs/coordination/CURRENT.md
 - **Transcripts 2–5 are still not ingested.** `runs/` holds only video 1
   (`YYW4Q1Nivg8-20260814-1248.json`). `ingest.py` needs YouTube. This is the one blocker
   that cannot be cleared offline and it is the subject of the planned flight work.
-- **`apps/studio/media/` is empty.** PR 7 makes offline playback possible but requires
+- **`apps/studio/media/` is empty.** PR 8 makes offline playback possible but requires
   `{videoId}.mp4` on disk. Without a pull, playback is still dead in the air.
-- PR 7 (`4b344d5`) has no session log and is not reflected in `CURRENT.md`. Someone should
+- PR 8 (`4b344d5`) has no session log and is not reflected in `CURRENT.md`. Someone should
   reconcile it.
 - Airplane-mode smoke test was never run end to end with the studio.
 
@@ -120,7 +120,7 @@ task: docs/coordination/CURRENT.md
   at q8_0. Verified: 65536 context, 100% GPU, 21 GB resident, `/v1` endpoint answering.
 - Brian: "so we are actually at pencils down on the local model" — yes. I flag the two
   remaining network-dependent items; he does not paste the URLs.
-- Meanwhile, a parallel session commits PR 7 (`4b344d5`) — local video mode — at 07:03.
+- Meanwhile, a parallel session commits PR 8 (`4b344d5`) — local video mode — at 07:03.
 - Brian invokes `/session-log`.
 
 ## Banked artifacts
@@ -158,7 +158,7 @@ Open http://127.0.0.1:8765
 ~3h of continuous generation. Use a smaller model or pause between prompts.
 ```
 
-Note: the "KNOWN OFFLINE LIMITS" player line is now stale — PR 7 addresses it in code,
+Note: the "KNOWN OFFLINE LIMITS" player line is now stale — PR 8 addresses it in code,
 though `media/` is still empty.
 
 Ingest command for transcripts 2–5, unrun:

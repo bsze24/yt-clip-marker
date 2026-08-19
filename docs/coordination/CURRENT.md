@@ -1,6 +1,6 @@
 # Current task
 
-**Review PR 7 — local video mode.** Baton: **→ reviewer**, on `fced73f` — round 2, after F18
+**Review PR 8 — local video mode.** Baton: **→ reviewer**, on `fced73f` — round 2, after F18
 and F19.
 
 Roles are reversed for this round at Brian's instruction: Claude Code implemented, Codex
@@ -13,13 +13,13 @@ rebuild it.
 
 | Item | Where | Status |
 | --- | --- | --- |
-| **PR 7 — local video mode** | `local-video-mode`, `fced73f` | **under review**, this task |
+| **PR 8 — local video mode** | `local-video-mode`, `fced73f` | **under review**, this task |
 | PR 4 — video 1 store | merged, `43c99dd` on `main` | closed |
 | PR 3 | merged `5af3e13` | closed |
 | PR 5 | `949cb7b` | closed, superseded — do not merge |
 | PR 6 + `docs/remove-coordination-md` | `e158710` | **close, do not merge** — ~1,000 lines stale |
 
-`main` is `836258f`. PR 7 branches from it and carries three product commits — `4b344d5`,
+`main` is `836258f`. PR 8 branches from it and carries three product commits — `4b344d5`,
 `c4de36d`, then `fced73f` (F18/F19) — plus two session-log commits interleaved by Brian and the
 coordination-doc commits. Verify before reviewing:
 
@@ -32,7 +32,7 @@ two things in the studio that needed the internet were the player and the ingest
 
 ## 1. The task
 
-Review `fced73f` per the `README.md` review loop. `docs/prs/pr-7-local-video-mode.md` is the
+Review `fced73f` per the `README.md` review loop. `docs/prs/pr-8-local-video-mode.md` is the
 spec and carries the design rationale; this file carries the baton and the audit.
 
 **Where to look hard.** Places this change could plausibly be wrong, not a generic checklist:
@@ -85,7 +85,7 @@ re-review verdict.
 
 ## Handoff notes
 
-### 2026-08-19 — implementer, PR 7 local video mode (`4b344d5`, `c4de36d`)
+### 2026-08-19 — implementer, PR 8 local video mode (`4b344d5`, `c4de36d`)
 
 - **Acceptance criteria and evidence.** All six met, browser-driven against a **disposable
   copy** of the store so the real `runs/` and `labels.jsonl` were never written to.
@@ -131,7 +131,7 @@ re-review verdict.
   claim rests on the code path (a local run never calls `ensureYouTubeApi`) plus the observed
   fact that a local run's playback issues no external request, not on a disconnected test.
 
-### 2026-08-19 — implementer, PR 7 review findings F18-F19 (`fced73f`)
+### 2026-08-19 — implementer, PR 8 review findings F18-F19 (`fced73f`)
 
 - **Acceptance criteria and evidence.** Both findings fixed in one commit. F18: `find_sidecars`
   now requires the remainder after the media stem to begin with `.`; on the reported
@@ -153,10 +153,10 @@ re-review verdict.
 Each turn appends here: role, surface, SHA, what was verified, assumptions made, anything
 skipped. See `README.md`, "Before recording a SHA".
 
-### 2026-08-19 — reviewer, PR 7 local video mode (`c4de36d`)
+### 2026-08-19 — reviewer, PR 8 local video mode (`c4de36d`)
 
 - **Anchor and scope.** Confirmed `c4de36d` is an ancestor of this
-  `local-video-mode` checkout (`6fbbb0a`); reviewed only PR 7 code plus its spec and active
+  `local-video-mode` checkout (`6fbbb0a`); reviewed only PR 8 code plus its spec and active
   coordination thread. No product code or store data changed.
 - **Verified independently.** In a disposable archive of `c4de36d`, compiled all four Python
   modules and syntax-checked the changed JS modules. Exercised `/media/` with full, explicit,
