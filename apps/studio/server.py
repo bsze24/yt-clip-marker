@@ -528,9 +528,17 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"[studio] {self.address_string()} {fmt % args}")
 
+    # True for the length of one HEAD request. Reset per request rather than in
+    # a finally, so the 500 path in handle_one_request is still bodyless when a
+    # HEAD is what failed. BaseHTTPRequestHandler reuses one instance across
+    # every keep-alive request on a connection, which is why this must be reset
+    # at the start of each rather than at the end of the last.
+    _head_request = False
+
     def handle_one_request(self):
         # A bug in a route handler should surface as a 500 JSON error, not a raw
         # traceback and a reset connection in the UI.
+        self._head_request = False
         try:
             super().handle_one_request()
         except (BrokenPipeError, ConnectionResetError):
@@ -549,6 +557,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
+        if self._head_request:
+            return
         self.wfile.write(data)
 
     def _json(self, code, obj):
@@ -583,7 +593,7 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("unsatisfiable range")
         return start, min(end, size - 1)
 
-    def _send_media(self, path, head_only=False):
+    def _send_media(self, path):
         """Serve a media file with byte-range support.
 
         Chrome will happily *play* a 200 response, but it can only seek inside
@@ -621,7 +631,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
-        if head_only:
+        if self._head_request:
             return
         # Seeking aborts in-flight range requests constantly; a dropped client
         # is normal here, not a fault. handle_one_request swallows the reset.
@@ -640,15 +650,11 @@ class Handler(BaseHTTPRequestHandler):
         return media_file(name)
 
     def do_HEAD(self):
-        parsed = urlparse(self.path)
-        if parsed.path.startswith("/media/"):
-            found = self._media_for_request(parsed.path)
-            if found is None:
-                self._json(404, {"error": "not found"})
-                return
-            self._send_media(found, head_only=True)
-            return
-        self._json(404, {"error": "not found"})
+        # Same routing as GET, same status and Content-Length, no body. _send
+        # and _send_media both stop at the flag, so every route answers a HEAD
+        # correctly rather than only /media/.
+        self._head_request = True
+        self.do_GET()
 
     def do_GET(self):
         parsed = urlparse(self.path)

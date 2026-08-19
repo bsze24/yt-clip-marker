@@ -134,6 +134,14 @@ def find_sidecars(path):
         if not sibling.name.startswith(stem):
             continue
         rest = sibling.name[len(stem):]
+        # The remainder has to start at an extension boundary. A bare prefix
+        # match makes `Lesson 1.mp4` adopt `Lesson 10.vtt` — a whole grid of the
+        # adjacent recording's captions, or worse, another video's identity from
+        # its `.info.json`, with nothing to signal it. Sequentially numbered
+        # files are exactly how recordings get named. The right answer when no
+        # true sidecar exists is the zero-cue path, which is already supported.
+        if not rest.startswith("."):
+            continue
         if sibling.name.endswith(".info.json"):
             info = sibling
         elif sibling.suffix == ".description":
