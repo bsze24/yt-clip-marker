@@ -13,7 +13,16 @@
   --gold-text: #e6d7a8;
 }
 * { box-sizing: border-box; }
+html { overflow: hidden; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+/* Column, so the layout takes exactly the space the header leaves rather than
+   a guess at the header's height. The header wraps — at a narrow window or any
+   browser zoom it is two or three rows, not one — and a hardcoded offset made
+   the page taller than the viewport. The document then scrolled, and the first
+   time the grid scrolled a selected row into view it took the header with it,
+   putting the run picker out of reach. Nothing here may overflow the viewport. */
+body { display: flex; flex-direction: column; overflow: hidden; }
+body > header { flex: 0 0 auto; }
 header {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   padding: 10px 16px; border-bottom: 1px solid var(--line);
@@ -32,7 +41,8 @@ label.toggle.on { color: var(--text); }
 .text-btn:hover { color: var(--text); }
 .layout {
   display: grid;
-  height: calc(100% - 49px);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 body.player-top .layout {
   grid-template-rows: auto minmax(0, 1fr);
@@ -58,6 +68,13 @@ body.player-left .grid-wrap { grid-column: 3; }
 body.player-top .player-col {
   padding: 8px 16px 10px;
   border-bottom: 1px solid var(--line);
+  /* Hard cap, because this is an `auto` grid row and `auto` resolves to
+     max-content — it will happily take the whole layout and starve the caption
+     grid to zero height. At a small window or any browser zoom the meta line
+     and the keyboard hint wrap into enough rows to do exactly that. The column
+     already clips, so the hint is what gets cut, which is the right thing to
+     lose. */
+  max-height: 62vh;
 }
 body.player-left .player-col {
   padding: 12px;
