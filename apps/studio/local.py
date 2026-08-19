@@ -42,6 +42,14 @@ VTT_SHORT_TIME_RE = re.compile(
 TAG_RE = re.compile(r"<[^>]*>")
 UNSAFE_RE = re.compile(r"[^A-Za-z0-9._-]+")
 
+# Zoom exports one meeting as `{meeting}_Recording_{W}x{H}.mp4`,
+# `{meeting}_Recording.m4a` and `{meeting}_Recording.transcript.vtt` — the video
+# carries a resolution suffix the transcript does not, so a stem match alone
+# never pairs them. A browser that downloaded the set twice also appends " (1)".
+# Both are stripped to get a second stem to match sidecars against.
+DUP_SUFFIX_RE = re.compile(r"\s*\(\d+\)$")
+RESOLUTION_SUFFIX_RE = re.compile(r"_\d{2,5}x\d{2,5}$")
+
 
 def looks_like_media_path(s):
     """True when this string is a local file reference, not a YouTube URL/id.
@@ -119,6 +127,25 @@ def synthetic_video_id(path):
     return (stem or "local")[:48]
 
 
+def stem_variants(path):
+    """Stems a sidecar may be named after: the literal one, then Zoom's base.
+
+    Deliberately narrow. F18 was a bare prefix match letting `Lesson 1.mp4`
+    adopt `Lesson 10.vtt`; the answer there was to require a `.` boundary, and
+    that requirement still holds for every variant returned here. This only adds
+    stems produced by removing two specific, well-formed suffixes, so a file
+    with neither is unaffected.
+    """
+    stem = path.stem
+    variants = [stem]
+    base = DUP_SUFFIX_RE.sub("", stem)
+    base = RESOLUTION_SUFFIX_RE.sub("", base)
+    base = DUP_SUFFIX_RE.sub("", base)
+    if base and base != stem:
+        variants.append(base)
+    return variants
+
+
 def find_sidecars(path):
     """Subtitle / info-json / description files sharing this file's stem.
 
@@ -126,14 +153,18 @@ def find_sidecars(path):
     `{name}.vtt`. Both are stem-prefix matches in the same directory.
     """
     path = Path(path)
-    stem = path.stem
+    variants = stem_variants(path)
     subs, info, description = [], None, None
     for sibling in sorted(path.parent.iterdir()):
         if not sibling.is_file() or sibling.name == path.name:
             continue
-        if not sibling.name.startswith(stem):
+        rest = None
+        for stem in variants:
+            if sibling.name.startswith(stem):
+                rest = sibling.name[len(stem):]
+                break
+        if rest is None:
             continue
-        rest = sibling.name[len(stem):]
         # The remainder has to start at an extension boundary. A bare prefix
         # match makes `Lesson 1.mp4` adopt `Lesson 10.vtt` — a whole grid of the
         # adjacent recording's captions, or worse, another video's identity from

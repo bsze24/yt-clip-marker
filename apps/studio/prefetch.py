@@ -35,6 +35,7 @@ MEDIA_DIR = APP_DIR / "media"
 
 FORMAT = "bv*[height<=1080][vcodec^=avc1]+ba[acodec^=mp4a]/b[ext=mp4]/b"
 DOWNLOAD_TIMEOUT = 3600
+SUBS_TIMEOUT = 300
 
 # The two tracks a YouTube lesson actually carries: "English (Original)" and
 # the auto-generated "English". A wildcard like `en.*` also matches
@@ -58,6 +59,14 @@ SUB_LANGS = "en-orig,en"
 PLAYER_CLIENTS = "web_embedded,mweb"
 
 
+def run_cue_count(run_id, runs_dir):
+    try:
+        data = json.loads((runs_dir / f"{run_id}.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return 0
+    return len(data.get("cues") or [])
+
+
 def existing_run_for(video_id, runs_dir):
     """Newest run id already covering this video, or None."""
     best = None
@@ -70,6 +79,10 @@ def existing_run_for(video_id, runs_dir):
             if best is None or path.stat().st_mtime > best[1]:
                 best = (path.stem, path.stat().st_mtime)
     return best[0] if best else None
+
+
+def caption_sidecars(video_id, media_dir):
+    return sorted(media_dir.glob(f"{video_id}.*.json3")) + sorted(media_dir.glob(f"{video_id}.*.vtt"))
 
 
 def downloaded_media(video_id, media_dir):
@@ -115,6 +128,33 @@ def fetch(video_id, media_dir):
     return path
 
 
+def fetch_subs(video_id, media_dir):
+    """Captions and metadata only — no media. Cheap enough to retry freely.
+
+    Split out from `fetch` because YouTube generates auto-captions well after a
+    freshly uploaded video is watchable. Downloading the video is the expensive,
+    once-only half; getting its transcript is the half you come back for.
+    """
+    cmd = [
+        "yt-dlp", "--skip-download",
+        "--write-auto-subs", "--write-subs",
+        "--sub-langs", SUB_LANGS,
+        "--sub-format", "json3/vtt",
+        "--write-info-json",
+        "--no-playlist",
+        "--extractor-args", f"youtube:player_client={PLAYER_CLIENTS}",
+        "-o", str(media_dir / "%(id)s.%(ext)s"),
+        ingest.watch_url(video_id),
+    ]
+    try:
+        subprocess.run(cmd, timeout=SUBS_TIMEOUT)
+    except FileNotFoundError:
+        raise IngestError("yt-dlp not found. Install it: pip install yt-dlp")
+    except subprocess.TimeoutExpired:
+        raise IngestError("yt-dlp timed out fetching captions")
+    return caption_sidecars(video_id, media_dir)
+
+
 def prefetch_one(spec, runs_dir, media_dir):
     video_id = ingest.parse_video_id(spec)
     if not video_id:
@@ -129,10 +169,29 @@ def prefetch_one(spec, runs_dir, media_dir):
         path = fetch(video_id, media_dir)
         print(f"  downloaded {path.name}")
 
+    # A rerun must be able to pick up captions that appeared after the video
+    # did. Without this the function short-circuits on the existing run and a
+    # zero-cue run stays zero-cue forever, which is the wrong answer for a
+    # freshly uploaded video — exactly the case reruns exist for.
+    if not caption_sidecars(video_id, media_dir):
+        print("  no captions on disk — checking whether YouTube has them yet")
+        if fetch_subs(video_id, media_dir):
+            print("  captions arrived")
+        else:
+            print("  still none. Rerun this later; the video download is already done.")
+
     known = existing_run_for(video_id, runs_dir)
     if known:
-        print(f"  run {known} already exists — it will play from this file")
-        return known, False
+        known_cues = run_cue_count(known, runs_dir)
+        if known_cues or not caption_sidecars(video_id, media_dir):
+            print(f"  run {known} already exists ({known_cues} cues) — it will play from this file")
+            return known, False
+        # Captions landed after a zero-cue run was built. Runs are immutable
+        # ingest output (D-002), so this writes a second one rather than editing
+        # the first; both play from the same file. Say so, because label events
+        # are keyed by run id and do not follow.
+        print(f"  run {known} has 0 cues but captions now exist — writing a new run")
+        print(f"    delete runs/{known}.json if you have not annotated it")
 
     run_id, run, notes = local.create_local_run(path, runs_dir, media_dir)
     print(f"  wrote run {run_id}: {len(run['cues'])} cues, {len(run['extracted'])} extracted")
