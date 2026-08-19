@@ -14,14 +14,14 @@ rebuild it.
 | Item | Where | Status |
 | --- | --- | --- |
 | **PR 7 — local video mode** | `local-video-mode`, `fced73f` | **under review**, this task |
-| PR 4 — video 1 store | `codex/pr-4-video-1-store`, `43c99dd` | review clean → **Brian, merge** |
+| PR 4 — video 1 store | merged, `43c99dd` on `main` | closed |
 | PR 3 | merged `5af3e13` | closed |
 | PR 5 | `949cb7b` | closed, superseded — do not merge |
 | PR 6 + `docs/remove-coordination-md` | `e158710` | **close, do not merge** — ~1,000 lines stale |
 
-`main` is `15571f9`. PR 7 branches from it and carries three commits, `4b344d5`, `c4de36d`,
-then `fced73f` (F18/F19),
-with two session-log commits interleaved by Brian. Verify before reviewing:
+`main` is `836258f`. PR 7 branches from it and carries three product commits — `4b344d5`,
+`c4de36d`, then `fced73f` (F18/F19) — plus two session-log commits interleaved by Brian and the
+coordination-doc commits. Verify before reviewing:
 
 ```bash
 git merge-base --is-ancestor fced73f HEAD
