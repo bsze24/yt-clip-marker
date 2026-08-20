@@ -67,18 +67,26 @@ recipe. Related: [[D-021]].
 
 ### D-011 — Suggest-markers stays a skill invoke for now  (Accepted 2026-08-14)
 `~/.claude/skills/yt-clipper` proposes candidate markers (rules + "over-include" prompt).
-In-app ingest (URL → cues + gaps + gold, **empty markers**) landed in the two-surface
-refactor so a video can be annotated without the skill. Full "Suggest markers" as a studio
-action is future work (`BACKLOG.md`).
+In-app ingest (URL → cues + gaps + extracted markers, **empty `markers[]`**) landed in the
+two-surface refactor so a video can be annotated without the skill.
+
+**Flagged 2026-08-19, not re-decided.** "Future work" was true when every lesson arrived through
+YouTube. It no longer is: four YouTube uploads have had zero captions for over a day, and the only
+two transcripts that exist came from Zoom. The skill's input is a URL, so today it cannot run on
+either. Teaching it to read an existing run's cues is now on the critical path for four separate
+items — see `BACKLOG.md`, "The corpus, and the one blocker". Re-decide there, not here.
 
 ### D-012 — `end` is nullable; range collection is deferred  (Accepted 2026-08-14)
 Schema keeps `end` nullable — markers and coarse captures are start-only. Collecting ranges
 from the grid is the studio's next feature after the two-surface land, required before
 reel-oriented export is useful. Don't sneak it into an unrelated PR.
 
-### D-013 — Gold column stays  (Accepted 2026-08-14)
-Published YouTube-description timestamps as a reference lane (and eval target while eval
-mode exists). Copy-timestamps never drops gold. Related: [[D-022]].
+### D-013 — The extracted lane stays  (Accepted 2026-08-14, vocabulary corrected 2026-08-19)
+Published YouTube-description timestamps are a reference lane, and an eval target while eval mode
+exists. Copy-timestamps never drops an extracted marker. Reinforced by [[D-033]].
+
+Originally titled "Gold column stays". The word is banned ([[D-023]], `AGENTS.md`) because it
+collides with the `g` grade; corrected in place, since only the vocabulary was ever wrong.
 
 ### D-014 — Repo layout is `apps/extension/` + `apps/studio/`  (Accepted 2026-08-14)
 No `schema/` folder until shared code exists; the contract lives in `docs/clip-schema.md`.
@@ -168,8 +176,9 @@ entry. IDs are stable; the gap stays.
 Spoken sequential finger numbers (`5 4 3 1`) → tag `fingering`. Do not prefer the last
 mention in a caption block — that heuristic died in review.
 
-Language: **marker** (run `markers[]`) vs **added clip** (`miss` / `unmiss`) vs **gold**
-(published description stamps). Stop saying "skill marker" in product copy.
+Vocabulary lives in one place — `README.md`'s "Shared vocabulary" table: **skill marker**,
+**added marker**, **extracted marker**. This entry originally said the opposite ("stop saying
+skill marker", and *gold* for the third kind); corrected 2026-08-19.
 
 ### D-021 — Eval / keep channels stay distinct  (Accepted 2026-08-16)
 From video 1. Do not collapse these into "just train on x":
@@ -189,8 +198,9 @@ Useful ballpark ≠ perfect place: keep both, or `x` the hunt. Related: [[D-010]
 Shipped in PR 3 (`a051667`, `apps/studio/ui/export.js`). Description-timestamp copy is
 the near-term YouTube paste; JSON export for media-scraper is still backlog ([[D-015]]).
 Rules:
-- Never drop gold or human-added clips.
-- Nearby rows collapse at 2s; **add beats marker**; gold's title and start win when present.
+- Never drop an extracted marker or a human-added clip.
+- Nearby rows collapse at 2s; **add beats marker**; an extracted marker's title and start win
+  when present.
 - `g` still exports (so 20:46 `g` and 21:18 add both copy). Whether ballpark-`g` should be
   export-excluded is an open modeling decision in `BACKLOG.md` — do not change it silently.
 - YouTube chapters need a `0:00` stamp; park it under the first work header so that header
@@ -204,9 +214,9 @@ and identifies the run in both the UI and stderr. `attach_extracted.py` is the e
 lossless repair boundary; conflicting dual keys abort rather than choosing one. Historical
 session prose and append-only label feedback are not rewritten.
 
-This supersedes only the old storage vocabulary and fallback wording in [[D-011]], [[D-013]],
-[[D-020]] and [[D-022]]. Their product behavior remains: the extracted lane stays, extracted
-and added markers are never dropped by copy-timestamps, and the eval `g` channel is unchanged.
+Vocabulary only — the behaviour in [[D-011]], [[D-013]], [[D-020]] and [[D-022]] is unchanged.
+Those four entries were corrected in place on 2026-08-19 so a reader no longer meets the banned
+word and has to remember this entry undoes it.
 
 ### D-027 — Copy-timestamps: cluster anchor and `0:00` placement  (Accepted 2026-08-18)
 From PR 3 review (F6, F7). Refines the last two bullets of [[D-022]], which were both stated
@@ -259,32 +269,16 @@ videos" now applies to a much smaller surface than it reads like: two display el
 label formats. Whether that surface is worth a toggle at all is open, and the inverted `why`
 swap is the part most likely to confuse someone. Do not resolve it from one testing session.
 
-### D-031 — YouTube chapters stay a goal; the `0:00 Start` line stays  (Accepted 2026-08-18)
-Brian's call, 2026-08-18, after measurement. Resolves the open modeling item raised the same
-day about whether the exporter should keep synthesising a `0:00 Start` line.
+### D-031 — YouTube chapters stay a goal  (Accepted 2026-08-18) — **SUPERSEDED by [[D-033]]**
+Do not read the body of this entry as live. Its substance survives in corrected form: chapters are
+**wanted when free**, every marker reaching the output is the hard constraint, and the synthetic
+`0:00 Start` line **stays**. [[D-033]] carries all three, plus what this entry got wrong — it
+priced chapter compliance as nearly free when the only route to it deletes three of Brian's own
+labels.
 
-Navigable timestamps work unconditionally; chapters — the progress bar splitting into named
-pieces — need the whole set to pass four tests: earliest stamp `0:00`, at least three stamps,
-ascending, and every resulting piece at least 10 seconds. Video 1's export passes three of
-four. It carries 71 timestamps with a median gap of 40s and only **four** consecutive pairs
-under 10s, so chapter compliance is close enough to be worth keeping rather than abandoning.
-
-So: the `0:00 Start` injection stays, and [[D-027]]'s placement rule stays load-bearing.
-
-Reaching compliance is separate work, deliberately not in PR 3. Tracked as `TD-9`.
-
-**Amended 2026-08-19 — this decision was taken on a false premise.** It was presented as
-"chapters are nearly free: widening the fold reaches 68 timestamps and loses nothing." The
-taxonomy does survive a widened fold, but three of Brian's own labels are deleted and replaced by
-the published wording of a nearby stamp, and at least two of those name a different moment. The
-real trade is *surrender three descriptions to gain a segmented scrubber*, which is a legitimate
-thing to want and a different question from the one that was asked. Nothing is broken either way:
-the current export is correct, and chapters are an external constraint it happens not to meet.
-Re-decide at the export freeze with the actual cost in view; `TD-9` carries the table.
-
-Caveat carried from the measurement: the 10-second rule is stated from memory and was not
-verified against YouTube's documentation, and the whole picture is one video. Confirm both by
-pasting a real description before treating chapter compliance as achieved.
+One caveat outlived the decision and is still unverified: **YouTube's 10-second chapter minimum is
+stated from memory**, never checked against documentation. [[D-033]] rests on it. Confirm it
+against a real description before treating any chapter claim as settled.
 
 ### D-032 — the skill copies caption start times exactly  (Accepted 2026-08-19)
 `R-NEIGHBORHOOD` ("Approximate timestamps; clip-marker nailing is downstream") is retired and
