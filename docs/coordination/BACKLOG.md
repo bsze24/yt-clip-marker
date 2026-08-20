@@ -507,7 +507,11 @@ tagging-reduction path; there is no point splitting the schema if the split voca
 resets per video.
 
 
-### TD-16 — the export fold merges on time and rank, never on label text
+### TD-16 — the export fold merges on time and rank, never on label text — CLOSED, fixed
+
+**CLOSED 2026-08-19 — fixed rather than deferred, see [[D-035]].** The merge now also requires
+the labels to match, so [[D-033]] is enforced by the code instead of holding by circumstance.
+Byte-identical output on video 1. The detection check this entry proposed is no longer owed.
 
 Lifted out of `TD-9` (CLOSED, wontfix) and [[D-033]]'s closing prose on 2026-08-19, because a
 live item inside a closed one is an item nobody reads.
