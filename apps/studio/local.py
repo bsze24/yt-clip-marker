@@ -154,14 +154,23 @@ def find_sidecars(path):
     """
     path = Path(path)
     variants = stem_variants(path)
-    subs, info, description = [], None, None
+    subs, infos, descriptions = [], [], []
     for sibling in sorted(path.parent.iterdir()):
         if not sibling.is_file() or sibling.name == path.name:
             continue
         rest = None
-        for stem in variants:
+        variant_rank = None
+        for index, stem in enumerate(variants):
             if sibling.name.startswith(stem):
                 rest = sibling.name[len(stem):]
+                # Which stem matched leads every ranking below. `variants` is
+                # ordered exact-first, so a sidecar named after the media file
+                # itself always beats one named after the Zoom base. Without
+                # this, `Lecture_1920x1080.mp4` sitting beside both
+                # `Lecture.vtt` and `Lecture_1920x1080.vtt` picked whichever
+                # sorted first — a real title that merely ends in something
+                # resolution-shaped would ingest the wrong transcript (F20).
+                variant_rank = index
                 break
         if rest is None:
             continue
@@ -174,9 +183,9 @@ def find_sidecars(path):
         if not rest.startswith("."):
             continue
         if sibling.name.endswith(".info.json"):
-            info = sibling
+            infos.append((variant_rank, sibling))
         elif sibling.suffix == ".description":
-            description = sibling
+            descriptions.append((variant_rank, sibling))
         elif sibling.suffix.lower() in SUB_EXT:
             # Rank: json3 over vtt over srt; then "English (Original)" over the
             # auto-generated English track, over anything else. yt-dlp writes
@@ -187,9 +196,18 @@ def find_sidecars(path):
                 lang_rank = 1
             else:
                 lang_rank = 2
-            rank = (SUB_EXT.index(sibling.suffix.lower()), lang_rank)
+            rank = (variant_rank, SUB_EXT.index(sibling.suffix.lower()), lang_rank)
             subs.append((rank, sibling))
+    # Stable sorts, so files matching the same stem keep directory order.
+    # `info` and `description` get the same treatment as subtitles rather than
+    # last-write-wins: F18 recorded that a wrong `.info.json` is the worse half
+    # of this bug, because it silently replaces the video identity instead of
+    # producing a visibly wrong grid.
     subs.sort(key=lambda item: item[0])
+    infos.sort(key=lambda item: item[0])
+    descriptions.sort(key=lambda item: item[0])
+    info = infos[0][1] if infos else None
+    description = descriptions[0][1] if descriptions else None
     return [s for _rank, s in subs], info, description
 
 
