@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "05:28"
-revised: 2026-08-19 07:06
+revised: 2026-08-19 17:51
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: two-surface-land
@@ -113,7 +113,11 @@ and roughly half the session went to fixing that.
   never against label text — the field that actually carries Brian's work.
 - **Third instance this session of critical work living only in a working tree**: coordination
   docs, the review record, then the local video player. Ask "is this in a commit?" before ranking
-  anything else.
+  anything else. A fourth followed — a session log committed onto a feature branch because the
+  checkout had moved and I did not run `git branch --show-current` first.
+- **Read `main` before writing to it when other sessions are live.** Two parallel sessions were
+  working this afternoon. Reciting the backlog from memory would have been wrong twice, and a
+  `TD-13` draft would have collided with theirs. Check, then write.
 
 ## Next / open threads
 - **PR 4 is the only open PR and the clear next step.** Thread 2 has one question left: shapes
@@ -271,6 +275,33 @@ and roughly half the session went to fixing that.
   lived only in a working tree. Brian committed it as `4b344d5` while I was checking. It also
   closes the transcript-import gap raised at 05:48: `local.py` builds a run from a file on disk
   using yt-dlp's sidecars, no network.
+- **07:10** — Pre-flight stack-rank. Everything network-dependent first: download videos 2-5 with
+  sidecars, prove `local.py` on one file, then optionally `/yt-clipper` for markers to grade in
+  the air. Held `TD-7` and `TD-8` back deliberately — he will hit both across four videos, which
+  is exactly why touching studio code hours before losing support is a bad trade.
+- **07:20** — "Should doc changes always go straight to `main`?" Answered with a split rather than
+  a yes: living records (`docs/coordination/`, `docs/sessions/`, `docs/reference/`) go straight to
+  `main` because a PR only ever holds a stale snapshot of a document still being written; docs that
+  *describe code* ride in the PR that changes the behaviour. Test: would this doc be wrong once some
+  open PR merges? Written into `AGENTS.md` § Git workflow at `283e49e`, with the caveat that
+  straight-to-main means no second reader. Also owned that `15571f9` was labelled docs work and
+  changed `server.py` — product code through the wrong door.
+- **17:40** — Full accounting of everything open. Pulled from `main` rather than memory, which
+  mattered: two other sessions had been working. `TD-11`, `TD-12` were new; a fourth review thread
+  (PR 8, local video mode) was mid-flight with `F18`/`F19` addressed; `CURRENT.md`'s baton had moved
+  to a review I was not part of.
+- **17:45** — Brian asked whether the skill incorporates the `g` grades. It does not — the skill has
+  **no worked examples of any kind**, only twelve rules and three "do not" lessons. Measured which
+  rule to revise instead of guessing: grouped video 1's 64 markers by the rule each cited.
+  `R-CONCEPT` rejects at 26%, `R-TAKE-GAP` at 67%, `R-TAKE-CLUSTER` at 88% with zero `g` ever.
+  Gap size predicts nothing — the three largest gaps are all rejects. The caption *ending* the gap
+  predicts almost everything: all three `g` takes land on a real sentence, eleven land on a
+  backchannel or fragment (`Heat.`, `Wow.`, `Yeah.`, `D.`, `Blueberry.`) and none of the eleven
+  earned a `g`. Proposed amending `R-TAKE-GAP` accordingly; not applied. `b6f3d87`.
+- **17:50** — Nearly shipped a duplicate. Drafted `TD-13`-`TD-15` for the three items I had flagged
+  as unrecorded; checked `main` first and found another session had recorded all three that hour,
+  taking `TD-13`-`TD-16`, with its `TD-16` carrying the same detection-before-enforcement framing I
+  was about to write. Threw the draft away and appended only the rule diagnosis its entry lacked.
 
 ## Banked artifacts
 

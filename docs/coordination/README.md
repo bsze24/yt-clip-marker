@@ -77,11 +77,12 @@ Measured on video 1, 2026-08-18:
   `1:18:57` the added marker stored at `4737` displays "Freedom Demo c1" — the label of the
   extracted stamp stored at `4738`.
 
-The earlier version of this paragraph said skill marker 53 stored at `1:18:52` displays at
-`1:18:50`. That was true under earliest-cue-wins and stopped being true when [[D-008]] made
-alignment exact-start-first; there is a cue at exactly `4732` and marker 53 sits on it. It also
-cited an added marker at `1:18:54` that has been tombstoned since 2026-08-16. Both claims
-misled a reviewer on 2026-08-18. Do not restore them.
+- **Video 2 cannot show any of this** — it has zero extracted stamps, and every added marker was
+  created with Enter on a caption row. The trap needs a description lane to fire.
+
+Two claims that used to sit here — skill marker 53 displaying at `1:18:50`, and an added marker at
+`1:18:54` — are false since [[D-008]] and a 2026-08-16 tombstone respectively. They misled a
+reviewer. Do not restore them.
 
 Before arguing about a timestamp, dump the stored identity — `markerIndex` for a skill marker,
 `start` for an added marker — and check `labels.jsonl` for an `unmiss` before concluding a
@@ -245,26 +246,22 @@ round-by-round.
 No per-PR archive files. `docs/prs/pr-*.md` are the task specs that became PRs — provenance,
 not a second `CURRENT.md`.
 
-## Where things go
+## Where things go — outside these four files
+
+The four files themselves are the table at the top. Everything else:
 
 | Kind | Home |
 | --- | --- |
-| Active task, baton, acceptance | `CURRENT.md` |
-| Review findings | `REVIEW.md` |
-| Roadmap, deferred work, tech debt | `BACKLOG.md` |
-| Durable architecture and product calls | `DECISIONS.md` |
 | Product requirements — the why | `docs/youtube-clip-marker-prd.md` |
 | Clip contract | `docs/clip-schema.md` (PR 3) |
 | Session and learning state | `docs/sessions/`, one file per session |
 | A video's labelled state, folded for reading | `docs/sessions/<date>-<videoId>-folded-ledger.md` |
 | Two-surface pivot provenance | `docs/two-surface-handoff.md` — historical, not live |
 
-**Finding the right session log.** Filter by `track:`, then read the file's own "Project
-context" block to find which one is the resume head. Do not take the newest match. On
-`track: studio-workspace` the newest file is `2026-08-17-1740-grok-studio-prototype-handoff.md`,
-and it says in its own first lines that the head is
-`2026-08-16-1507-grok-studio-fable-lock.md`. Filenames carry the date the log was *written*,
-not the dates it covers, so recency ordering lies whenever a log is written after the fact.
+**Finding the right session log.** The rule and the current heads live in `AGENTS.md` §
+"Session logs" — one home per fact. Short version: filter by `track:`, then read each candidate's
+own "Project context" block. Never take the newest match; a filename carries the date the log was
+*written*, not the dates it covers.
 
 A real project finding that surfaces during a learning session — a bug, a contract gap — is
 project state and routes here. What the artifact is decides its home, not how it came up.

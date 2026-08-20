@@ -48,9 +48,44 @@ Unscheduled but unblocked:
 
 - **Extension → studio handoff** of coarse `[` / `]` marks. Until it exists the extension is
   a capture scratchpad and its marks die with the tab.
-- **Video 2.** The door is the studio header's **Add video** — URL in, cues, gaps and extracted
-  markers out, `markers[]` empty. A `/yt-clipper` pass is optional and only needed if you want
-  proposed skill markers to score.
+
+## The corpus, and the one blocker
+
+Measured 2026-08-19. Four items in this file say "measure a second video." A second video exists.
+None of them can run, and the reason is not the one any of them assumes — so it is stated here
+once and cited, not re-explained in each.
+
+| Run | Cues | Source | Annotated | Skill markers |
+| --- | --- | --- | --- | --- |
+| `YYW4Q1Nivg8` — video 1 | 1464 | youtube | 67 rows, 54 judged | 64 |
+| `GMT20260730-…-1` — video 2 | 688, **diarized** | local | 75 rows | 0 |
+| `GMT20260712-…` | 688, **diarized** | local | 0 | 0 |
+| `Oa0wqetkNcg` | **0** | local | 0 | 0 |
+| `dYT41doJw2I` | **0** | local | 0 | 0 |
+| `glhvfs6OOOE` | **0** | local | 0 | 0 |
+| `nWCc3xBSz-0` | **0** | local | 0 | 0 |
+
+**The blocker: the skill's input is a YouTube URL, and no URL in this store has captions.** The
+four YouTube uploads had zero `automatic_captions` at download and still had zero when re-checked
+a day later. The only two transcripts that exist came from Zoom, through the local door, and carry
+no YouTube identity the skill will accept. Waiting is not a plan — and the Zoom transcript is the
+better artifact anyway: diarized, and free of the hallucinated captions behind 5 of video 1's 24
+rejections and behind the `R-TAKE-GAP` failure above.
+
+**Blocked on this:** `TD-6` (does `R-CUE-EXACT` hold), [[D-032]]'s revert signal (candidate count),
+step 2 of the tagging path (score the skill on held-out ground truth), and re-running the rule
+grouping on video 2 — which every "not applied" candidate change above is waiting for.
+
+**Unblocking move: teach the skill to read an existing run's `cues[]` instead of fetching a URL.**
+One change, four items. It re-opens [[D-011]], which parked this as future work when every lesson
+still arrived through YouTube.
+
+**Also true and not yet handled — video 2 is in the store twice.** `Oa0wqetkNcg` is the same lesson
+as the local Zoom run: 3883s against a last cue at 3870s, and its YouTube title is literally
+`GMT20260730 155336 Recording 640x360`, because the Zoom file was uploaded as-is. `dYT41doJw2I` is
+likewise a GMT20260707 lesson. When captions eventually land, ingesting the YouTube twin mints a
+second run id for a lesson that already has 75 label events keyed to the local one ([[D-008]]), and
+nothing in the store says the two are the same lesson. Decide the relationship before ingesting.
 
 ## Reducing manual tagging — the path (agreed 2026-08-19)
 
@@ -83,7 +118,9 @@ below: **n = 1.** The skill has only ever run on video 1.
    on a video the skill has never seen. It is the only unanchored ground truth in the store and
    it answers whether the 82% ceiling is real or an artifact of one video. Blocked on one thing:
    the skill's input is a YouTube URL and video 2 is `source: "local"` with no YouTube identity
-   ([[D-036]]) — decide whether to teach the skill to read an existing run or to export its cues.
+   ([[D-036]]). **Blocked; see "The corpus, and the one blocker"** — the fork it named is settled by
+   measurement: waiting for a captioned YouTube URL does not terminate, so teach the skill to read
+   a run's `cues[]`.
 3. **Teach the skill the speaker rule.** Measured limit, so nobody wastes a cycle on it: speaker
    at the marker start does **not** predict the `take` tag — Jake is the speaker at 70 of 75
    video-2 rows, giving 100% recall and 19% precision. Neither does `gapBefore` (4/13 take rows
@@ -137,6 +174,45 @@ the skill against a corpus that has lost every rejection. Fix or document `TD-14
 **Needs a sentence from Brian before it can be specced:** are the 23 `g` markers few-shot
 *examples* pasted into the skill prompt, or an *eval set* the skill is scored against and never
 sees? They cannot be both, and run 1 is the only labelled corpus that exists.
+
+**Which rule to revise — measured 2026-08-19.** The step above says "a single hand-picked rule
+change"; it does not have to be hand-picked. Grouping video 1's 64 markers by the rule each one
+cited in its rationale:
+
+| rule | `g` | `x` | note | blank | unjudged | reject ÷ all | reject ÷ judged |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `R-CONCEPT` | 20 | 12 | 2 | 4 | 8 | 26% | 38% |
+| `R-TAKE-GAP` | 3 | 12 | 1 | 0 | 2 | 67% | 80% |
+| `R-TAKE-CLUSTER` | 0 | 7 | 1 | 0 | 0 | 88% | **100%** |
+| `R-TAKE-LABEL` | 1 | 0 | 0 | 0 | 0 | 0% | 0% |
+
+Two denominators, because they answer different questions. *Reject ÷ all* is the share of a rule's
+proposals Brian explicitly rejected; *reject ÷ judged* is the precision complement over
+`g + x` only, ignoring rows he never graded. The second is the one to revise against, and it is
+worse: `R-TAKE-CLUSTER` is 100% reject, not 88%.
+
+Concept detection carries the skill. Take detection is where the rejects live, and `R-TAKE-CLUSTER`
+has never produced a single `g`.
+
+**Gap size does not predict quality.** Kept takes sat on 22s, 25s and 54s gaps; rejects ran
+20-58s. Raising the gap threshold would not have helped. *(Corrected 2026-08-19: an earlier
+version said "the three largest gaps are all rejects". The top three are 58s → `x`, 54s → `g`,
+54s → `x`. The conclusion holds; that sentence did not.)*
+
+**The caption that ends the gap does predict it.** All three `g` takes land on a real sentence
+("Let's stop for a second.", "Let's get that.", "So, I'm going to be focusing on the"). Eleven
+takes land on a backchannel or one-word fragment — `Heat. Heat.` ×2, `Wow.`, `Yeah. Yeah.`,
+`Yeah.`, `Okay.`, `3.`, `Blueberry.`, `D.` — and **not one of the eleven earned a `g`**: nine
+rejected, one ordinary keep, one never graded at all. Brian's own reject reasons name the cause: "heat is reliably
+hallucinated", "hallucinated caption" ×3. The gap is real; the resumption is caption noise, so
+there is nothing to label the take from.
+
+**Candidate change, not applied:** amend `R-TAKE-GAP` to skip a gap whose ending caption is a
+backchannel or single fragment. The studio already models this as `isBackchannel` /
+`DEFAULT_FILLER` in `ui/util.js` and the skill does not use it. **Cost:** it trades against
+`R-COPIOUS` — suppressing those eleven loses one ordinary keep and one ungraded row along with
+nine rejects — and it rests on one video. `isBackchannel` is `ui/util.js:37`, `DEFAULT_FILLER`
+is `:9`, both verified present. Re-run this grouping on video 2 before touching the rule.
 
 **Rejected: tagging less granularly.** Cutting granularity cuts output one-for-one — it is a
 retreat, not leverage. The defensible version is *two passes*: coarse chapter markers on the
@@ -242,35 +318,15 @@ from text. The optional half marks the regime machine-readably — new writes ca
 `schemaVersion: 2`, so `1` means derive from text and `2` means trust `verdict`. History is not
 backfilled ([[D-002]]); video 1 stays entirely version 1.
 
-### TD-5 — four shared documents exist in divergent copies across the open PRs
+### TD-5 — four shared documents existed in divergent copies — CLOSED 2026-08-19
 
-**Where:** `AGENTS.md`, `README.md`, `docs/youtube-clip-marker-prd.md`,
-`docs/two-surface-handoff.md`.
+`AGENTS.md`, `README.md`, the PRD and `docs/two-surface-handoff.md` each existed in up to five
+mutually different versions across open branches. All four reconciled after PR 3 merged; PRs 5 and
+6 closed rather than merged, removing the remaining divergent copies.
 
-**Issue:** each open branch carries its own version and the working tree holds a fifth,
-uncommitted, on `docs/remove-coordination-md`. As of 2026-08-18 the PRD exists in five
-mutually different versions; `AGENTS.md` and `two-surface-handoff.md` are absent from `main`
-entirely. Whatever order the PRs land in, all four files conflict or silently take the wrong
-side. `docs/coordination/` itself is untracked in the working tree while a committed, older
-copy sits in PR 6.
-
-**Resolved 2026-08-18** for the four shared docs, after PR 3 merged. Each was reconciled
-rather than picked: `README.md` and the PRD took the working-tree wording (skill / added /
-extracted vocabulary plus `docs/coordination/` pointers); `docs/two-surface-handoff.md` kept
-**main's** body, which was the newer one — the working-tree copy still said `attach_gold.py` —
-and gained only the "Historical" banner; `AGENTS.md` was a genuine two-way split, so the
-coordination-pointing rewrite won and main's `## File structure` tree was ported into it, its
-`## Architecture rules` sections being restatements of `D-002`, `D-005`, `D-007`-`D-010`,
-`D-016` and `D-017` that the rewrite deliberately replaced with citations.
-
-**Fully resolved 2026-08-19.** PR 6 closed; PR 5 closed as superseded (`REVIEW.md` thread 3).
-Re-checked what the remaining open PR would actually apply, using each branch's merge-base
-rather than a tree diff against `main`: **PR 4 touches no `.md` file at all** — it applies
-`apps/studio/labels.jsonl` and one run JSON, nothing else. No open PR can now clobber a document.
-
-Method worth reusing, because the naive check reads alarmingly wrong: `git diff main..branch`
-shows tree differences and made PR 5 look like it reverted all of `apps/studio/`. What a merge
-applies is `git diff $(git merge-base main branch) branch`.
+The rule that came out of it is the live artifact, in `AGENTS.md` § Git workflow: **living records
+go straight to `main`; docs that describe code ride in the PR that changes the behaviour.** Test:
+would this doc be wrong once some open PR merges?
 
 ### TD-6 — stored-vs-displayed: measured on one video, needs a second
 
@@ -292,7 +348,8 @@ on caption starts"; it is "does the new instruction hold". Same one-line check, 
 **Trigger:** the next `/yt-clipper` run. Compare `marker.start` against the `cues[]` start set. A
 non-caption start now means the rule is being ignored, which is a finding rather than a curiosity.
 Watch candidate count at the same time — that is [[D-032]]'s revert signal. **No labelling
-needed**; the ingest and skill pass alone answer this.
+needed**; the ingest and skill pass alone answer this. **Blocked** — see "The corpus, and the one
+blocker".
 
 ### TD-7 — selection jumps to the top when the selected row is filtered out
 
@@ -328,67 +385,16 @@ work as well as tags.
 
 **Trigger:** with the next taxonomy-entry work. Held out of PR 3 deliberately.
 
-### TD-9 — widening the export fold would buy chapters by deleting three labels — CLOSED, wontfix
+### TD-9 — widening the export fold to reach chapters — CLOSED 2026-08-19, wontfix
 
-**Where:** `apps/studio/ui/util.js` — `export const MATCH = 2`, consumed by `grid.js`
-(`takeNear`, row alignment) and `export.js` (`mergeNearby`, the copy-timestamps fold).
+[[D-033]] settles it. Chapters are wanted only by means that cost no marker, and widening the fold
+costs three of Brian's own descriptions — so the fold never widens. The measurement that closed
+it: at the 2s window all 10 collapsed candidates are text-identical to their survivor, so nothing
+is lost; at 6s three carry different text and two name a different moment. **Two seconds is the
+boundary between collapsing a duplicate and deleting work.**
 
-**Nothing is broken.** Corrected 2026-08-19. Two earlier framings here were wrong. The fold
-window is not *for* chapters — YouTube is blind to this repo and simply reads the description
-text; chapter compliance is a downstream accident of what the window produces. And the export is
-correct as it stands: 71 timestamps faithfully reflecting what Brian marked, with four pairs close
-together because he marked two things close together.
-
-**Issue:** [[D-031]] keeps chapters as a goal, and video 1 fails only the 10-second minimum, on
-four consecutive pairs. Widening the fold to ~6s makes it qualify — 68 timestamps, every gap ≥10s
-— but it is a **trade, not a fix, and it is not free.** `mergePair` unions tags, lane and work
-onto the surviving line, so the taxonomy survives. The *labels do not*: three of Brian's
-descriptions are deleted and replaced by the published wording of a nearby stamp, and at least two
-of the three name a different moment rather than the same one.
-
-| deleted | replaced by |
-| --- | --- |
-| `54:38 Loop 4-bar chunks (backdoor ii-V)` | `54:42 Finding a few places to really nail` |
-| `55:40 *** Hearing vs executing; hand ahead of ear` | `55:43 Is the limitation hearing the line…` |
-| `1:18:52 *** Jake demo — melody, harmonized` | absorbed into `1:18:58 Freedom Demo c1` |
-
-An earlier version of this entry said widening "loses nothing". That was checked against tags only
-and never against the label text. Measured 2026-08-18:
-
-| fold window | timestamps | gaps under 10s |
-| --- | --- | --- |
-| 2s (today) | 71 | 4 |
-| 3s | 70 | 3 |
-| **6s** | **68** | **0** |
-| 10s | 66 | 0 |
-
-One constant serves both callers, so raising it would also let the grid snap a marker onto a
-caption six seconds away and undo [[D-008]]. The export needs its own window.
-
-**CLOSED 2026-08-19, wontfix.** [[D-033]] settles it: every marker reaches the output, so the fold
-never widens and chapters are not a goal. The measurement that closed it — at 2s all 10 collapsed
-candidates are text-identical to their survivor, so nothing is lost; at 6s three carry different
-text. Two seconds is the boundary between collapsing a duplicate and deleting work. The rest of
-this entry is kept as the record of what was priced.
-
-~~**Trigger:** a second *labelled* video.~~ This is the one item that cannot ride along with a plain
-ingest — `TD-6` and [[D-032]] need only a `/yt-clipper` pass, but the fold window can only be
-judged against a real export, which needs a real annotation pass first. Scope it separately.
-
-Then: give `export.js` a separate constant, leave `MATCH` at 2 for the grid, and pick the window
-from the second video rather than fitting it to this one. 6s is the smallest value that works on
-video 1, which is exactly the kind of number that overfits. Do not make the code change before
-the number is decided — a separate constant still set to 2 is churn.
-
-**Known property that widening makes worse.** The fold anchors each cluster at the time it
-opened, so a cluster spans at most one window and "within the window" does not reliably mean
-"same line": `10.0, 12.0, 12.5` prints `[10.0, 12.0]` and then `[12.5]`, splitting a pair half a
-second apart. That is the price of the bounded rule [[D-027]] chose, and the alternative —
-anchoring on the previous clip — is consistent but lets a cluster grow without limit, which is
-the unbounded behaviour F7 removed. Video 1 has zero chains of three or more clips inside the
-window, so it never fires today. A wider window gives boundaries more places to fall, so price
-this again against real data before settling on a number, and check whether any near pair ends
-up split.
+The live remainder was lifted out to `TD-16`: the fold merges on time and rank and never compares
+label text, so [[D-033]]'s hard constraint is observed rather than enforced.
 
 ### TD-10 — the add-clip form can submit twice before it closes
 
@@ -520,10 +526,10 @@ whether any merge collapsed two rows whose resolved labels differ; if none ever 
 enforcement is not worth writing. If one does, merge only when the resolved labels match — which
 turns [[D-033]] from an observation into an invariant.
 
-**Trigger:** the next video annotated densely enough to export. Video 2 qualifies — 75 added
-clips over 64 minutes, 14 clusters under 45 seconds apart, and unlike video 1 it has no extracted
-stamps at all, so `resolvedLabel` cannot manufacture the text-identity that made video 1 safe.
-This is the first real test of the invariant.
+**Trigger: runnable today, and the only measurement here that is.** It needs an annotated video,
+not a skill pass. Video 2 qualifies and is the sharpest possible test — 75 clips over 64 minutes,
+14 clusters under 45 seconds apart, and **zero extracted stamps**, so `resolvedLabel` cannot
+manufacture the text-identity that made video 1 safe.
 
 
 ## Parking lot
@@ -540,6 +546,12 @@ Each is bound to the step that forces it. When the planner specs that step in `C
 resolving the bound decision is part of the task, and the resolution becomes a dated
 `DECISIONS.md` entry.
 
+- **~~The synthetic `0:00 Start` line~~ — decided 2026-08-19: keep it.** [[D-033]] carries the
+  reasoning. It costs no marker and is the only one of YouTube's four chapter requirements
+  obtainable for free, so removing it would foreclose chapters on every future video to save one
+  line. Recorded here rather than deleted, because it was briefly removed and should not be
+  re-proposed from the same wrong premise.
+
 - **Ballpark-`g` in copy-timestamps — decide at: the export freeze.**
   Today `g` still exports ([[D-022]]), so on video 1 both 20:46 (skill marker, `g`, ballpark) and
   21:18 (added marker, the actually-good placement of the same lick) copy into the description.
@@ -551,15 +563,6 @@ resolving the bound decision is part of the task, and the resolution becomes a d
   Same shape elsewhere on video 1: 29:23 `g` names a better caption at 29:09 with no clip
   stored there; 35:53 `x` (still hunting) pairs with the 36:39 add that keeps.
 
-- **The synthetic `0:00 Start` line — decide at: the export freeze.**
-  `descriptionTimestampText` synthesises a `0:00 Start` line that matches no record. It exists
-  solely to satisfy the YouTube chapter rule that [[D-033]] abandoned, so its entire
-  justification is gone. [[D-033]] notes this in prose and says "Decide separately"; nothing
-  scheduled the decision until now. It adds a line rather than dropping one, so it does not
-  violate [[D-033]] — which is why it is a decision and not a bug. Options: (a) drop it,
-  (b) keep it as a deliberate "lesson starts here" marker on its own merits, (c) emit it only
-  when the first real record is more than N seconds in. Bound to the export freeze so
-  copy-timestamps and JSON export cannot diverge on it ([[D-027]] governs placement).
 
 - **Extension → studio handoff transport — decide at: when scratchpad friction hurts.**
   Clipboard JSON, a localhost POST, or something else. Constraint: the studio store stays
