@@ -38,12 +38,30 @@ function restoreSelection() {
 // j/k origin: when follow is on, the playhead row (where the video is), not a
 // pinned selection the video has already walked past. Follow-off (or no
 // playhead yet) still walks from the selected row.
+//
+// Except when the playhead and the selection sit on the same second. Cue starts
+// are stored as whole seconds, so two Zoom transcript cues 0.4s apart collapse
+// onto one — ordinary here, 25 such pairs in one lesson and 64 in another, and
+// rare enough in YouTube captions that this never showed up before.
+//
+// The trap is that followPlayhead resolves the playhead to the *last* row at or
+// before the current time, i.e. the second row of the pair, while j/k seeks the
+// video to the row it selects. Land on the first row of a pair and the video
+// stays on that same second, so the next poll puts the playhead back on the
+// second row, and k computes (second row - 1) = the row you are already on.
+// Selection never moves again. Measured at 33:38: five presses, no movement.
+//
+// When both are on the same second the video has not walked anywhere, so the
+// selection is the finer cursor and stepping from it escapes the pair. This
+// also stops j from silently skipping the pair's first row on the way down.
 function navOriginIndex(rows) {
+  const selected = rows.findIndex((r) => r.classList.contains("selected"));
   if (S.follow) {
     const playhead = rows.findIndex((r) => r.classList.contains("playhead"));
-    if (playhead >= 0) return playhead;
+    const sameSecond = playhead >= 0 && selected >= 0
+      && Number(rows[playhead].dataset.start) === Number(rows[selected].dataset.start);
+    if (playhead >= 0 && !sameSecond) return playhead;
   }
-  const selected = rows.findIndex((r) => r.classList.contains("selected"));
   return selected >= 0 ? selected : 0;
 }
 

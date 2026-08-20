@@ -13,7 +13,16 @@
   --gold-text: #e6d7a8;
 }
 * { box-sizing: border-box; }
+html { overflow: hidden; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+/* Column, so the layout takes exactly the space the header leaves rather than
+   a guess at the header's height. The header wraps — at a narrow window or any
+   browser zoom it is two or three rows, not one — and a hardcoded offset made
+   the page taller than the viewport. The document then scrolled, and the first
+   time the grid scrolled a selected row into view it took the header with it,
+   putting the run picker out of reach. Nothing here may overflow the viewport. */
+body { display: flex; flex-direction: column; overflow: hidden; }
+body > header { flex: 0 0 auto; }
 header {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   padding: 10px 16px; border-bottom: 1px solid var(--line);
@@ -32,11 +41,29 @@ label.toggle.on { color: var(--text); }
 .text-btn:hover { color: var(--text); }
 .layout {
   display: grid;
-  height: calc(100% - 49px);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 body.player-top .layout {
-  grid-template-rows: auto minmax(0, 1fr);
+  /* The player's share is capped against THIS grid, not the viewport. `62vh`
+     measured the whole window while the header had already taken a slice of it,
+     so a header wrapped to three rows plus a 62vh player left the caption grid
+     at literally zero height — the annotation surface gone (F21). A percentage
+     row track resolves against the grid container, which is the viewport minus
+     the header, so the grid keeps at least 38% of whatever is actually left. */
+  grid-template-rows: minmax(0, 62%) minmax(0, 1fr);
   grid-template-columns: 22px minmax(0, 1fr);
+}
+/* A short window is where the header wraps, so it is exactly where 62% is still
+   too generous: the grid is left showing three caption rows. Give the player
+   less of a small viewport — it is the element that degrades gracefully. */
+@media (max-height: 640px) {
+  body.player-top .layout { grid-template-rows: minmax(0, 45%) minmax(0, 1fr); }
+  /* At this size the keyboard hint wraps to four or five lines and takes the
+     player column for itself, leaving a 28px sliver of video. The hint is the
+     one thing here that is pure reminder, so drop it and give the space back to
+     the picture. */
+  body.player-top .player-meta .hint { display: none; }
 }
 body.player-top .player-col { grid-column: 1 / -1; }
 body.player-top .timeline { grid-row: 2; grid-column: 1; }
@@ -58,13 +85,29 @@ body.player-left .grid-wrap { grid-column: 3; }
 body.player-top .player-col {
   padding: 8px 16px 10px;
   border-bottom: 1px solid var(--line);
+  /* The cap lives on the grid track above, not here. This column still clips,
+     so when the meta line and the keyboard hint wrap into more rows than fit,
+     the hint is what gets cut — the right thing to lose. */
 }
 body.player-left .player-col {
   padding: 12px;
   border-right: 1px solid var(--line);
   overflow: auto;
 }
-.player-wrap { position: relative; width: 100%; background: #000; min-width: 0; }
+/* Shrinkable: the aspect-ratio box is a preference, not a floor. Without
+   `min-height: 0` a flex item refuses to go below its content size, so a
+   16:9 video in a short column pushes the meta line out of the clip instead of
+   letterboxing. `object-fit: contain` on the local element does the rest. */
+.player-wrap {
+  position: relative; width: 100%; background: #000; min-width: 0;
+  /* Grows into whatever the column has left after the meta line, and shrinks
+     below the media's natural box when there is not enough. That gives the
+     media a definite parent to size against, which is the whole point: a cap
+     in `vh` guesses at space the header may already have taken. */
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
+}
+body.player-top .player-wrap > #player,
+body.player-top .player-wrap > #localVideo { max-height: 100%; }
 .player-catcher { position: absolute; inset: 0; z-index: 1; cursor: pointer; }
 #player { width: 100%; aspect-ratio: 16 / 9; background: #000; }
 body.player-top #player { max-height: 52vh; }

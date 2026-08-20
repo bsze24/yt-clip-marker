@@ -4,3 +4,17 @@ node_modules/
 .env
 __pycache__/
 apps/studio/media/
+
+# Raw recording exports kept locally for reference — hundreds of MB each, not
+# product. Matches any export folder under docs/reference/, not just the first
+# one: a per-folder rule silently stops covering the next drop.
+docs/reference/**/*.mp4
+docs/reference/**/*.m4a
+docs/reference/**/*.mkv
+docs/reference/**/*.mov
+# Raw meeting transcripts ship beside the media in a Zoom export. Small, but
+# they are source exports rather than product, and leaving them untracked made
+# every export folder show as `??` on a broad `git add` (F22). A deliberately
+# curated parser fixture belongs somewhere else, tracked on purpose.
+docs/reference/**/*.vtt
+.aider*

@@ -9,13 +9,16 @@ let offline = false;
 
 function showRunWarnings(payload, id) {
   const warnings = Array.isArray(payload.warnings) ? payload.warnings : [];
-  const apiWarning = warnings.find((warning) => warning && warning.code === "deprecated-run-key");
+  const messages = warnings.map((warning) => warning && warning.message).filter(Boolean);
+  // The deprecated-key fault is also derived straight from the payload, not
+  // only from the API's warning list ([[D-023]]): a store fault must stay
+  // visible even if the server failed to name it. Kept as its own check rather
+  // than folded into the loop above for that reason.
   const directFault = payload.run && Object.prototype.hasOwnProperty.call(payload.run, "gold");
-  const message = apiWarning && apiWarning.message
-    ? apiWarning.message
-    : directFault
-      ? `run ${id} has deprecated gold[]; rename gold[] → extracted[]`
-      : "";
+  if (directFault && !warnings.some((warning) => warning && warning.code === "deprecated-run-key")) {
+    messages.unshift(`run ${id} has deprecated gold[]; rename gold[] → extracted[]`);
+  }
+  const message = messages.join(" · ");
   const el = $("runWarning");
   el.textContent = message;
   el.hidden = !message;

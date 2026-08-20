@@ -204,11 +204,28 @@ def load_run(run_id):
 
 def run_warnings(run_id, run):
     """Nonfatal store faults that must stay visible while the run remains usable."""
-    if "gold" not in run:
-        return []
-    message = f"run {run_id} has deprecated gold[]; rename gold[] → extracted[]"
-    print(f"[studio] ERROR: {message}", file=sys.stderr)
-    return [{"code": "deprecated-run-key", "key": "gold", "message": message}]
+    warnings = []
+    if "gold" in run:
+        message = f"run {run_id} has deprecated gold[]; rename gold[] → extracted[]"
+        print(f"[studio] ERROR: {message}", file=sys.stderr)
+        warnings.append({"code": "deprecated-run-key", "key": "gold", "message": message})
+    # A run that names a media file but cannot find it. Worth saying out loud:
+    # files in media/ are usually symlinks into wherever the recording actually
+    # lives, so moving or renaming the source breaks one without touching
+    # anything the studio owns. The old failure was silent — a black player and
+    # no reason — and the fix is a one-line repoint, but only if you know that
+    # is what happened. Annotations are unaffected either way; they are keyed by
+    # run id in labels.jsonl, not by the file.
+    declared = run.get("media")
+    if declared and resolve_run_media(run) is None:
+        message = (
+            f"run {run_id} expects media/{declared}, which is missing or is a "
+            f"broken symlink — captions and markers are intact, but it will not play. "
+            f"Repoint it: ln -sf <new path> apps/studio/media/{declared}"
+        )
+        print(f"[studio] ERROR: {message}", file=sys.stderr)
+        warnings.append({"code": "missing-media", "key": declared, "message": message})
+    return warnings
 
 
 def load_feedback(run_id):

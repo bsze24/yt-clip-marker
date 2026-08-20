@@ -42,6 +42,14 @@ VTT_SHORT_TIME_RE = re.compile(
 TAG_RE = re.compile(r"<[^>]*>")
 UNSAFE_RE = re.compile(r"[^A-Za-z0-9._-]+")
 
+# Zoom exports one meeting as `{meeting}_Recording_{W}x{H}.mp4`,
+# `{meeting}_Recording.m4a` and `{meeting}_Recording.transcript.vtt` — the video
+# carries a resolution suffix the transcript does not, so a stem match alone
+# never pairs them. A browser that downloaded the set twice also appends " (1)".
+# Both are stripped to get a second stem to match sidecars against.
+DUP_SUFFIX_RE = re.compile(r"\s*\(\d+\)$")
+RESOLUTION_SUFFIX_RE = re.compile(r"_\d{2,5}x\d{2,5}$")
+
 
 def looks_like_media_path(s):
     """True when this string is a local file reference, not a YouTube URL/id.
@@ -119,6 +127,25 @@ def synthetic_video_id(path):
     return (stem or "local")[:48]
 
 
+def stem_variants(path):
+    """Stems a sidecar may be named after: the literal one, then Zoom's base.
+
+    Deliberately narrow. F18 was a bare prefix match letting `Lesson 1.mp4`
+    adopt `Lesson 10.vtt`; the answer there was to require a `.` boundary, and
+    that requirement still holds for every variant returned here. This only adds
+    stems produced by removing two specific, well-formed suffixes, so a file
+    with neither is unaffected.
+    """
+    stem = path.stem
+    variants = [stem]
+    base = DUP_SUFFIX_RE.sub("", stem)
+    base = RESOLUTION_SUFFIX_RE.sub("", base)
+    base = DUP_SUFFIX_RE.sub("", base)
+    if base and base != stem:
+        variants.append(base)
+    return variants
+
+
 def find_sidecars(path):
     """Subtitle / info-json / description files sharing this file's stem.
 
@@ -126,14 +153,27 @@ def find_sidecars(path):
     `{name}.vtt`. Both are stem-prefix matches in the same directory.
     """
     path = Path(path)
-    stem = path.stem
-    subs, info, description = [], None, None
+    variants = stem_variants(path)
+    subs, infos, descriptions = [], [], []
     for sibling in sorted(path.parent.iterdir()):
         if not sibling.is_file() or sibling.name == path.name:
             continue
-        if not sibling.name.startswith(stem):
+        rest = None
+        variant_rank = None
+        for index, stem in enumerate(variants):
+            if sibling.name.startswith(stem):
+                rest = sibling.name[len(stem):]
+                # Which stem matched leads every ranking below. `variants` is
+                # ordered exact-first, so a sidecar named after the media file
+                # itself always beats one named after the Zoom base. Without
+                # this, `Lecture_1920x1080.mp4` sitting beside both
+                # `Lecture.vtt` and `Lecture_1920x1080.vtt` picked whichever
+                # sorted first — a real title that merely ends in something
+                # resolution-shaped would ingest the wrong transcript (F20).
+                variant_rank = index
+                break
+        if rest is None:
             continue
-        rest = sibling.name[len(stem):]
         # The remainder has to start at an extension boundary. A bare prefix
         # match makes `Lesson 1.mp4` adopt `Lesson 10.vtt` — a whole grid of the
         # adjacent recording's captions, or worse, another video's identity from
@@ -143,9 +183,9 @@ def find_sidecars(path):
         if not rest.startswith("."):
             continue
         if sibling.name.endswith(".info.json"):
-            info = sibling
+            infos.append((variant_rank, sibling))
         elif sibling.suffix == ".description":
-            description = sibling
+            descriptions.append((variant_rank, sibling))
         elif sibling.suffix.lower() in SUB_EXT:
             # Rank: json3 over vtt over srt; then "English (Original)" over the
             # auto-generated English track, over anything else. yt-dlp writes
@@ -156,9 +196,18 @@ def find_sidecars(path):
                 lang_rank = 1
             else:
                 lang_rank = 2
-            rank = (SUB_EXT.index(sibling.suffix.lower()), lang_rank)
+            rank = (variant_rank, SUB_EXT.index(sibling.suffix.lower()), lang_rank)
             subs.append((rank, sibling))
+    # Stable sorts, so files matching the same stem keep directory order.
+    # `info` and `description` get the same treatment as subtitles rather than
+    # last-write-wins: F18 recorded that a wrong `.info.json` is the worse half
+    # of this bug, because it silently replaces the video identity instead of
+    # producing a visibly wrong grid.
     subs.sort(key=lambda item: item[0])
+    infos.sort(key=lambda item: item[0])
+    descriptions.sort(key=lambda item: item[0])
+    info = infos[0][1] if infos else None
+    description = descriptions[0][1] if descriptions else None
     return [s for _rank, s in subs], info, description
 
 
