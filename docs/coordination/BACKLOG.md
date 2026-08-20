@@ -571,6 +571,12 @@ Each is bound to the step that forces it. When the planner specs that step in `C
 resolving the bound decision is part of the task, and the resolution becomes a dated
 `DECISIONS.md` entry.
 
+- **~~The synthetic `0:00 Start` line~~ — decided 2026-08-19: keep it.** [[D-033]] carries the
+  reasoning. It costs no marker and is the only one of YouTube's four chapter requirements
+  obtainable for free, so removing it would foreclose chapters on every future video to save one
+  line. Recorded here rather than deleted, because it was briefly removed and should not be
+  re-proposed from the same wrong premise.
+
 - **Ballpark-`g` in copy-timestamps — decide at: the export freeze.**
   Today `g` still exports ([[D-022]]), so on video 1 both 20:46 (skill marker, `g`, ballpark) and
   21:18 (added marker, the actually-good placement of the same lick) copy into the description.
