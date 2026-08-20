@@ -173,7 +173,14 @@ The suggester skill lives outside the repo at `~/.claude/skills/yt-clipper/` and
 
 ## Git workflow
 
-- Never commit to `main`. Pull latest `main` before creating a branch.
+- Never commit **code** to `main`. Pull latest `main` before creating a branch.
+- **Living records go straight to `main`**: `docs/coordination/`, `docs/sessions/`,
+  `docs/reference/`. They are appended to continuously, so a PR holds only a stale snapshot —
+  PRs 5 and 6 both died that way, and the review record sat outside git for three days. Docs
+  that *describe code* — `docs/clip-schema.md`, field tables, the file tree below — ride in the
+  PR that changes the behaviour, or `main` documents software that does not exist yet. Test:
+  would this doc be wrong once some open PR merges? Yes → it belongs in that PR. The cost of
+  going straight to `main` is that nobody else reads it, so re-read before you push.
 - A new branch per change; never reuse a branch name. One PR per change, even a small one.
 - **Never `git add -A`.** Run data and session logs are not the product PR.
 - Do not push while BugBot is mid-review — the review restarts.
