@@ -346,6 +346,58 @@ merges are text-identical today is a happy accident of `resolvedLabel` making an
 adopt a nearby stamp's label. Merging only when the resolved labels match would make this decision
 an enforced invariant rather than an observed one.
 
+### D-034 — Media is resolved on every read, never written into the run file  (Accepted 2026-08-19)
+Harvested from PR 8 (`71b9d82`). A run gains offline playback because a matching file appeared
+in `apps/studio/media/`, and loses it when the file goes. `resolve_run_media` computes the match
+on every `/api/run`; no write path gains a `media` key.
+
+Keeps `runs/*.json` immutable ([[D-002]]) and makes attaching a download to an existing YouTube
+run a rename rather than an edit. The cost is a stat per read, which is nothing at this scale.
+
+The failure mode this creates is silent: `media/` entries are usually symlinks into wherever the
+recording actually lives, so renaming the source breaks playback without touching anything the
+studio owns. PR 9's `run_warnings` addition exists to make that failure say so.
+
+### D-035 — Local playback wins over the YouTube embed whenever both exist  (Accepted 2026-08-19)
+Harvested from PR 8. There is no mode to toggle, remember or persist. If a matching file is in
+`media/`, the `<video>` backend plays it; otherwise the embed does.
+
+The alternative — a user-visible switch — buys nothing. Nobody wants the network path when the
+local file is right there, and a persisted preference is a thing to get wrong on the one flight
+it matters.
+
+### D-036 — A local file with no YouTube identity keeps the field name `videoId`  (Accepted 2026-08-19)
+Harvested from PR 8. `local.py` synthesises a filename-derived id into `videoId` and adds
+`source: "local"` beside it. Readers test `source`, never the shape of the id.
+
+Renaming the field would have touched the run filename, the `labels.jsonl` key and every
+existing reader, to express something one boolean already says. The run filename and the label
+event key stay `{videoId}-{stamp}` and `(runId, …)` respectively, unchanged.
+
+### D-037 — Sidecar matching requires a `.` boundary after the stem  (Accepted 2026-08-19)
+Established fixing F18 on PR 8; extended, not relaxed, by PR 9. `find_sidecars` accepts a
+sibling only when the remainder after the media stem begins with `.`.
+
+When Zoom forced a second stem variant — strip a trailing `_{W}x{H}`, strip a browser `" (1)"`
+duplicate marker — the boundary rule was carried onto each variant rather than loosened. A bare
+prefix match is how `Lesson 1.mp4` adopts `Lesson 10.vtt`, which is a wrong transcript silently
+attached to a lesson, not a missing one.
+
+Any future variant obeys the same rule. Adding a variant widens the surface F18 was filed
+about, so each one owes an adversarial case, not just a happy path.
+
+### D-038 — Captions arriving late write a NEW run; the old one is never edited  (Accepted 2026-08-19)
+Harvested from PR 8's `prefetch.py` and completed by PR 9. YouTube generates auto-captions well
+after a fresh upload is watchable, so "download now, transcribe later" is the normal path, not an
+edge case — four of four videos hit it.
+
+When captions appear and the existing run has zero cues, `prefetch.py` writes a new run and names
+the superseded one. It does not edit the old run, because runs are immutable ingest output
+([[D-002]]) and label events are keyed by run id ([[D-008]]), so annotations cannot follow an
+edit. Deleting the superseded run is safe only if nothing was annotated on it, and the tool says
+so rather than deciding for you.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

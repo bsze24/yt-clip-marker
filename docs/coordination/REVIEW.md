@@ -1,10 +1,12 @@
 # Review
 
-Active target: **PR 8 — local video mode** (thread 4). Threads 1 and 3 are closed; thread 2
-(PR 4) is clean and waiting on Brian to merge, not on a reviewer. Thread 1's durable outcomes
-were harvested into `DECISIONS.md` and `BACKLOG.md` and its round-by-round is not kept here.
+Active target: **PR 9 — Zoom export ingest** (thread 5). Threads 1, 3 and 4 are closed;
+thread 2 closed when PR 4 merged. Durable outcomes from the closed threads were harvested into
+`DECISIONS.md` and `BACKLOG.md` and their round-by-round is not kept here.
 
-Roles are reversed on thread 4 at Brian's instruction: Claude Code implemented, Codex reviews.
+Roles stay reversed on thread 5, same as thread 4 and at Brian's instruction: Claude Code
+implemented, **Codex reviews**. BugBot is not a second pair of eyes on this one — it failed
+seven times on PR #9 against the Cursor usage cap and filed nothing.
 
 > ## Concurrency protocol — read before editing
 >
@@ -30,9 +32,10 @@ Roles are reversed on thread 4 at Brian's instruction: Claude Code implemented, 
 | Thread | Target | Status | Baton |
 | --- | --- | --- | --- |
 | 1 — two-surface product | `eea83b8` (PR 3) | **CLOSED** 2026-08-18 — no open findings | — |
-| 2 — video 1 store | `43c99dd` (PR 4) | **clean** — F16 fixed, F17 non-blocking | → Brian, merge |
+| 2 — video 1 store | `43c99dd` (PR 4) | **CLOSED** 2026-08-19 — merged; F17's cause is `TD-10` | — |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
-| 4 — local video mode | `fced73f` (PR 8) | **addressed** — F18, F19 fixed at `fced73f` | → reviewer |
+| 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
+| 5 — Zoom export ingest | `5eb55d2` (PR 9) | **open** — no findings filed | → reviewer |
 
 ---
 
@@ -673,7 +676,18 @@ _No findings — the branch is obsolete rather than wrong._
 
 ---
 
-## Thread 4 — local video mode (`c4de36d`) — OPEN
+## Thread 4 — local video mode (`c4de36d`) — CLOSED 2026-08-19
+
+**Closed on merge.** Two findings, both non-blocking, both fixed at `fced73f` and verified by
+the reviewer; PR 8 merged to `main` at `71b9d82`. F18 (sidecar lookup adopting the adjacent
+recording) and F19 (a non-media `HEAD` sending a body) are `resolved`. The round-by-round below
+is kept because thread 5 widens F18's matching surface and a reviewer will want the original
+reasoning to hand.
+
+Durable outcomes harvested as [[D-034]]–[[D-038]]. The one gap this thread never closed —
+playback on an actually disconnected machine — was closed by use rather than by test: the Zoom
+run played in the air on intermittent service during the session that produced PR 9. No
+automated check covers it, and none is planned ([[D-005]]).
 
 **Target.** `c4de36d` on `local-video-mode`, two product commits: `4b344d5` (the mode) and
 `c4de36d` (`prefetch.py` plus two yt-dlp fixes). Verify it is on the branch before reviewing:
@@ -796,3 +810,43 @@ only places a body is written, and all three now stop at the flag.
 machine. Everything else in this round was re-driven.
 
 **Baton: → reviewer** — re-review at `fced73f`.
+
+---
+
+## Thread 5 — Zoom export ingest (`5eb55d2`) — OPEN
+
+**Target.** `5eb55d2` on `zoom-export-ingest`, five product commits off `main` at `d2ad793`:
+`247f7b3` (Zoom sidecar variants + late captions), `b0c4dd3` (gitignore), `4b3ee5d` (sticky
+header), `cae20a2` (missing-media warning), `5eb55d2` (`k` stick). The branch head is `6ef767c`
+— a duplicate session-log commit and a merge of `main`, neither of them product. Verify before
+reviewing:
+
+```bash
+git merge-base --is-ancestor 5eb55d2 HEAD
+git log --oneline main..zoom-export-ingest
+```
+
+**Scope.** What real use of PR 8 exposed. `docs/prs/pr-9-zoom-export-ingest.md` is the spec but
+covers only the first two commits — review the diff, not the spec. Acceptance criteria and the
+implementer's audit are in `CURRENT.md`. The extension is untouched ([[D-006]]).
+
+**Read `CURRENT.md` §1 "Where to look hard" first.** It names the five places this change could
+plausibly be wrong, and two of them are places the implementer's own audit records **no
+receipt**: the late-caption rerun end to end, and a post-`5eb55d2` video-1 regression pass.
+
+**What the implementer verified**, so the review need not re-derive it unless a finding depends
+on it: both real Zoom exports ingesting to 688 cues each (checked, not assumed — the raw VTTs
+hold 690 and the dedupe drops 2), the `Lesson 1.mp4` / `Talk_640x360.mp4` sidecar regressions,
+the `k` stick reproduced and then driven directly through the poll→keypress loop, and the
+header fix found from a screenshot at non-default browser zoom.
+
+**Severity, per `README.md`.** Measure it. Two real Zoom runs and six run files now exist in
+the working tree, and video 2's store carries 147 label events over 75 live added clips — so
+"fires on data that exists today" is a meaningful bar here, unlike thread 4. Say plainly
+whether a finding costs Brian something on his next lesson, or is latent.
+
+**Note on process.** BugBot filed nothing on PR #9 — seven runs, seven `usage limit reached`
+failures. This thread is the whole review.
+
+**Baton: → reviewer** — review `5eb55d2`, file each finding as its own item with severity and
+status `open`.
