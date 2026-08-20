@@ -35,7 +35,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 2 — video 1 store | `43c99dd` (PR 4) | **CLOSED** 2026-08-19 — merged; F17's cause is `TD-10` | — |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 | 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
-| 5 — Zoom export ingest | `5eb55d2` (PR 9) | **open** — no findings filed | → reviewer |
+| 5 — Zoom export ingest | `5eb55d2` (PR 9) | **open** — F21 blocking; F20–F23 open | → implementer |
 
 ---
 
@@ -848,5 +848,62 @@ whether a finding costs Brian something on his next lesson, or is latent.
 **Note on process.** BugBot filed nothing on PR #9 — seven runs, seven `usage limit reached`
 failures. This thread is the whole review.
 
-**Baton: → reviewer** — review `5eb55d2`, file each finding as its own item with severity and
-status `open`.
+### F20 — normalized Zoom base can beat an exact sidecar — non-blocking · open
+
+**Finding.** `find_sidecars` adds the literal stem and then the normalized Zoom stem to one
+candidate list, but subtitle candidates are finally sorted only by extension and language.
+For tied `.vtt` files, the directory's lexical order decides the winner. A real title that
+legitimately ends in a resolution-looking suffix therefore can ingest an unrelated sibling
+instead of the media file's exact sidecar:
+
+```
+Lecture_1920x1080.mp4
+Lecture.vtt                 # WRONG BASE
+Lecture_1920x1080.vtt       # RIGHT EXACT
+```
+
+The disposable fixture returned `Lecture.vtt`, and `read_cue_pairs` produced `WRONG BASE`.
+The current two Zoom exports do not contain both forms, so this does **not** fire on Brian's
+present data and is non-blocking under the measured-severity rule. It is nonetheless one of
+the adversarial cases named in the acceptance criteria: preserve the `.` boundary, but rank
+an exact-stem **subtitle** sidecar ahead of every normalized-base subtitle before the generic
+extension/language ranking erases which variant matched.
+
+### F21 — the player cap can leave the annotation grid with zero usable height — blocking · open
+
+**Finding.** The new flex shell keeps the header reachable, but
+`body.player-top .player-col { max-height: 62vh; }` sizes the player only against the viewport,
+not against the space remaining after a wrapped header. On the real video-2 local run in a
+760×520 browser viewport, the header consumed 170.8px and the player consumed 322.4px; after
+the density control, `#gridScroll.clientHeight` was exactly **0**. The document itself stayed
+at 520px and the header remained at top 0, so the original header problem is fixed while the
+only annotation surface disappears.
+
+Pressing `n` made the composer form (304.2px tall) render below the zero-height grid viewport;
+it could not be used. This fires today on the actual newly ingested video and fails acceptance
+criterion 5's small-viewport half, so it is blocking. Reserve a usable grid height before
+giving the player its auto row; a cap expressed only in `vh` cannot account for a header that
+has already claimed much of that same viewport.
+
+### F22 — raw transcript sidecars remain neither tracked nor ignored — optional · open
+
+**Finding.** PR 9 ignores the large recording media and correctly ignores `.aider*`, but the
+two real `docs/reference/GMT20260712/` and `GMT20260730/` directories still appear as `??`
+because their `.transcript.vtt` files are neither tracked nor ignored. The user has to notice
+and exclude them manually on every broad `git add`.
+
+**Recommendation.** Ignore `docs/reference/**/*.vtt` as well. These are raw local source
+exports (full meeting transcripts), while a deliberately curated parser fixture can be tracked
+elsewhere if one becomes necessary. Non-blocking by construction: the exposed files are small
+text and no data is committed yet.
+
+### F23 — the PR spec omits three of the five product commits — optional · open
+
+**Finding.** `docs/prs/pr-9-zoom-export-ingest.md` describes `247f7b3` and part of `b0c4dd3`,
+but not the sticky-header, missing-media warning, or duplicate-cue navigation changes
+(`4b3ee5d`, `cae20a2`, `5eb55d2`). This costs a later reader the acceptance criteria and
+verification intent for most of the PR, even though the current review caught them by reading
+the diff. Add concise scope and browser receipts before the PR is closed.
+
+**Baton: → implementer** — address F21 (blocking) and return with a new SHA. F20 may be batched
+with it; F22–F23 are optional polish and do not hold the baton.

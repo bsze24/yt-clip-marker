@@ -1,7 +1,7 @@
 # Current task
 
 **Review PR 9 — Zoom exports ingest, and reruns pick up late captions.** Baton:
-**→ reviewer**, on `5eb55d2`.
+**→ implementer**, on `5eb55d2`.
 
 Roles are reversed again for this round, same as PR 8 and for the same reason: Claude Code
 implemented, **Codex reviews**. The code is written, committed and pushed on
@@ -104,7 +104,10 @@ the `BACKLOG.md` roadmap. None of it is in this diff.
 
 ## 3. Baton
 
-**→ reviewer**, on `5eb55d2`. No findings filed yet; `REVIEW.md` thread 5 is open and empty.
+**→ implementer**, from `5eb55d2`. Two findings are open in `REVIEW.md` thread 5: F21 is
+blocking (the grid collapses at a real small viewport); F20 is non-blocking (an exact
+resolution-suffixed sidecar can lose to a normalized-base sibling). F22–F23 are optional
+review/documentation polish.
 
 ---
 
@@ -161,3 +164,33 @@ receipt, this note says so rather than inventing one.
 
 Each turn appends here: role, surface, SHA, what was verified, assumptions made, anything
 skipped. See `README.md`, "Before recording a SHA".
+
+### 2026-08-19 — reviewer, PR 9 Zoom export ingest (`5eb55d2`)
+
+- **Acceptance criteria and evidence.** (1) The two real local Zoom runs render with 688
+  cues; one contains speaker attribution. A disposable adversarial fixture preserved F18's
+  `Lesson 1_640x360.mp4` / `Lesson 10.vtt` boundary and the empty-normalized-stem case. It
+  also exposed F20: an exact `Lecture_1920x1080.vtt` loses to `Lecture.vtt`. (2) A disposable
+  late-caption fixture left the original zero-cue run byte-for-byte unchanged, printed its id,
+  wrote one cue-bearing successor, and returned that successor without writing again on the
+  next invocation. (3) Direct `run_warnings` exercise returned both
+  `deprecated-run-key` and `missing-media` for a doubly faulty run, and no missing-media
+  warning for a run with no declared `media`. (4) In the browser on video 2's real duplicate
+  `1:42` pair, follow-on `k` moved the first cue to `1:41` while the playhead sat on the
+  second; follow-off `j` moved from the second cue to `1:46`. (5) A 760×520 viewport kept the
+  wrapped header fixed and the document unscrollable, but failed F21: the grid had 0px client
+  height and the composer was inaccessible. (6) Video 1 loaded with no console errors and
+  exactly 64 markers, 21 added, 24 extracted, and 1464 cues.
+- **Checks.** `python3 -m compileall -q apps/studio`, `node --check` on the changed JS modules,
+  and `git diff --check d2ad793..5eb55d2` passed. The browser was a local real-player pass,
+  not a source-only inference.
+- **Assumptions.** No new product choice made. F22 recommends ignoring raw `.vtt` source
+  exports, because they are local reference artifacts (and full meeting transcripts), not
+  product fixtures; Brian can choose to retain them intentionally instead.
+- **Skips and divergences.** I exercised a wrapped narrow viewport, not an actual browser zoom
+  control. That is enough to expose the stronger F21 failure, but the exact non-100%-zoom
+  visual path remains unverified. I made no code changes and preserved all untracked runs,
+  labels, source exports, and Aider files.
+
+**Baton: → implementer** — address F21 before another review pass; F20 should travel with that
+fix if practical. See thread 5 in `REVIEW.md`.
