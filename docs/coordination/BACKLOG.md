@@ -89,7 +89,23 @@ nothing in the store says the two are the same lesson. Decide the relationship b
 
 ## Reducing manual tagging — the path (agreed 2026-08-19)
 
-Brian's goal: **cut manual tagging effort by 75%+**. Recorded here as roadmap because it spans
+Brian's goal, restated as a rate 2026-08-20: **0.27x realtime — 20 minutes to review a
+75-minute lesson.** Thrilled case is under 10 minutes, 0.13x. It replaces "cut manual tagging
+by 75%+", which invited arguing about the denominator; a rate is checkable with a clock.
+
+**The measured baseline is 2.0x** — 126 minutes of active annotation on a 64.5-minute lesson,
+folded from `labels.jsonl` by dropping every gap over five minutes. Treat it as an upper bound
+on the real baseline: that session was split across an aeroplane, and two bugs now fixed in PR 9
+were live during it (the header scrolled the run picker away, `k` stuck on duplicate cue starts).
+Re-measure on `GMT20260712` for a clean number.
+
+**Where the 126 minutes went, because it decides what automation can reach:** roughly 64.5 of it
+is playing the lesson and about 62 is stopped time — seeking, typing labels, picking tags, redoing
+the 29 of 75 rows that got revised. Automation only reaches the stopped half. Perfect automation
+of all of it still leaves 64.5 minutes, or 1.0x, which is a 49% cut and nowhere near 0.27x.
+**The target is only reachable by not playing the lesson end to end** — reading a drafted list and
+playing only the uncertain rows. That is the precondition this whole path rests on, and the
+video-2 eval is what says whether it is safe. Recorded here as roadmap because it spans
 process, an experiment and code, and because the ordering is evidence-driven rather than
 obvious. The evidence is an audit of videos 1 and 2 run on 2026-08-19 against `runs/` and
 `labels.jsonl`; the numbers below are measured, not estimated.

@@ -20,8 +20,8 @@ touching `SKILL.md` is the whole point.
 
 No PR is open. `REVIEW.md` has no active thread.
 
-**Why this task and not a code task.** The goal is cutting manual tagging by 75%+
-(`BACKLOG.md`, "Reducing manual tagging"). Every remaining engineering step — rewriting the
+**Why this task and not a code task.** The goal is **0.27x realtime** — 20 minutes to review
+a 75-minute lesson, against 2.0x measured today (`BACKLOG.md`, "Reducing manual tagging"). Every remaining engineering step — rewriting the
 skill, building the review loop, drafting labels — is sized by one number nobody has: how well
 the skill places markers on a video it did not influence. The only measurement so far is video
 1, where Brian judged markers the model proposed, so its 100% region recall may be anchoring
@@ -60,25 +60,67 @@ file and run steps 2-6.
 
 ## 2. What to measure
 
-Three numbers and one list. The first is the one that matters.
+**Star recall is the primary number. Not precision, not overall recall.** Brian's
+constraint, 2026-08-20: extra markers are close to costless — flipping past one is a
+keypress — but a starred moment with no marker near it puts him back into manual culling,
+which is the whole cost being removed. So the tool is bought on recall of the moments he
+cared about, and everything else is secondary.
 
-1. **Region recall.** For each of the 75 human markers, distance to the nearest skill proposal.
-   Video 1's answer was 21 of 21 within 90s, zero missed. If video 2 comes back materially
-   worse, the "recall is not the problem" premise under the whole roadmap is wrong and the
-   ordering changes.
-2. **Precision.** Proposals with no human marker nearby. Video 1's judged baseline was 49%,
-   rising to a projected 82% once four fixable classes are removed.
-3. **Candidate count** — [[D-032]]'s revert signal for `R-CUE-EXACT`. A drop means the rule is
-   suppressing proposals. Check `marker.start` against the `cues[]` start set at the same time;
-   a non-caption start means the rule is being ignored. That closes `TD-6`.
-4. **A rejection taxonomy**, in the style of video 1's: sort every false positive into a named
-   class rather than counting it. That list, not the percentage, is what rewrites the skill.
+Do not compute this by hand. `apps/studio/eval/score_run.py` produces every number below
+from the skill's output plus the ground-truth run id, and refuses to run if the proposals
+file is sitting in `runs/`:
 
-**One prediction to falsify, filed 2026-08-19.** `R-TAKE-GAP` should fail here. Zoom transcribes
-the playing instead of leaving silence — at a moment Brian labelled `Line 1 - jake demo` the
-transcript reads `Jake Sherman: Ba-ba-do da.` Gaps >=30s: 14 on video 1, 5 on video 2. And gaps
-do not track his takes (4 of 13 tagged rows near one, against 19 of 62 untagged — identical).
-**If `R-TAKE-GAP` fires well anyway, half the rewrite case is wrong and should be dropped.**
+```
+python3 apps/studio/eval/make_transcript.py GMT20260730-155336_Recording_640x360-1-20260819-0903 > /tmp/video2-transcript.txt
+python3 apps/studio/eval/score_run.py /tmp/video2-proposals.json GMT20260730-155336_Recording_640x360-1-20260819-0903
+```
+
+**Video 1 baseline, from the same script**, so the comparison is like-for-like:
+
+| | 20s | 30s | 45s | 60s |
+| --- | --- | --- | --- | --- |
+| **Star recall** (self-created only) | 56% | 89% | **100%** | 100% |
+| Region recall (all 67 rows) | 84% | 93% | 97% | 100% |
+| Precision (proposals near a human row) | — | 81% | 84% | — |
+
+Two confounds the script already handles, both of which inflate the score if ignored:
+
+1. **A star on a skill marker is covered by definition.** Only stars on clips Brian created
+   himself are evidence. On video 1 that cuts the sample from 17 to 9 — and `n = 9` is why
+   the 100% needs video 2 before anyone leans on it.
+2. **Ground truth folds in file order**, last event per row identity wins. Sorting by
+   `recordedAt` eventually picks the wrong record; video 1's store has three pairs written
+   out of timestamp order.
+
+Also produced, in descending order of how much they change a decision:
+
+3. **Direction and lead time.** Brian, 2026-08-20: not knowing whether to scrub forward or
+   back is its own cost, separate from distance. On video 1 the nearest proposal was earlier
+   14 times and later 7 — so a third of the time he moves the wrong way first. The script
+   prints what a deliberate lead would buy. Video 1 says **−30s takes it from 7 of 21 down to
+   2, at a median 42s of lead-in** — which at 1.5× is 28 seconds of run-up, roughly what a
+   clip wants anyway. If video 2 agrees, placing markers early stops being a hack and becomes
+   the rule: the marker means "the clip starts here", not "the moment is here".
+4. **Candidate count and `R-CUE-EXACT`** — [[D-032]]'s revert signal. The script reports how
+   many proposals miss an exact cue start; any that do mean the rule is being ignored, which
+   is a finding rather than a curiosity. Closes `TD-6`.
+5. **A rejection taxonomy.** The script lists every proposal more than 45s from a human row.
+   Sort each into a named class the way video 1's 24 were sorted. That list, not the
+   percentage, is what rewrites the skill.
+
+**One prediction to falsify, filed 2026-08-19.** `R-TAKE-GAP` should fail here. Zoom
+transcribes the playing instead of leaving silence — at a moment Brian labelled `Line 1 -
+jake demo` the transcript reads `Jake Sherman: Ba-ba-do da.` Gaps >=30s: 14 on video 1, 5 on
+video 2, and gaps do not track his takes (4 of 13 tagged rows near one, against 19 of 62
+untagged). **If `R-TAKE-GAP` fires well anyway, half the rewrite case is wrong and should be
+dropped.**
+
+**Settled 2026-08-20, do not re-litigate:** diarization does not rescue `take`. Four angles
+tested on video 2 and all dead — scat syllables (one line in 64 minutes), longest Jake-only
+cue run (2.9 against 2.9), Jake's share of the window (68% against 62%), and talk-density
+dips (39% precision against a 32% base rate). Speaker labels say who is *talking*; a demo is
+someone *not talking*. What works is what Brian already does — writing "jake take" into the
+label, which 24 of video 2's 75 labels carry in prose.
 
 ## 3. After this, in order
 
