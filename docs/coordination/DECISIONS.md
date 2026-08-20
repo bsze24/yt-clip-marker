@@ -331,16 +331,27 @@ that survives — the same moment marked twice, by the skill and by hand, or alr
 Nothing is lost. At 6s three more collapse and every one of the three carries different text.
 Two seconds is the boundary between collapsing a duplicate and deleting work.
 
-**Chapters are abandoned as a goal.** Timestamps in a description are clickable seek links
-unconditionally; chapters additionally require the whole set to pass four tests, one of which is a
-10-second minimum gap that Brian's annotation granularity does not meet and should not be bent to
-meet. If chapters ever happen for free on some video, fine — it is a side effect, never a target.
+**Chapters are pursued only by means that cost no markers.** Corrected 2026-08-19: an earlier
+version of this entry said "chapters are abandoned as a goal", which contradicted its own next
+sentence and is not what was decided. The two requirements do not conflict in general — only when
+a video's spacing violates the rule.
 
-**Still open, and its justification just disappeared:** `descriptionTimestampText` synthesises a
-`0:00 Start` line that matches no record, purely to satisfy the chapter rule this decision
-abandons ([[D-027]] governs where it goes). It adds a line rather than dropping one, so it does
-not violate this decision — but nothing now argues for it. Decide separately. **Now scheduled** as an open
-modeling decision in `BACKLOG.md`, bound to the export freeze.
+- Every marker reaching the output is a **hard constraint**. Never traded.
+- Chapters are **wanted when free**. Timestamps are clickable seek links unconditionally; chapters
+  additionally need the whole set to pass four tests, including a 10-second minimum gap.
+- So: a means that costs no marker is fair game. A means that drops one is not. Widening the fold
+  drops three descriptions — refused. The synthetic `0:00 Start` line adds a line and removes
+  nothing — **kept**, and it is the only one of the four requirements obtainable for free.
+
+Video 1 fails the 10-second rule in four places and will never qualify. A future video with
+comfortable spacing would qualify, and deleting the `0:00` line would have foreclosed that
+permanently to save one line of noise. [[D-027]]'s placement rule therefore stands in full.
+
+**Resolved 2026-08-19 — the `0:00 Start` line stays.** It was briefly removed on the reading that
+chapters were abandoned; Brian caught that the two requirements do not conflict and that the line
+costs no marker. It is the cheapest of the four chapter requirements and the only one obtainable
+without dropping anything, so removing it buys one less line of noise and forecloses chapters on
+every future video. [[D-027]] governs its placement and stands.
 
 **Worth considering, not decided:** the fold merges on time and rank, not on text. That all 10
 merges are text-identical today is a happy accident of `resolvedLabel` making an added marker
