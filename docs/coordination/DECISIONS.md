@@ -339,12 +339,14 @@ meet. If chapters ever happen for free on some video, fine — it is a side effe
 **Still open, and its justification just disappeared:** `descriptionTimestampText` synthesises a
 `0:00 Start` line that matches no record, purely to satisfy the chapter rule this decision
 abandons ([[D-027]] governs where it goes). It adds a line rather than dropping one, so it does
-not violate this decision — but nothing now argues for it. Decide separately.
+not violate this decision — but nothing now argues for it. Decide separately. **Now scheduled** as an open
+modeling decision in `BACKLOG.md`, bound to the export freeze.
 
 **Worth considering, not decided:** the fold merges on time and rank, not on text. That all 10
 merges are text-identical today is a happy accident of `resolvedLabel` making an added marker
 adopt a nearby stamp's label. Merging only when the resolved labels match would make this decision
-an enforced invariant rather than an observed one.
+an enforced invariant rather than an observed one. **Now tracked as `TD-16`** — this decision is
+observed, not enforced, and video 2 is the first corpus that can break it.
 
 ### D-034 — Media is resolved on every read, never written into the run file  (Accepted 2026-08-19)
 Harvested from PR 8 (`71b9d82`). A run gains offline playback because a matching file appeared

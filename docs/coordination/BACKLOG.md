@@ -112,6 +112,32 @@ below: **n = 1.** The skill has only ever run on video 1.
    have `end: null` ([[D-012]]). Every clip in the store is a point, so "75% less tagging" is
    measured against a job that is not finished. Already item 1 under "Next studio features".
 
+**The missing loop — skill revision from run 1's corpus.** Recorded here 2026-08-19. It was
+first written down that morning, but into a session log
+(`docs/sessions/2026-08-19-0528-claude-code-pr3-review-and-docs-reconcile.md`, "Two work items
+exist nowhere") — the wrong home for project state, and invisible to anyone reading this file.
+
+`g` is called "the positive training signal" in `README.md`, `AGENTS.md`'s vocabulary table and
+`apps/studio/README.md`. **Nothing schedules using it.** Run 1 carries 23 `g` and 24 `x` on 47
+judged skill markers and neither channel has ever been fed back into the skill.
+
+The seven steps above do not close this. They use the `x` channel for diagnosis and the added-clip
+geometry for the recall finding; the 23 `g` exemplars are used **nowhere**, and there is no
+revise-then-rescore cycle — step 2 measures on a different video and step 3 is a single
+hand-picked rule change.
+
+What the loop would be: read the 47 judged markers, revise `~/.claude/skills/yt-clipper/`'s rules
+and few-shots, re-run on video 1, and compare precision against the 49% baseline. Then re-run on
+video 2 as held-out.
+
+**Blocked on `TD-14`.** A scoring pass that reads `labels.jsonl` and trusts `verdict` sees
+`check 10 · wrong 0 · note 40` where the text says `check 23 · wrong 24 · note 3`. It would score
+the skill against a corpus that has lost every rejection. Fix or document `TD-14` first.
+
+**Needs a sentence from Brian before it can be specced:** are the 23 `g` markers few-shot
+*examples* pasted into the skill prompt, or an *eval set* the skill is scored against and never
+sees? They cannot be both, and run 1 is the only labelled corpus that exists.
+
 **Rejected: tagging less granularly.** Cutting granularity cuts output one-for-one — it is a
 retreat, not leverage. The defensible version is *two passes*: coarse chapter markers on the
 first watch, dense clip marking only inside the chapters worth revisiting. Also real: about five
@@ -448,6 +474,9 @@ scored without the run file. Any external consumer — a skill-scoring pass, a t
 export — that trusts `verdict` silently loses all 24 rejections and 13 of 23 approvals. That is
 exactly the reader the tagging-reduction path in this file depends on.
 
+**This blocks the skill-revision loop** under "Reducing manual tagging" above: any scoring pass
+that trusts `verdict` scores the skill against a corpus with every rejection erased.
+
 Two options: backfill the field with a one-shot rewrite (violates append-only in spirit, though
 the events are not being *changed*, only corrected to match their own text), or state in
 `README.md` that `verdict` is advisory for pre-2026-08-18 lines and `feedback` is authoritative.
@@ -470,6 +499,31 @@ Fix is a corpus-wide vocabulary with per-video counts beside each entry, so the 
 offers the vocabulary and shows how it is being used. Prerequisite for item 4 of the
 tagging-reduction path; there is no point splitting the schema if the split vocabulary still
 resets per video.
+
+
+### TD-16 — the export fold merges on time and rank, never on label text
+
+Lifted out of `TD-9` (CLOSED, wontfix) and [[D-033]]'s closing prose on 2026-08-19, because a
+live item inside a closed one is an item nobody reads.
+
+[[D-033]] is an invariant: every marker Brian made reaches the output. The fold that produces
+copy-timestamps merges candidates by time and rank and **never compares their labels**. On video
+1 that invariant holds by luck — all 10 collapsed candidates at the 2s window are text-identical
+to their survivor, which is a happy accident of `resolvedLabel` making an added marker adopt a
+nearby extracted stamp's label. At 6s, three carry different text.
+
+So [[D-033]] is *observed*, not *enforced*. One video where two genuinely different labels land
+inside 2 seconds silently deletes one of them, and nothing says so.
+
+**The cheap version is detection, not a code change.** After each newly annotated video, check
+whether any merge collapsed two rows whose resolved labels differ; if none ever does, the
+enforcement is not worth writing. If one does, merge only when the resolved labels match — which
+turns [[D-033]] from an observation into an invariant.
+
+**Trigger:** the next video annotated densely enough to export. Video 2 qualifies — 75 added
+clips over 64 minutes, 14 clusters under 45 seconds apart, and unlike video 1 it has no extracted
+stamps at all, so `resolvedLabel` cannot manufacture the text-identity that made video 1 safe.
+This is the first real test of the invariant.
 
 
 ## Parking lot
@@ -496,6 +550,16 @@ resolving the bound decision is part of the task, and the resolution becomes a d
   copy-timestamps and JSON cannot diverge.
   Same shape elsewhere on video 1: 29:23 `g` names a better caption at 29:09 with no clip
   stored there; 35:53 `x` (still hunting) pairs with the 36:39 add that keeps.
+
+- **The synthetic `0:00 Start` line — decide at: the export freeze.**
+  `descriptionTimestampText` synthesises a `0:00 Start` line that matches no record. It exists
+  solely to satisfy the YouTube chapter rule that [[D-033]] abandoned, so its entire
+  justification is gone. [[D-033]] notes this in prose and says "Decide separately"; nothing
+  scheduled the decision until now. It adds a line rather than dropping one, so it does not
+  violate [[D-033]] — which is why it is a decision and not a bug. Options: (a) drop it,
+  (b) keep it as a deliberate "lesson starts here" marker on its own merits, (c) emit it only
+  when the first real record is more than N seconds in. Bound to the export freeze so
+  copy-timestamps and JSON export cannot diverge on it ([[D-027]] governs placement).
 
 - **Extension → studio handoff transport — decide at: when scratchpad friction hurts.**
   Clipboard JSON, a localhost POST, or something else. Constraint: the studio store stays
