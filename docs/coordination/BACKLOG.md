@@ -16,18 +16,26 @@ Merged to `main`:
 - **PR 3** (merged `5af3e13`, 2026-08-18) — two-surface refactor: studio promoted to the
   product, extension frozen and moved under `apps/extension/`, in-app ingest, eval mode, clip
   contract, copy-timestamps ([[D-022]]), `gold` → `extracted`. Fifteen review findings closed.
+- **PR 4** (merged `43c99dd`, 2026-08-19) — video 1 run file and `labels.jsonl`.
+- **PR 8** (merged `71b9d82`, 2026-08-19) — local video mode: play from disk, ingest without
+  network, `/media/` byte-range route, `prefetch.py`. Decisions harvested as
+  [[D-034]]–[[D-038]]. Two review findings, both resolved.
 
-Open, in review order (`CURRENT.md` is running this):
+Open:
 
-- **PR 4** (`43c99dd`) — video 1 run file and `labels.jsonl`.
-- **PR 5** (`949cb7b`) — session log and folded ledger.
-- **PR 6** (`e158710`) — coordination write-head and `AGENTS.md`.
+- **PR 9** (`5eb55d2` on `zoom-export-ingest`) — Zoom export ingest and four fixes found by
+  using PR 8 on a flight. **Under review**; `CURRENT.md` is running it.
+
+Closed unmerged:
+
+- **PR 5** (`949cb7b`) — session log and folded ledger. Superseded.
+- **PR 6** (`e158710`) — coordination write-head and `AGENTS.md`. ~1,000 lines stale.
 
 The order is deliberate: the studio came out of an eval harness built to score the
 `yt-clipper` skill, and it stayed in daily use until it *was* the product. Nothing below
 assumes the extension grows back into an IDE.
 
-After 3–5 merge, in priority order (matches the PRD's "Next"):
+After PR 9 merges, in priority order (matches the PRD's "Next"):
 
 1. **End collection.** Set `end` from the grid. Required before reel-oriented export is worth
    anything ([[D-012]]).
@@ -43,6 +51,71 @@ Unscheduled but unblocked:
 - **Video 2.** The door is the studio header's **Add video** — URL in, cues, gaps and extracted
   markers out, `markers[]` empty. A `/yt-clipper` pass is optional and only needed if you want
   proposed skill markers to score.
+
+## Reducing manual tagging — the path (agreed 2026-08-19)
+
+Brian's goal: **cut manual tagging effort by 75%+**. Recorded here as roadmap because it spans
+process, an experiment and code, and because the ordering is evidence-driven rather than
+obvious. The evidence is an audit of videos 1 and 2 run on 2026-08-19 against `runs/` and
+`labels.jsonl`; the numbers below are measured, not estimated.
+
+**The finding that sets the order.** All 21 clips Brian hand-added to video 1 sit within 90
+seconds of a skill marker; 19 within 45s, 10 within 20s. **Zero** regions were missed. The
+skill's recall on video 1 is effectively total — the manual work was nudging markers by 5–45
+seconds and rewriting labels, not authoring new ones. Recall is not the problem, so the lever
+is better inputs plus a review loop, not a better model.
+
+**Second finding.** Of the 24 rejections on video 1, exactly **one** was a genuine disagreement
+about what is worth marking. The rest sort into fixable classes: 5 hallucinated YouTube
+captions, 5 "me talking, less interesting" (a diarization problem), 4 right-event-wrong-second
+(7–17s early), 4 where the silence-gap rule anchored to an empty caption ("Yeah.", "Okay."),
+4 structural (lesson start, chapter pivot, continuation), 1 duplicate of an existing human tag.
+
+Stripping those classes moves precision 49% → 62% → 73% → 82%. Caveat that governs everything
+below: **n = 1.** The skill has only ever run on video 1.
+
+1. **Record lessons through Zoom cloud, not YouTube.** Zero engineering. Video 2's transcript is
+   100% diarized (413 Jake cues / 275 Brian); video 1's is not, and has a 10-minute stretch with
+   no captions at all. That one input change removes 10 of 24 rejection causes before any code
+   changes.
+2. **Run the current skill against video 2 and score it. Do this first.** Video 2 carries 75
+   human markers chosen with no model proposal to anchor them, on a clean diarized transcript,
+   on a video the skill has never seen. It is the only unanchored ground truth in the store and
+   it answers whether the 82% ceiling is real or an artifact of one video. Blocked on one thing:
+   the skill's input is a YouTube URL and video 2 is `source: "local"` with no YouTube identity
+   ([[D-036]]) — decide whether to teach the skill to read an existing run or to export its cues.
+3. **Teach the skill the speaker rule.** Measured limit, so nobody wastes a cycle on it: speaker
+   at the marker start does **not** predict the `take` tag — Jake is the speaker at 70 of 75
+   video-2 rows, giving 100% recall and 19% precision. Neither does `gapBefore` (4/13 take rows
+   near a gap vs 19/62 non-take). Diarization predicts *worth marking*, not *is a demo*.
+   Detecting "Jake is demonstrating" needs music-vs-speech detection on the audio.
+4. **Fix the taxonomy schema before tagging video 3.** The current tag field is four questions
+   in one multi-select: who is playing (`take`), domain (`harmony`, `technique`, `fingering`,
+   `comping`, `voicings`, `escapement`, `drums`), pedagogical function (`feedback`, `synthesis`,
+   `process`, `polish`, `chord exercise`) and salience (`star`). Split it into a required
+   single-select function field and a domain multi-select; make `demo:jake` / `demo:me` its own
+   field; drop the singleton tags. See `TD-15` for the vocabulary-scoping half. This saves no
+   time directly — it is what makes 5 and 6 learnable.
+5. **Build the review loop, not the authoring loop.** The studio is optimised for authoring
+   (`n`, seek, type); what actually happened on video 1 was review. Accept, reject and
+   nudge-to-next-content-cue should each be one key, and a reject must not leave a stub that
+   gets duplicated around — video 1 has two such ghosts (skill markers 57 and 61, untagged,
+   sitting 5s and 40s from the real added clips).
+6. **Draft labels from the transcript.** This is the load-bearing step for the 75% target —
+   typing the label is the expensive part, not placing the marker. Note what the labels actually
+   are: only 3 of video 2's 75 are transcript text kept verbatim (one still carrying its
+   `Jake Sherman:` speaker prefix, one still carrying a `…` truncation). The other 72 are Brian's
+   own compression of what was said. So the draft has to be a *summary*, not an excerpt — a
+   suggester that pastes captions will be rewritten every time, and if every label gets rewritten
+   the ceiling is nearer 40% than 75%.
+7. **`end` collection is a prerequisite for the target being meaningful.** All 700 label events
+   have `end: null` ([[D-012]]). Every clip in the store is a point, so "75% less tagging" is
+   measured against a job that is not finished. Already item 1 under "Next studio features".
+
+**Rejected: tagging less granularly.** Cutting granularity cuts output one-for-one — it is a
+retreat, not leverage. The defensible version is *two passes*: coarse chapter markers on the
+first watch, dense clip marking only inside the chapters worth revisiting. Also real: about five
+video-2 rows are pure structural bookkeeping ("Line 2 - kick off") that a model should emit.
 
 ## Next studio features (detail)
 
@@ -343,6 +416,61 @@ a Zoom recording's `.m4a` is the plausible route.
 
 **Trigger:** if audio-only recordings become a real input. Swap the element on `kind`, or
 collapse the player column and let the grid have the width.
+
+### TD-13 — cue starts are truncated to whole seconds, so distinct cues collide
+
+`build_cues` stores `int(start)`. Two cues 0.4s apart collapse onto one second, which is
+ordinary in a Zoom transcript and rare in YouTube captions — **25 such pairs in one lesson, 64
+in the other, 0 problems on video 1**, which is why it took until 2026-08-19 to surface.
+
+PR 9 (`5eb55d2`) fixed the visible symptom: `k` stuck because the playhead resolves to the last
+row at or before now while `j`/`k` seek the video to whatever they select, so a pair trapped the
+cursor. `j` was also silently skipping the first row of every pair.
+
+The upstream fix is storing fractional starts. It was deliberately not taken in PR 9 because it
+changes the stored shape of every existing run, video 1 included, and runs are immutable
+([[D-002]]) — so it is a migration, not an edit. Decide whether the grid's 2-second alignment
+window and the standing stored-vs-displayed trap get simpler or harder under fractional starts
+before doing it; `TD-6` is the related item.
+
+### TD-14 — `labels.jsonl` history records 144 rejects and keeps as `verdict: "note"`
+
+F9 (thread 1) added `wrong` to `verdict_for` and was resolved forward-only: "existing history is
+untouched", deliberately and with the reviewer's agreement. `server.py` recomputes the verdict
+from `feedback` text on every read, so the studio and the API are correct.
+
+The residue is that the persisted field disagrees with the persisted text on **144 of 240**
+non-taxonomy events (121 `note`→`wrong`, 23 `note`→`check`). Folded for video 1 the stored field
+says `check 10 · wrong 0 · note 40`; recomputed it says `check 23 · wrong 24 · note 3`.
+
+This matters because `apps/studio/README.md` says each line is a standalone example that can be
+scored without the run file. Any external consumer — a skill-scoring pass, a training-data
+export — that trusts `verdict` silently loses all 24 rejections and 13 of 23 approvals. That is
+exactly the reader the tagging-reduction path in this file depends on.
+
+Two options: backfill the field with a one-shot rewrite (violates append-only in spirit, though
+the events are not being *changed*, only corrected to match their own text), or state in
+`README.md` that `verdict` is advisory for pre-2026-08-18 lines and `feedback` is authoritative.
+Related to `TD-4` (`schemaVersion` did not move when the vocabulary changed) — same root.
+
+### TD-15 — taxonomy vocabulary is scoped to the loaded run, so it resets per video
+
+`videoVocab()` in `ui/suggest.js` unions the four built-in `TAGS` with the tags on the **current
+run's** additions and annotations only. Open a freshly ingested run and the dropdown offers
+`take`, `fingering`, `technique`, `star` and nothing else, however many videos have been tagged.
+
+Consequence, measured across videos 1 and 2: 15 distinct tags exist, only 6 appear in both, and
+`chord exercise` (15 uses on video 1) is invisible on any other video until it is retyped. Within
+a single session on video 1 the same construct was tagged two ways four minutes apart — Freedom
+Demo c1–c4 without `take`, Simpler Demo c1–c3 with it, and c1 was *rewritten* seven minutes after
+the convention changed and still not updated. Nothing in the UI shows the distribution while you
+work.
+
+Fix is a corpus-wide vocabulary with per-video counts beside each entry, so the dropdown both
+offers the vocabulary and shows how it is being used. Prerequisite for item 4 of the
+tagging-reduction path; there is no point splitting the schema if the split vocabulary still
+resets per video.
+
 
 ## Parking lot
 

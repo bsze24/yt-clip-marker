@@ -1,11 +1,11 @@
 # Current task
 
-**Review PR 8 — local video mode.** Baton: **→ reviewer**, on `fced73f` — round 2, after F18
-and F19.
+**Review PR 9 — Zoom exports ingest, and reruns pick up late captions.** Baton:
+**→ reviewer**, on `5eb55d2`.
 
-Roles are reversed for this round at Brian's instruction: Claude Code implemented, Codex
-reviews. The code is written and committed on `local-video-mode`; nothing here asks anyone to
-rebuild it.
+Roles are reversed again for this round, same as PR 8 and for the same reason: Claude Code
+implemented, **Codex reviews**. The code is written, committed and pushed on
+`zoom-export-ingest`; nothing here asks anyone to rebuild it.
 
 ---
 
@@ -13,163 +13,151 @@ rebuild it.
 
 | Item | Where | Status |
 | --- | --- | --- |
-| **PR 8 — local video mode** | `local-video-mode`, `fced73f` | **under review**, this task |
-| PR 4 — video 1 store | merged, `43c99dd` on `main` | closed |
+| **PR 9 — Zoom export ingest** | `zoom-export-ingest`, `5eb55d2` | **under review**, this task |
+| PR 8 — local video mode | merged `71b9d82` on `main` | closed; decisions harvested as [[D-034]]–[[D-038]] |
+| PR 4 — video 1 store | merged `43c99dd` on `main` | closed |
 | PR 3 | merged `5af3e13` | closed |
 | PR 5 | `949cb7b` | closed, superseded — do not merge |
 | PR 6 + `docs/remove-coordination-md` | `e158710` | **close, do not merge** — ~1,000 lines stale |
 
-`main` is `836258f`. PR 8 branches from it and carries three product commits — `4b344d5`,
-`c4de36d`, then `fced73f` (F18/F19) — plus two session-log commits interleaved by Brian and the
-coordination-doc commits. Verify before reviewing:
+`main` is `d2ad793`. PR 9 branches from exactly that commit and carries **five product
+commits** plus one duplicate session-log commit and one merge of `main` back in. The branch
+head is `6ef767c`; the last product commit is `5eb55d2`. Verify before reviewing:
 
 ```bash
-git merge-base --is-ancestor fced73f HEAD
+git merge-base --is-ancestor 5eb55d2 HEAD
+git log --oneline main..zoom-export-ingest
 ```
 
-**Why this exists.** Brian is flying and the annotation loop is otherwise complete. The only
-two things in the studio that needed the internet were the player and the ingest.
+**Why this exists.** Every one of the five commits is a defect found by *using* PR 8 on a real
+flight, not by reading it. PR 8 shipped the offline path; PR 9 is what happened when the first
+real Zoom export met it.
+
+**BugBot did not run.** Seven attempts on PR #9, seven `usage limit reached` failures against
+the Cursor spend cap. The automated pass that normally covers this repo produced nothing, so
+this review is the only review PR 9 gets.
 
 ## 1. The task
 
-Review `fced73f` per the `README.md` review loop. `docs/prs/pr-8-local-video-mode.md` is the
-spec and carries the design rationale; this file carries the baton and the audit.
+Review `5eb55d2` per the `README.md` review loop. `docs/prs/pr-9-zoom-export-ingest.md` is the
+spec — **but it is incomplete, and that is itself a finding worth confirming**: it describes
+`247f7b3` and `b0c4dd3` only. Three of the five commits are undocumented there. Review the
+diff, not the spec:
+
+| Commit | What | Covered by the spec? |
+| --- | --- | --- |
+| `247f7b3` | Zoom sidecar stem variants; `prefetch.py` fetches subs independently of media and writes a **new** run when late captions arrive | yes |
+| `b0c4dd3` | `docs/reference/**` media gitignored; `.aider*` added | partly — the `.aider*` line is not mentioned |
+| `4b3ee5d` | Sticky header so the run picker stops scrolling out of reach | **no** |
+| `cae20a2` | `run_warnings` reports a declared-but-missing media file | **no** |
+| `5eb55d2` | `k` no longer sticks when playhead and selection share a second | **no** |
 
 **Where to look hard.** Places this change could plausibly be wrong, not a generic checklist:
 
-- `server.py` `_send_media` and `_parse_range` — the byte-range path is new and hand-rolled.
-  Suffix ranges, `start > end`, a range past EOF, a multi-range header (deliberately ignored,
-  first span only), and the switch to `protocol_version = "HTTP/1.1"`, which is only safe
-  because every response on every route sets `Content-Length`. Check that claim rather than
-  taking it.
-- `server.py` `media_file` — the traversal guard deliberately does **not** `resolve()`, because
-  files in `media/` are usually symlinks and resolving would read every legitimate one as an
-  escape. The safety therefore rests entirely on `MEDIA_FILE` rejecting anything with a slash
-  or a dot-dot. If that regex is wrong, the route is wrong.
-- `server.py` `resolve_run_media` — runs stay immutable ([[D-002]]); media is matched on every
-  read instead of being written back. Confirm nothing on the write paths gained a `media` key,
-  and that a run whose file disappears degrades to the embed rather than erroring.
-- `ui/player.js` — the whole file changed shape. Both backends must satisfy the same contract:
-  every export either works or no-ops when its backend is not ready. The bug found during
-  verification was exactly this class (`getDuration` unguarded), so check its siblings.
-- `ui/grid.js` `buildRows` — the synthetic composer row. It must not collide with a real row
-  at the same start, and must vanish once the marker exists.
-- `keys.js` — `n` is the one new binding. Confirm it does not fire while a field has focus and
-  that it sits in `gridKeys`, not `playerKeys`, so it works before a player is ready.
-- `local.py` `parse_vtt` — the three real input shapes are Zoom's cue-numbered VTT with
-  `Speaker: text` bodies, yt-dlp's auto-caption VTT with inline karaoke tags and rolling
-  repeated lines, and SRT. The rolling-window dedupe only catches *exact* repeats.
+- `local.py` `stem_variants` / `find_sidecars` — this widens F18's matching surface, which is
+  the exact thing F18 was filed about. The `.` boundary must hold on **every** variant, not
+  just the bare stem. Construct the adversarial cases yourself rather than trusting the ones
+  in the spec: `Lesson 1_640x360.mp4` against `Lesson 10.vtt`, a file that legitimately ends
+  in `_1920x1080`, a name carrying both ` (1)` and a resolution suffix, and a stem that after
+  stripping becomes empty or a prefix of a sibling.
+- `prefetch.py` — subtitle fetching now runs independently of the media download, and a
+  zero-cue run whose captions arrived later causes a **new** run file to be written. Check
+  that the old run is never mutated ([[D-002]]), that the superseded run id is named in the
+  output, and that this cannot fire repeatedly and mint a run per invocation. Idempotence was
+  an acceptance criterion on PR 8; confirm it survived.
+- `server.py` `run_warnings` — it now calls `resolve_run_media` on every warnings pass. Confirm
+  that adding a second warning did not change the shape consumers read (`runs.js` renders the
+  list), that a run with **both** faults reports both, and that a missing-media warning does not
+  fire for a run that never declared media.
+- `grid.js` `navOriginIndex` — the fix compares `dataset.start` between the playhead row and
+  the selected row. `dataset.start` is a render snapshot ([[D-029]]); confirm it is populated on
+  every row shape the grid builds, including the synthetic composer row and a
+  description-only row, and that a missing/`NaN` value degrades to the old behaviour rather
+  than to a stuck cursor. **This one needs a browser.** Reading the dispatcher is not checking
+  it — see `README.md`, "Having the source files is not having the tab."
+- `styles.css` — the header fix changes the page's scroll container. Check the grid's
+  `scrollIntoView` still works, at a non-100% browser zoom (that is how it was found), and that
+  the player column cap does not clip the composer at small viewport heights.
+- The gitignore has a hole: `docs/reference/**/*.mp4|m4a|mkv|mov` covers 368 MB of media, but
+  the `.transcript.vtt` files sit beside them untracked, so both export directories still show
+  as `??`. Decide whether transcripts should be tracked reference or ignored; right now they are
+  neither. Non-blocking by construction — the exposure is two small text files, not the media.
 
 **Out of scope.** End collection, JSON export, in-app suggest, extension→studio handoff, the
-copy-timestamps fold ([[D-022]]), and the two items filed as `TD-11` and `TD-12`.
+copy-timestamps fold ([[D-022]]), `TD-11`, `TD-12`, and the whole tagging-schema path now on
+the `BACKLOG.md` roadmap. None of it is in this diff.
 
 ## 2. Acceptance criteria
 
-1. The studio plays a local file with no network: seek, playback rate, follow, and the
-   transport keys all drive the `<video>` backend as they drive the embed.
-2. A YouTube run gains offline playback from `media/{videoId}.mp4` with no change to its run
-   file, and loses it cleanly when the file is removed.
-3. A recording with no transcript is usable — empty grid, `n` marks at the playhead, and the
-   resulting clip round-trips to `labels.jsonl`.
-4. `/media/` serves byte ranges correctly and serves nothing outside `media/`.
-5. `prefetch.py <url>` leaves a playable run behind, and re-running it writes nothing new.
+1. Pointing the ingest at a Zoom cloud export's `.mp4` finds the sibling
+   `.transcript.vtt` and produces a run with real cues — and `Lesson 1.mp4` still adopts
+   nothing.
+2. `prefetch.py` on a video whose captions arrived after the media download leaves a new,
+   cue-bearing run behind, names the superseded zero-cue run, and does not edit it.
+3. A run whose `media` file has been moved or whose symlink dangles surfaces a warning naming
+   the file and the repoint command, and still loads its captions and markers.
+4. `k` and `j` step off a pair of cues sharing a start second instead of sticking, with follow
+   on and with follow off.
+5. The header and run picker stay reachable when the header wraps.
 6. No regression on the YouTube path: video 1 loads with a clean console and its counts
-   unchanged.
+   unchanged (64 markers · 21 added · 24 extracted · 1464 cues).
 
 ## 3. Baton
 
-**→ reviewer**, on `fced73f`. F18 and F19 are `addressed` in `REVIEW.md` thread 4, awaiting a
-re-review verdict.
+**→ reviewer**, on `5eb55d2`. No findings filed yet; `REVIEW.md` thread 5 is open and empty.
 
 ---
 
 ## Handoff notes
 
-### 2026-08-19 — implementer, PR 8 local video mode (`4b344d5`, `c4de36d`)
+### 2026-08-19 — implementer, PR 9 Zoom export ingest (`247f7b3` … `5eb55d2`)
 
-- **Acceptance criteria and evidence.** All six met, browser-driven against a **disposable
-  copy** of the store so the real `runs/` and `labels.jsonl` were never written to.
-  (1) `player.js` `mode` switches every export; verified in the tab — row click seeking to
-  exactly 12.0s, timeline rail scrub to 44.85s of 90, `follow` advancing the playhead row
-  across the 0:45 boundary, `<`/`>` stepping 1 → 1.25 → 1.5 → 1.25 with the label in sync,
-  and arrows / digits / Home / End / `m` / space each moving the element as specified.
-  (2) `resolve_run_media` matched a fabricated run at `YYW4Q1Nivg8` to `media/YYW4Q1Nivg8.mp4`
-  with `'media' not in run` still true, and returned `None` once the file was moved away.
-  (3) the zero-cue run rendered an empty grid, `n` opened the composer at 0:27 — the video
-  paused on 00:00:27.000, confirmed on screen — and the submitted clip landed in
-  `labels.jsonl` as `verdict: "miss"`, `start: 27.0`.
-  (4) 206 for `bytes=0-99`, open-ended and suffix forms; 416 with `Content-Range: bytes */N`
-  when unsatisfiable; 200 with `Accept-Ranges` when no range is asked for; the served span
-  hashes identical to `dd` over the same offsets. `..`, percent-encoded `..`, a sibling file
-  and a non-media extension all 404.
-  (5) `prefetch.py` against a real video produced media, `en` captions and `.info.json`, a run
-  with the real id, title, watch URL, 6 cues and 3 extracted markers, playing from `/media/`;
-  the rerun took the already-exists branch and wrote nothing.
-  (6) video 1 on the **real** store: clean console, YouTube embed cued, 64 markers · 21 added ·
-  24 extracted · 1464 cues.
-- **Assumptions.** (a) `videoId` keeps its name for a local run, with a filename-derived value
-  and a new `source: "local"` beside it, so the run filename, the `labels.jsonl` key and every
-  existing reader work untouched — readers test `source`, not the shape of the id. (b) Local
-  wins over the embed whenever both are available, so there is no mode to remember. (c) Files
-  outside `media/` are symlinked in rather than copied, keeping the served surface to one
-  directory. (d) `n` is a new binding rather than a change to `Enter`, because with no
-  transcript there is no row for `Enter` to act on. (e) Byte ranges were treated as mandatory,
-  not an optimisation: without them Chrome can only seek inside its buffer.
-- **Skips and divergences.** Silence-gap detection without a transcript (needs ffmpeg), local
-  transcription, and an `<audio>` element for audio-only files were all left out; the last is
-  filed as `TD-12`. `ingest.py` was not touched despite sharing the caption-language wildcard
-  that caused a real failure in `prefetch.py` — it is latent there for a stated reason, filed
-  as `TD-11`. No decision entries were written: per the `README.md` wrap-up, durable outcomes
-  are harvested when review lands clean, so the calls above are proposals until then.
-- **Two findings outside this repo**, both of which will hit anyone running the offline path.
-  yt-dlp's default player client (`android_vr`) lists every format and then answers **403** for
-  the stream; pinned to `web_embedded,mweb`. And a Homebrew yt-dlp has no `curl_cffi`, so it
-  cannot impersonate a browser — a version outside its supported range is silently ignored and
-  shows as `(unsupported)` only under `--verbose`. Both are recorded in `apps/studio/README.md`.
-- **What I could not check.** Playback on a genuinely offline machine — the verification ran
-  with network available, and the YouTube backend was exercised *because* it was. The offline
-  claim rests on the code path (a local run never calls `ensureYouTubeApi`) plus the observed
-  fact that a local run's playback issues no external request, not on a disconnected test.
+Written up after the fact, from the session record at
+`docs/sessions/2026-08-19-1656-claude-code-opus-5-local-video-mode-and-field-fixes.md`, by a
+later session that did not write the code. Treat the receipts below as that log's claims,
+recorded here so the reviewer knows what was and was not exercised. Where the log gives no
+receipt, this note says so rather than inventing one.
 
-### 2026-08-19 — implementer, PR 8 review findings F18-F19 (`fced73f`)
+- **Acceptance criteria and evidence.**
+  (1) Verified on the real export: 688 cues with speaker attribution, 26 silence-gap rows,
+  playing in the browser. A second export at `docs/reference/GMT20260712` gave 688 cues and 8
+  gap rows; both landing on 688 was checked rather than assumed — the raw VTTs hold 690 each
+  and the rolling dedupe drops 2. Regression-checked that `Lesson 1.mp4` adopts nothing and
+  that `Talk_640x360.mp4` picks up `Talk.transcript.vtt` but not `Talk2.vtt`.
+  (2) **No receipt in the log.** The defect is described precisely and the fix is stated, but
+  no run of the late-caption path is recorded. Four of four videos hit the defect; whether the
+  fix was exercised end to end is not written down. Review this one from the code.
+  (3) Found by a real failure: renaming the export left the `media/` symlink dangling and a run
+  carrying 52 markers went to a black player. Fixed by repointing the symlink rather than
+  re-ingesting, which would have minted a new run id and orphaned the markers. The warning was
+  then added so the next occurrence explains itself.
+  (4) Reproduced and then driven directly rather than reasoned about: two cues share start
+  2018, five presses of `k` produced no movement. Systemic, not a one-off — 25 such pairs in
+  one lesson and 64 in the other. A second bug fell out of the same read: `j` had been silently
+  skipping the first row of every duplicate pair.
+  (5) Found from a screenshot, not a report — the run dropdown was off-screen because
+  `calc(100% - 49px)` hardcoded a one-row header, the header wraps at non-default zoom, the
+  document became scrollable and the grid's `scrollIntoView` carried the header off the top.
+  Body is now a flex column with `html` clipped, and the player column is capped at 62vh
+  because `minmax(0, auto)` did not help — an `auto` max still resolves to max-content.
+  (6) **No receipt in the log** for a post-`5eb55d2` video-1 regression pass. PR 8's merge
+  receipt covers video 1 at `fced73f`; four commits landed after that.
 
-- **Acceptance criteria and evidence.** Both findings fixed in one commit. F18: `find_sidecars`
-  now requires the remainder after the media stem to begin with `.`; on the reported
-  reproduction `create_local_run("Lesson 1.mp4")` yields its own `Lesson-1` id, 0 cues and 0
-  extracted rather than the adjacent recording's identity, while real sidecars still resolve in
-  json3-first order. F19: `do_HEAD` runs the same dispatch as `do_GET` behind a per-request flag;
-  six routes probed over raw TCP each returned the GET's status and `Content-Length` with zero
-  body bytes, and the following request on the same connection began with a status line. Ranges
-  still 206, studio clean in a fresh tab, video 1 unchanged at 64 · 21 · 23 · 24 · 14.
-- **Assumptions.** F19 was fixed wider than the finding asked. `HEAD` was equally wrong on `/`,
-  `/ui/` and every `/api/` route, and one flag read where bodies are actually written beats a
-  parameter plus a branch condition that can drift apart. The flag resets at the start of a
-  request rather than in a `finally`, so a failed `HEAD`'s 500 stays bodyless and no state leaks
-  across a keep-alive connection.
-- **Skips and divergences.** None. Both diagnoses were correct as filed and neither fix touched
-  a decision. The prefix glob in `prefetch.fetch` was left alone deliberately — it only gates a
-  printed hint, so a false positive costs a suppressed note and nothing else.
+- **Assumptions.** (a) Stem variants were added rather than the `.` boundary relaxed — F18
+  established that a bare prefix match lets `Lesson 1.mp4` adopt `Lesson 10.vtt`, and the
+  boundary was carried onto each new variant instead. (b) Late captions write a **new** run
+  rather than editing the old one, because runs are immutable ([[D-002]]) and label events are
+  keyed by run id, so annotations cannot follow an edit. (c) The `k` fix prefers the selection
+  over the playhead only when both sit on the same second, leaving follow behaviour otherwise
+  untouched; the alternative — storing fractional cue starts — was rejected for this PR because
+  it changes the stored shape of every existing run, and is filed as `TD-13`.
+
+- **Skips and divergences.** The spec doc was never extended past the first two commits. The
+  three later fixes are real product changes with no written spec, which is why §1 above tells
+  the reviewer to work from the diff. Nothing was cut from what the spec does describe.
+
+- **What nobody has checked.** A post-`5eb55d2` browser pass over the YouTube path, and the
+  late-caption rerun end to end. Both are cheap for a reviewer with network and a tab.
 
 Each turn appends here: role, surface, SHA, what was verified, assumptions made, anything
 skipped. See `README.md`, "Before recording a SHA".
-
-### 2026-08-19 — reviewer, PR 8 local video mode (`c4de36d`)
-
-- **Anchor and scope.** Confirmed `c4de36d` is an ancestor of this
-  `local-video-mode` checkout (`6fbbb0a`); reviewed only PR 8 code plus its spec and active
-  coordination thread. No product code or store data changed.
-- **Verified independently.** In a disposable archive of `c4de36d`, compiled all four Python
-  modules and syntax-checked the changed JS modules. Exercised `/media/` with full, explicit,
-  open-ended, suffix and multi-range requests: each returned the expected 200/206 body and
-  `Content-Range`; an unsatisfiable range returned 416; encoded traversal, double-encoded
-  traversal and a non-media sibling each returned 404. A temporary `{videoId}.mp4` made the
-  existing YouTube run report local media, then its removal restored `media: null`; the run
-  file's SHA-256 was unchanged throughout. Local ingest with no sidecars produced a zero-cue
-  local run, and a `miss` at 27.0 round-tripped to the disposable `labels.jsonl`.
-- **Findings.** F18 and F19 are both non-blocking because the real `media/` directory currently
-  has no local files, but each is a real local-mode edge case reproduced in the disposable
-  copy. They need an implementer response before a clean verdict.
-- **Not re-verified.** I did not drive a browser or re-run yt-dlp against the network. The
-  implementer's browser receipts cover local transport, `n`, the YouTube regression and the
-  real `prefetch.py` download; an actually disconnected-machine playback test remains the
-  explicit gap recorded in `REVIEW.md`.
