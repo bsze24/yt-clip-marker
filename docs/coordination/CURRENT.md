@@ -1,7 +1,7 @@
 # Current task
 
-**Review PR 9 — Zoom exports ingest, and reruns pick up late captions.** Baton:
-**→ implementer**, on `5eb55d2`.
+**Review PR 9 — Zoom exports ingest, and reruns pick up late captions — clean at
+`8a47c2b`.** Baton: **→ planner** to scope the next task.
 
 Roles are reversed again for this round, same as PR 8 and for the same reason: Claude Code
 implemented, **Codex reviews**. The code is written, committed and pushed on
