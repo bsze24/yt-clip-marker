@@ -109,18 +109,62 @@ captions, 5 "me talking, less interesting" (a diarization problem), 4 right-even
 Stripping those classes moves precision 49% → 62% → 73% → 82%. Caveat that governs everything
 below: **n = 1.** The skill has only ever run on video 1.
 
+### What the ceiling actually is (measured 2026-08-19)
+
+"How much can be auto-tagged" has no single answer — it is three jobs with different ceilings, and
+scoping the finish line means scoping them separately. Tested with a keyword lexicon over a ±35s
+transcript window around each of video 2's 75 markers:
+
+| Job | Ceiling | Evidence |
+| --- | --- | --- |
+| **Placement** | high | All 21 of video 1's hand-added clips within 90s of a skill marker; zero missed regions |
+| **Domain tags** (`harmony`, `comping`, `fingering`) | high | `harmony` 89% of its rows vs 42% elsewhere; `comping` 100% vs 14% — **with no training examples** |
+| **Function tags** (instruction / concept / exercise) | medium | `polish` only 86% vs 64%, and it is 56% of all rows — behaving as a default, not a class |
+| **Label text** | medium | 72 of 75 labels are Brian's own compression, not excerpts |
+| **`take`** — who was playing | **low, and more data will not move it** | No lexicon exists. Speaker = 100% recall / 19% precision. Gaps = zero discrimination |
+| **`star`** | **low, irreducibly** | Personal salience with a drifting threshold — 25% on video 1, 48% on video 2 |
+
+**The conclusion that scopes everything.** High automation on placement, domain tags and label
+drafts; **zero** on `take` and `star`. Those last two are a *feature* problem, not a data problem —
+detecting "Jake is demonstrating" needs music-vs-speech analysis of the audio, and no quantity of
+hand-tagged videos produces a signal that is not in the text.
+
+So: **more manual tagging up front is not the lever.** More labelled videos improve the tag model,
+but tags are not the bottleneck — placement and label text are, and the two tags that *are* broken
+are the two that labelling cannot fix. Domain tags separate on transcript keywords with zero
+examples, so they do not need a corpus either.
+
+**The finish line, stated so it can be checked.** A freshly ingested lesson opens with rows already
+placed and labelled. Brian plays through once and does four things: accept or drop, fix the labels
+that are wrong, stamp who was playing, and star what matters. Domain tags arrive pre-filled and are
+usually right. What is gone is scrubbing to find the moment and typing every label from nothing.
+What remains is judgment — which is the part that should not be automated, and why the honest
+target is "one pass", not "stop watching".
+
+The arithmetic that decides 75% versus 40% is **step 6, label drafting**. Accept most drafts and
+the expensive half disappears; rewrite them all and only the seeking was saved.
+
+### The path
+
 1. **Record lessons through Zoom cloud, not YouTube.** Zero engineering. Video 2's transcript is
    100% diarized (413 Jake cues / 275 Brian); video 1's is not, and has a 10-minute stretch with
    no captions at all. That one input change removes 10 of 24 rejection causes before any code
    changes.
-2. **Run the current skill against video 2 and score it. Do this first.** Video 2 carries 75
-   human markers chosen with no model proposal to anchor them, on a clean diarized transcript,
-   on a video the skill has never seen. It is the only unanchored ground truth in the store and
-   it answers whether the 82% ceiling is real or an artifact of one video. Blocked on one thing:
-   the skill's input is a YouTube URL and video 2 is `source: "local"` with no YouTube identity
-   ([[D-036]]). **Blocked; see "The corpus, and the one blocker"** — the fork it named is settled by
-   measurement: waiting for a captioned YouTube URL does not terminate, so teach the skill to read
-   a run's `cues[]`.
+2. **Run the current skill against video 2 and score it. Do this first — it is free.** Video 2
+   carries 75 human markers chosen with no model proposal to anchor them, on a video the skill has
+   never seen. It is unanchored ground truth **that already exists**, so this needs no new
+   marking, and it answers whether the 82% ceiling is real or an artifact of one video.
+
+   **No longer blocked.** The earlier note here said this waited on teaching the skill to read a
+   run's `cues[]`. That was overstated. The skill's step 1 is a script emitting plain text —
+   `HH:MM:SS<TAB>text` plus `>>> GAP <n>s @ HH:MM:SS` lines — and a run already holds everything
+   that file needs. Fifteen lines of Python produced it from video 2's run on 2026-08-19: 708
+   lines, 20 GAP flags, speaker names on every line. Hand the skill the file and substitute step 1.
+
+   Two things to get right. **Record the deviation** — steps 2-6 were tested, step 1 was
+   substituted. And **score against the 75, never merge into them**: if skill markers are written
+   onto video 2's run the ground truth is destroyed permanently. `SKILL.md` already asks before
+   creating a duplicate run; answer no.
 3. **Teach the skill the speaker rule.** Measured limit, so nobody wastes a cycle on it: speaker
    at the marker start does **not** predict the `take` tag — Jake is the speaker at 70 of 75
    video-2 rows, giving 100% recall and 19% precision. Neither does `gapBefore` (4/13 take rows
@@ -213,6 +257,34 @@ backchannel or single fragment. The studio already models this as `isBackchannel
 `R-COPIOUS` — suppressing those eleven loses one ordinary keep and one ungraded row along with
 nine rejects — and it rests on one video. `isBackchannel` is `ui/util.js:37`, `DEFAULT_FILLER`
 is `:9`, both verified present. Re-run this grouping on video 2 before touching the rule.
+
+**Marking a third video — what it is and is not for.** `GMT20260712` is ingested, 688 cues,
+untouched. It is worth marking, but for a narrower reason than "more training data", which the
+ceiling table above rules out.
+
+What it buys is the **lesson-type confound**. Video 2 is line-by-line polish — short phrases,
+constant interjection. Video 1 was long solo takes. Every claim about whether silence gaps find
+demos is entangled with that difference, and one Zoom video cannot separate transcript source from
+lesson type. `GMT20260712` is a different lesson type on the same source.
+
+**How to mark it: placement and label only, with two carve-outs.** Skip `work`, `lane` and every
+domain tag — those are recoverable from the transcript with no examples, and tagging them under a
+schema about to be split (step 4) makes data that has to be re-mapped. Keep:
+
+- **`star`.** One keystroke, pure judgment, no text signal. Skip it and it can never be
+  reconstructed.
+- **Who was playing, written into the label**, the way video 2 already does it — `Line 3 - jake
+  take`, `Line 1 - good me take`, `LIne - money take`. 24 of video 2's 75 labels carry it in prose.
+  This is the one thing the ceiling table says is unrecoverable, and it is already being captured
+  for free. Do not drop it on the grounds that it is "a tag".
+
+Match video 2's density (1.16 rows/min); do not coarsen. It made a harder and better ground truth
+than video 1's 0.73.
+
+**Ordering, corrected 2026-08-19.** An earlier version of this file put marking `GMT20260712` ahead
+of the skill run, on the belief that a held-out placement test needed new marking. It does not —
+video 2 is already unanchored ground truth. Run the skill first: it is free, and what it shows may
+change what is worth marking.
 
 **Rejected: tagging less granularly.** Cutting granularity cuts output one-for-one — it is a
 retreat, not leverage. The defensible version is *two passes*: coarse chapter markers on the
