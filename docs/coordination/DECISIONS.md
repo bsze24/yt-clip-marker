@@ -311,7 +311,7 @@ own rule rather than a general licence to approximate.
 **Revert signal.** Candidate count on the next video. If `R-CUE-EXACT` suppresses proposals it is
 the most visible number in the output, and reverting is one line.
 
-### D-033 — every marker reaches the output; chapters are not a goal  (Accepted 2026-08-19)
+### D-033 — every marker reaches the output; chapters only when they cost nothing  (Accepted 2026-08-19)
 Brian's call. The point of the tool is that a moment he marked appears in the exported
 description. Nothing may be dropped to satisfy an external constraint.
 
