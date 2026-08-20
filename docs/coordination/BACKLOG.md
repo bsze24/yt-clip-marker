@@ -138,6 +138,37 @@ the skill against a corpus that has lost every rejection. Fix or document `TD-14
 *examples* pasted into the skill prompt, or an *eval set* the skill is scored against and never
 sees? They cannot be both, and run 1 is the only labelled corpus that exists.
 
+**Which rule to revise — measured 2026-08-19.** The step above says "a single hand-picked rule
+change"; it does not have to be hand-picked. Grouping video 1's 64 markers by the rule each one
+cited in its rationale:
+
+| rule | `g` | `x` | reject rate |
+| --- | --- | --- | --- |
+| `R-CONCEPT` | 20 | 12 | 26% |
+| `R-TAKE-GAP` | 3 | 12 | 67% |
+| `R-TAKE-CLUSTER` | 0 | 7 | **88%** |
+| `R-TAKE-LABEL` | 1 | 0 | 0% |
+
+Concept detection carries the skill. Take detection is where the rejects live, and `R-TAKE-CLUSTER`
+has never produced a single `g`.
+
+**Gap size does not predict quality.** Kept takes sat on 22s and 25s gaps; rejects ran 20-58s, and
+the three largest gaps in the run are all rejects. Raising the gap threshold would not have helped.
+
+**The caption that ends the gap does predict it.** All three `g` takes land on a real sentence
+("Let's stop for a second.", "Let's get that.", "So, I'm going to be focusing on the"). Eleven
+takes land on a backchannel or one-word fragment — `Heat. Heat.` ×2, `Wow.`, `Yeah. Yeah.`,
+`Yeah.`, `Okay.`, `3.`, `Blueberry.`, `D.` — and **not one of the eleven earned a `g`**: nine
+rejected, two ordinary keeps. Brian's own reject reasons name the cause: "heat is reliably
+hallucinated", "hallucinated caption" ×3. The gap is real; the resumption is caption noise, so
+there is nothing to label the take from.
+
+**Candidate change, not applied:** amend `R-TAKE-GAP` to skip a gap whose ending caption is a
+backchannel or single fragment. The studio already models this as `isBackchannel` /
+`DEFAULT_FILLER` in `ui/util.js` and the skill does not use it. **Cost:** it trades against
+`R-COPIOUS` — suppressing those eleven loses two ordinary keeps along with nine rejects — and it
+rests on one video. Re-run this grouping on video 2 before touching the rule.
+
 **Rejected: tagging less granularly.** Cutting granularity cuts output one-for-one — it is a
 retreat, not leverage. The defensible version is *two passes*: coarse chapter markers on the
 first watch, dense clip marking only inside the chapters worth revisiting. Also real: about five
