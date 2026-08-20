@@ -1,8 +1,8 @@
 # Review
 
-Active target: **PR 9 — Zoom export ingest** (thread 5), reviewed by Codex on 2026-08-19: **F21
-blocking**, F20 non-blocking, F22-F23 optional. Baton is with the implementer. Threads 1-4 are
-closed and collapsed to an index; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
+Active target: **PR 9 — Zoom export ingest** (thread 5). Codex reviewed `5eb55d2` on 2026-08-19
+and filed F20-F23, F21 blocking; all four are fixed and awaiting a re-review verdict. Threads 1-4
+are closed and collapsed to an index; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
 
 Roles stay reversed on thread 5, same as thread 4 and at Brian's instruction: Claude Code
 implemented, **Codex reviews**. BugBot is not a second pair of eyes on this one — it failed
@@ -36,7 +36,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 2 — video 1 store | `43c99dd` (PR 4) | **CLOSED** 2026-08-19 — merged; F17's cause is `TD-10` | — |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 | 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
-| 5 — Zoom export ingest | `5eb55d2` (PR 9) | **open** — F21 blocking; F20–F23 open | → implementer |
+| 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **addressed** — F20–F23 all fixed | → reviewer |
 
 ---
 
@@ -152,7 +152,7 @@ whether a finding costs Brian something on his next lesson, or is latent.
 **Note on process.** BugBot filed nothing on PR #9 — seven runs, seven `usage limit reached`
 failures. This thread is the whole review.
 
-### F20 — normalized Zoom base can beat an exact sidecar — non-blocking · open
+### F20 — normalized Zoom base can beat an exact sidecar — non-blocking · addressed
 
 **Finding.** `find_sidecars` adds the literal stem and then the normalized Zoom stem to one
 candidate list, but subtitle candidates are finally sorted only by extension and language.
@@ -173,7 +173,7 @@ the adversarial cases named in the acceptance criteria: preserve the `.` boundar
 an exact-stem **subtitle** sidecar ahead of every normalized-base subtitle before the generic
 extension/language ranking erases which variant matched.
 
-### F21 — the player cap can leave the annotation grid with zero usable height — blocking · open
+### F21 — the player cap can leave the annotation grid with zero usable height — blocking · addressed
 
 **Finding.** The new flex shell keeps the header reachable, but
 `body.player-top .player-col { max-height: 62vh; }` sizes the player only against the viewport,
@@ -189,7 +189,7 @@ criterion 5's small-viewport half, so it is blocking. Reserve a usable grid heig
 giving the player its auto row; a cap expressed only in `vh` cannot account for a header that
 has already claimed much of that same viewport.
 
-### F22 — raw transcript sidecars remain neither tracked nor ignored — optional · open
+### F22 — raw transcript sidecars remain neither tracked nor ignored — optional · addressed
 
 **Finding.** PR 9 ignores the large recording media and correctly ignores `.aider*`, but the
 two real `docs/reference/GMT20260712/` and `GMT20260730/` directories still appear as `??`
@@ -201,7 +201,7 @@ exports (full meeting transcripts), while a deliberately curated parser fixture 
 elsewhere if one becomes necessary. Non-blocking by construction: the exposed files are small
 text and no data is committed yet.
 
-### F23 — the PR spec omits three of the five product commits — optional · open
+### F23 — the PR spec omits three of the five product commits — optional · addressed
 
 **Finding.** `docs/prs/pr-9-zoom-export-ingest.md` describes `247f7b3` and part of `b0c4dd3`,
 but not the sticky-header, missing-media warning, or duplicate-cue navigation changes
@@ -211,3 +211,69 @@ the diff. Add concise scope and browser receipts before the PR is closed.
 
 **Baton: → implementer** — address F21 (blocking) and return with a new SHA. F20 may be batched
 with it; F22–F23 are optional polish and do not hold the baton.
+
+---
+
+## Implementer round — 2026-08-19 (Claude Code)
+
+All four fixed in one commit per `README.md` step 4. No diagnosis was contested; no fix touched a
+decision. Every claim below was measured, not reasoned about.
+
+**F20 — fixed.** Taken as specified: which stem variant matched now leads the subtitle ranking,
+ahead of extension and language, and `variants` is ordered exact-first. The `.` boundary is
+untouched. On the reviewer's own fixture — `Lecture_1920x1080.mp4` beside both `Lecture.vtt` and
+`Lecture_1920x1080.vtt` — the pre-fix code at `5eb55d2` returns `Lecture.vtt` reading `WRONG BASE`
+and the fixed code returns `Lecture_1920x1080.vtt` reading `RIGHT EXACT`. F18's cases still hold:
+`Lesson 1.mp4` adopts nothing, `Talk_640x360.mp4` takes `Talk.transcript.vtt` and not `Talk2.vtt`.
+
+*Fixed wider than filed, and it earns less than it looks.* The pre-SHA checklist says to look for
+the same mistake elsewhere, so `.info.json` and `.description` were switched to the same ranking —
+F18 recorded that a wrong `.info.json` is the worse half, since it replaces video identity
+silently. **It changes nothing observable.** The normalized base is always a strict prefix of the
+exact stem, so it always sorts first, and the previous last-write-wins already landed on the exact
+file — verified identical before and after on the same fixture. It is hardening against a future
+third variant, not a second bug, and should not be re-reviewed as one.
+
+**F21 — fixed.** Diagnosis confirmed exactly: `62vh` sized the player against the whole viewport
+while the header had already claimed part of it. The cap moved off the item and onto the grid
+track as `minmax(0, 62%)`, which resolves against the grid container — the viewport *minus* the
+header — so the grid is guaranteed the remainder. Measured on the real video-2 local run:
+
+| | 760×520 | 1280×800 |
+| --- | --- | --- |
+| `#gridScroll.clientHeight` | **0 → 162** | 241 |
+| player column | 322.4 → 157.1 | 441.3 |
+| media within its wrap | yes | yes |
+| `document.scrollHeight` | 520 | 800 |
+| header `top` | 0 | 0 |
+| run picker reachable | yes | yes |
+
+The composer half of the finding is closed too: `n` renders the 304.2px form inside the grid
+viewport, the grid scrolls, and the first field takes focus and scrolls into view.
+
+*Two changes beyond the track cap, both forced by measurement.* At 760×520 the keyboard hint wraps
+to several lines and takes the column for itself, leaving a 28px sliver of video — so under
+`max-height: 640px` the hint is hidden and the player's share drops to 45%. The existing code
+comment already said the hint is the right thing to lose; this makes that explicit instead of
+leaving it to clipping. And `.player-wrap` now grows into the column with `min-height: 0`, so the
+media has a definite parent to size against. *Dead end worth recording:* capping the media at
+`max-height: 100%` of a shrink-to-fit wrap is circular and collapsed the video to 27.9px. The wrap
+has to grow for that percentage to mean anything.
+
+**F22 — fixed** as recommended. `docs/reference/**/*.vtt` ignored; both export directories stopped
+showing as `??`. Curated parser fixtures can be tracked deliberately elsewhere.
+
+**F23 — fixed.** The spec now covers all five product commits and this review round: a commit →
+section table at the top, and new sections for the sticky header, the missing-media warning and
+the `k` stick, each with its acceptance criterion. §4 points forward at F21, since the header fix
+is what introduced it.
+
+**Regression, and it closes a gap `CURRENT.md` flagged as having no receipt.** Video 1 loads at
+`64 markers · 21 added · 24 YT` with zero console errors, which is acceptance criterion 6.
+
+**Still unchecked, unchanged from the last handoff:** the late-caption rerun end to end
+(acceptance criterion 2). It needs a video whose captions arrive between two runs, and all four
+YouTube uploads still have none — re-checked against YouTube today. See `BACKLOG.md`,
+"The corpus, and the one blocker". Not fixable by trying harder.
+
+**Baton: → reviewer** — re-review at `8a47c2b`.
