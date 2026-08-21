@@ -1,12 +1,12 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 11:41
+revised: 2026-08-21 13:05
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
 branch: main
-commit: 0180557f8549970f249e4edaf34cfccb1b046fb9
+commit: a9c6cc037ce454ad98a83378ab8442f82a3e3920
 task: docs/coordination/CURRENT.md
 ---
 
@@ -526,4 +526,132 @@ of the repo, plus not re-reading what I had just changed.
 - **The eval conversation**, flagged above. Ran from "is eval free?" through three wrong counts,
   the accuracy challenge, the twenty-video reframe, and landed on [[D-041]].
 - **11:41** — this log. Codex's review on 21+22 is in and unaddressed.
+
+---
+
+# Append — 2026-08-21 13:05 — side chat: git mechanics
+
+Recorded at Brian's request from a forked chat. **No tools ran there; nothing was written to the
+repo.** Explanation only, plus one correction to something I got wrong in the main thread.
+
+The trigger was two questions that exposed the same confusion: "can't merges have multiple
+commits? similarly, branches also have multiple commits?" Both came from me describing the
+*pointer* while he was thinking about the *contents*.
+
+## What a branch is
+
+`.git/refs/heads/main` is a file containing one 40-character id. That is the whole file.
+
+Every commit separately records its own parent's id, written when the commit was created and
+never changed after. So "main has 134 commits" is shorthand for: start at the id in that file,
+follow parent links, count what you reach. The 134 links live in the 134 commits — the branch
+file contributes only the starting point.
+
+Moving a branch rewrites that one file and touches nothing else. No commit changes; no parent
+changes. You just start walking somewhere different. That is why it is instant regardless of
+history size — a 40-byte write.
+
+**Corrected a misreading:** moving a branch does not move "the commit and its parent." Parents
+are not involved at all.
+
+```
+cat .git/refs/heads/main      # the one id
+git cat-file -p HEAD          # the commit, with its parent line
+git rev-list --count HEAD     # git doing the walk
+```
+
+## What a merge commit is
+
+An ordinary commit with two ids in the parent field instead of one.
+
+```
+8d57e37
+  parent 1 → main's tip just before the merge
+  parent 2 → the tip of the branch being merged in
+```
+
+Order is fixed by which branch you were on. Parent 1 is "we were here", parent 2 is "and we are
+bringing this in". That ordering is what `git log --first-parent` follows to show main's own tips
+while skipping everything that arrived via branches.
+
+Always exactly two parents. How many commits the merge brings in is a separate question —
+whatever is reachable through parent 2 and was not already reachable through parent 1.
+
+```
+git cat-file -p 8d57e37 | head -4       # two parent lines
+git log --oneline 8d57e37^1..8d57e37^2  # exactly what it brought in
+```
+
+## Correction — why local `main` fell behind
+
+I had framed this in the main thread as "Codex pushed to GitHub while I was editing." **Wrong
+mechanism.**
+
+Codex and Claude run on the same Mac, in the same repository, sharing one `.git` and therefore
+the same refs. A commit made on `main` would be visible instantly, no fetch needed.
+
+What actually happened: Codex worked in **worktrees on detached HEAD** — separate checkout
+directories sharing one `.git`, committing without being on any branch:
+
+```
+scratchpad/fix33   54903b8 (detached HEAD)
+```
+
+It then pushed that commit straight to origin's `main`. Three refs, two moved:
+
+| Ref | Moved? | Why |
+| --- | --- | --- |
+| `main` (local) | no | nothing ever checked out `main` and committed |
+| `origin/main` (cache) | on fetch | that is what fetch updates |
+| GitHub's `main` | yes | the push landed |
+
+So local `main` fell behind not because GitHub is remote, but because the local branch pointer
+was never moved. `54903b8` was in the shared object store the whole time — reachable, just not
+pointed at.
+
+`origin/main` being a cache of GitHub is still the right model. The staleness just had a
+different cause than I said. This is consistent with the `git worktree list` output captured
+earlier in the main thread, which showed several detached-HEAD worktrees at exactly those SHAs.
+
+## Branch lists on each side
+
+The two lists do not have to match, and mismatches are usually forgotten cleanup — with one
+exception.
+
+- **Leftover on GitHub:** almost always just uncleaned. A merged branch holds nothing `main`
+  does not.
+- **Leftover locally:** a branch never pushed and never merged holds commits that exist nowhere
+  else. This is the only case where deleting can lose work.
+
+`git branch -d` refuses to delete unmerged branches. Use it, not `-D`.
+
+| Marker after the branch name | Meaning | Action |
+| --- | --- | --- |
+| `[origin/x]` | tracked, still on GitHub | leave |
+| `[origin/x: gone]` | pushed, then deleted on GitHub | `git branch -d x` |
+| (nothing) | never pushed | check before deleting |
+
+```
+git branch -vv                # brackets tell you which is which
+git ls-remote --heads origin  # what GitHub actually has
+git fetch --prune             # drop stale origin/* caches
+```
+
+## Next / open threads (from the side chat)
+
+- **Check `two-surface-refactor`** — local-only on the branch list, so it may hold commits that
+  exist nowhere else. `git log --oneline -1 two-surface-refactor` before deleting.
+- **Do not delete `review-base-appification` or `review-appification`** until PR 23's review
+  closes. They exist to make that PR render the right diff; deleting either breaks it. They are
+  deliberate, not leftovers.
+- Two one-time settings to stop the accumulation:
+  `gh repo edit --delete-branch-on-merge` and `git config --global fetch.prune true`.
+
+## Open questions (from the side chat)
+
+- Why `merge-only-matching-labels` and `two-surface-refactor` ended up asymmetric was **inferred,
+  not verified**. `git branch -vv` settles it in one line.
+- Whether Codex's worktrees are still lying around. Several were on detached HEAD, and one stale
+  worktree already blocked a branch delete earlier today. `git worktree list` and
+  `git worktree prune`.
 
