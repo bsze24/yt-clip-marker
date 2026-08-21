@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer, Phase 1.**
+**→ reviewer, Phase 1 / PR 28.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -14,9 +14,9 @@ does not repeat it.
 
 ## 0. State as of 2026-08-21
 
-**No PR is open.** Review-only PR #23 was closed rather than merged, which was its correct
-disposition. PRs 24, 25 and 26 have since landed — the app-lifecycle repair, the move-safe app
-bundle, and the same-origin guard. Working tree clean, tests 15/15
+**Draft PR 28 is open at `05a325c` for Phase 1.** Review-only PR #23 was closed rather than
+merged, which was its correct disposition. PRs 24, 25 and 26 have since landed — the app-lifecycle
+repair, the move-safe app bundle, and the same-origin guard. Working tree clean, tests 15/15
 (`python3 apps/studio/tests/test_sidecars.py`).
 
 Eval state and the roadmap live in `docs/reference/EVAL.md`. Two decisions landed 2026-08-21:
@@ -306,8 +306,7 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer.** Build Phase 1 from §4 as its own reviewed PR. Stop with the PR open; merging
-requires Brian's explicit approval.
+**→ reviewer.** Review Phase 1 at PR 28 / `05a325c`. Merging requires Brian's explicit approval.
 
 ---
 
@@ -377,3 +376,47 @@ still wrong or open:
 
 Also recorded: the duplicate storage is 571 MB across two lessons, not just a picker annoyance;
 and duration matching (§3.9) makes the link selectable rather than typed.
+
+### 2026-08-21 — Codex, implementing Phase 1
+
+Draft PR 28 is open at `05a325c`. No merge was performed.
+
+**Acceptance audit, criterion by criterion.**
+
+- One URL-evidenced identity now serves both read APIs: `effective_youtube_id` validates known
+  YouTube hosts and 11-character ids (`server.py:278`), while `/api/runs` and `run_payload`
+  expose it as `youtubeId` (`server.py:631,649-654`). Tests cover watch, short, live and embed
+  URLs, a foreign host, a synthetic local id, and even a valid-shaped id without a URL
+  (`test_youtube_fallback.py:16-48`).
+- The player receives only that resolved value (`runs.js:115`). With no local file and no
+  effective id, its readiness and time controls stay inert and it hides and clears any prior
+  iframe (`player.js:113,229-244,325-360`). This last transition was found in the browser: the
+  first implementation refused the new cue but visibly retained the previous lesson.
+- Missing declared media is silent only when the same resolver found a fallback
+  (`server.py:313`). Tests cover both halves and both API surfaces
+  (`test_youtube_fallback.py:51-126`).
+- Live acceptance used the real disposable fixtures. Moving all four zero-clip MP4s to a
+  temporary directory cleared their picker `⏏` marks; all four opened the YouTube player with
+  no warning. Moving only the GMT20260730 symlink produced `missing-media` and, after the stale
+  iframe repair, no visible player. All five entries were restored; both GMT entries again show
+  `⏏`, local playback returned, and no run file changed.
+- The API contract rides in this PR at `docs/clip-schema.md`; local playback documentation was
+  corrected in `apps/studio/README.md`.
+
+**Assumptions.** URL evidence means a recognized YouTube host, not an 11-character
+`run.videoId`: local filenames can accidentally have the right shape. Local media retains
+precedence. The empty backend is represented by a hidden, inert YouTube container rather than a
+third player mode; that keeps the two-backend interface intact while preventing stale playback.
+
+**Skips and divergences.** The 783 MB was moved out only for acceptance and then restored, not
+permanently deleted; Phase 1 makes manual deletion safe but does not authorize deleting Brian's
+files. No immutable run or label data changed. Upload cache, link event, inventory/delete and
+title join remain Phases 2-5. No extension or annotation-keyboard loop was exercised because this
+PR changes only Studio identity and playback selection.
+
+**Verification.** `python3 apps/studio/tests/test_sidecars.py` (15/15),
+`python3 apps/studio/tests/test_youtube_fallback.py` (9/9), `python3 -m py_compile` over the three
+Studio Python entry modules, `node --check` over every `apps/studio/ui/*.js`, and
+`git diff --check`. Browser half: real Studio run switching, four fallback runs, broken local-only
+symlink, restored local playback, and a clean normal-path console; the deliberate broken-media
+case logged its existing visible warning as expected.
