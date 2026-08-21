@@ -41,7 +41,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
-| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..lane-as-section` | **open** — 22 unmerged | → reviewer |
+| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..lane-as-section` | **open** — 22 unmerged | → implementer |
 | 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
 
 ---
@@ -412,7 +412,58 @@ half-change — a new run-level path added on top of the old per-clip path, both
 Brian found it by using the app, not by reading the diff. The same shape is the thing worth
 looking for here.
 
-**Baton: → reviewer.**
+### F26 — the header work writer blanks its section lane — blocking · open
+
+`main.js`'s `#runWork` change handler is a second `/api/section` writer, but it
+still sends only `{runId, start: 0, work}`. After PR 22, `append_section` treats
+an omitted lane as `""`, so correcting a work title at 0:00 overwrites the
+co-owned lane with an empty string. This is not theoretical: at
+`668dff2a0266d7067d9226b39e8406cbb95a76c4`, sending the exact header payload to
+the isolated video-1 store changed its first section from
+`[0, "Pennies from Heaven | Stan Getz", "Transcription"]` to
+`[0, "Header review work", ""]`.
+
+**Cost.** Brian can lose the visible `Transcription` suffix from every early
+video-1 grid row and the export simply by fixing the header text. The lost lane
+is an append-only event, so the correct value needs to be reconstructed and
+written again.
+
+**Required repair.** Make the header use the same merge discipline as
+`persistSection` (or send the resolved lane with the header write). Audit every
+remaining section writer before returning a SHA; a section event must carry the
+complete `{work, lane}` pair.
+
+### F27 — in-row lane edits still write the old per-clip taxonomy — blocking · open
+
+The `tbody` input handler in `main.js` still treats `data-combo="lane"` as a
+clip-taxonomy field: it changes `S.liveTax.lane` and calls `queueTaxonomy()`.
+PR 22's `finishComboEdit` then also writes the intended section. On an isolated
+copy of video 1 at `668dff2a`, editing lane at 1:20 and pressing Enter appended
+both `human-annotate` for marker index 1 (`lane: "Review lane"`) and the
+intended `human-chapter` break at start 80. The existing composer path also
+continues to carry inherited work/lane into `/api/miss` and `/api/annotate`.
+
+**Cost.** The migration promises that neither value is stored on a clip, but a
+normal `Tab`+`l` interaction silently creates a durable, separately folded
+per-clip value. That recreates the two-live-path shape PR 21 was meant to
+remove; future readers cannot tell these accidental events from the legacy
+annotations they are supposed to preserve.
+
+**Required repair.** Restrict taxonomy debounce/state writes to tags. Route
+work and lane only through the merged section writer, and remove the inherited
+work/lane fields from new clip writes. Re-test that one section edit produces
+one `chapter` event and no `annotate` or `miss` event.
+
+### F28 — the section contract says an empty work deletes a lane-only section — optional · open
+
+`docs/clip-schema.md` says that an empty `work` removes a break, while the
+implementation correctly removes it only when **both** work and lane are empty.
+That makes the documented undo rule wrong for the lane-only state that PR 22
+explicitly supports. Say `both fields are empty` so the contract matches the
+fold.
+
+**Baton: → implementer** — F26 and F27 block the review; F28 may ride with the
+repair.
 
 ---
 
