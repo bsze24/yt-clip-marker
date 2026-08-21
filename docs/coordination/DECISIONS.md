@@ -436,6 +436,34 @@ sessions were writing to `DECISIONS.md` without seeing each other. Take the next
 moment of writing, not the next one you remember.
 
 
+### D-040 — the skill detects concepts only; takes are not detectable from a transcript  (Accepted 2026-08-21)
+`SKILL.md` v2. `R-TAKE-GAP`, `R-TAKE-CLUSTER` and `R-TAKE-LABEL` are retired. `R-CONCEPT` plus a
+new `R-COVERAGE` cap carry the whole job.
+
+**Measured, not argued.** Deleting the take rules strands **zero** starred moments across both
+unanchored lessons — `R-CONCEPT` alone reaches every one. The take rules scored 92% on a
+demo-dense lesson and 50% on a talk-dense one, where half their gaps were a reference recording
+playing at the top of the lesson: music detected correctly and worth nothing.
+
+No threshold separates those, because the distinction is *who* is playing and why, and that is
+not in the transcript. Same wall as the `take` tag ([[D-039]]'s neighbour finding, `BACKLOG.md`
+ceiling table): four independent features tested, none predicts it.
+
+**The IDs are retired, never reused.** `labels.jsonl` cites `R-TAKE-GAP` 130 times,
+`R-TAKE-CLUSTER` 51 and `R-TAKE-LABEL` 6. A retired id that comes back meaning something else
+silently corrupts every historical judgment. `SKILL.md` carries a retired-rules table for this.
+
+**What replaces them.** `R-COVERAGE` — never more than 60 seconds without a proposal. Recall
+failures were never a judgment problem: on video 3 a single 5-minute unproposed stretch held four
+of the user's 21 starred moments, and was the only real miss in the run. A spacing cap is
+mechanical and checkable where "be copious" was neither.
+
+**`R-LEAD` makes early placement a rule.** Brian's cost is asymmetric — an extra marker is one
+keypress, a marker *after* the moment is a rewind. Measured across three lessons, every starred
+moment has some proposal before it, so a forward-only scan never loses one; what varies is how
+far he plays. Anchoring to the start of the speaker's turn shortens that.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the
