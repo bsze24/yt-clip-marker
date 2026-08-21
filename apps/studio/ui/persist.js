@@ -276,6 +276,8 @@ export async function toggleCheck() {
 }
 
 // Marker: toggle a "wrong" reject. Added clip: unmiss (this is delete).
+// The delete half is the product and always works. The reject half is eval and
+// is gated ([[D-010]]) — otherwise an ordinary pass writes wrong verdicts.
 export async function rejectOrDelete() {
   const row = selectedTaxRow();
   if (!row) return;
@@ -283,7 +285,7 @@ export async function rejectOrDelete() {
     await persistUnmiss(row.dataset.taxId);
     return;
   }
-  if (row.dataset.taxType !== "model") return;
+  if (row.dataset.taxType !== "model" || !S.evalMode) return;
   const index = Number(row.dataset.taxId);
   const cur = (S.current.feedback[String(index)] || "").trim();
   if (isWrong(cur)) {
