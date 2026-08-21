@@ -114,19 +114,53 @@ Also produced, in descending order of how much they change a decision:
    Sort each into a named class the way video 1's 24 were sorted. That list, not the
    percentage, is what rewrites the skill.
 
-**One prediction to falsify, filed 2026-08-19.** `R-TAKE-GAP` should fail here. Zoom
-transcribes the playing instead of leaving silence — at a moment Brian labelled `Line 1 -
-jake demo` the transcript reads `Jake Sherman: Ba-ba-do da.` Gaps >=30s: 14 on video 1, 5 on
-video 2, and gaps do not track his takes (4 of 13 tagged rows near one, against 19 of 62
-untagged). **If `R-TAKE-GAP` fires well anyway, half the rewrite case is wrong and should be
-dropped.**
+## 2b. Results — three videos scored, 2026-08-21
 
-**Settled 2026-08-20, do not re-litigate:** diarization does not rescue `take`. Four angles
-tested on video 2 and all dead — scat syllables (one line in 64 minutes), longest Jake-only
-cue run (2.9 against 2.9), Jake's share of the window (68% against 62%), and talk-density
-dips (39% precision against a 32% base rate). Speaker labels say who is *talking*; a demo is
-someone *not talking*. What works is what Brian already does — writing "jake take" into the
-label, which 24 of video 2's 75 labels carry in prose.
+| | video 1 (anchored) | video 2 | video 3 |
+| --- | --- | --- | --- |
+| lesson | 91 min, mixed | 64 min, line-by-line polish | 44 min, harmony instruction |
+| human rows | 67 | 75 | 51 |
+| proposals | 64 (0.70/min) | 65 (1.02/min) | 31 (**0.70/min**) |
+| **star recall @45s** | 100% (n=9) | **94%** (n=36) | **81%** (n=21) |
+| star recall @60s | 100% | **100%** | 86% |
+| region recall @45s | 97% | 89% | 75% |
+| precision @45s | 84% | 94% | 81% |
+| `R-CUE-EXACT` | 64/64 | 65/65 | 31/31 |
+
+**`R-CUE-EXACT` holds on all three.** [[D-032]] does not revert; `TD-6` is closed by
+measurement — every proposal on every video lands on an exact cue start.
+
+**`R-CONCEPT` is the rule that works.** 95% on video 2 and 95% on video 3, on lessons whose
+content could hardly differ more. It carried 22 of video 3's 31 proposals.
+
+**`R-TAKE-GAP` is lesson-dependent, which is worse than being wrong.**
+
+| | fires | near a human row | near a **starred** row |
+| --- | --- | --- | --- |
+| video 2 (demo-dense) | 26 | 92% | 65% |
+| video 3 (talk-dense) | 8 | **50%** | **12%** |
+
+The 2026-08-19 prediction said the rule would fail on a Zoom transcript because Zoom writes
+down the playing instead of leaving silence. **Wrong mechanism, and the falsification test was
+badly specified** — one video could not settle it, and video 2 appeared to refute it outright.
+
+What is actually happening: gaps still exist and the rule still fires. Silence does mean
+someone is playing. But playing is only worth marking when it is *Jake demonstrating* — and on
+video 3 four of the eight gaps are the **reference track** at the top of the lesson, a Louis
+Armstrong recording, correctly detected as music and worth nothing. Tuning the threshold cannot
+separate those, because the distinction is not acoustic, it is who is playing and why.
+
+That is the same wall as `take`. See §2's settled note: no text feature predicts it.
+
+**Two named rejection classes**, both from video 3's six false positives:
+
+1. **The lesson has not started** — five of six sit before his first marker at 5:29, four of
+   them the reference track. `R-SKIP-INTERRUPT` covers scheduling chatter but not a warm-up
+   playthrough.
+2. **Under-production.** 0.70 proposals/min against a marking rate of 1.16/min. `R-COPIOUS`
+   asks for 20-30 per 90 minutes, which video 3 met — and that guidance is now the ceiling on
+   recall. Three starred moments were never proposed within 90s, all in the 33-38 minute
+   stretch on triad pairs, the densest teaching in the lesson.
 
 ## 3. After this, in order
 
