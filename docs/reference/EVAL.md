@@ -205,6 +205,13 @@ hand-marked three lessons and used the tool zero times. The missing number is no
 that from two blind videos. It is *what fraction of proposals you can judge from the label without
 playing the video*, and only real use produces it. Confidence: high.
 
+> **This contradicts [[D-041]] and has not been resolved.** D-041's "cadence" paragraph says the
+> opposite in as many words: *"There are zero unspent today and v2 is untested, so the next lesson
+> marked is the held-out one, and it has to be marked before v2 runs on it."* One of the two is
+> wrong and neither has been retired. Do not act on this recommendation as though it were settled
+> — either supersede D-041 with a dated entry, or strike this recommendation. Flagged
+> 2026-08-21.
+
 **D. Is re-running v2 on videos 2 and 3 worth it?** Recommend a single unmodified v2 run for an
 unconfounded baseline, then stop. Beyond that it is near-tautological — every v2 rule was derived
 from those two videos. `R-COVERAGE` exists because video 3 had a five-minute hole; re-run it and

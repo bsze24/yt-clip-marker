@@ -523,6 +523,45 @@ five. Spend one per skill revision. There are **zero unspent today** and v2 is u
 next lesson marked is the held-out one, and it has to be marked before v2 runs on it.
 
 
+### D-042 — markers flow one way, app → YouTube; the video title flows the other way  (Accepted 2026-08-21)
+
+Two things move between the studio and YouTube, and they move in opposite directions. Fixing
+each direction now, because the alternative is a reconciliation problem nobody wants to own.
+
+| Thing | Canonical home | Direction |
+|---|---|---|
+| Clips and their labels | the studio store | **app → YouTube, always** |
+| The video's title | YouTube | **YouTube → app** |
+
+**Markers, one way, always.** You author clips in the studio and paste timestamps into the
+description. A label edited on YouTube afterwards does **not** flow back, ever. No scraping a
+description to update clips, no matching by timestamp, no deciding a winner when both sides
+changed, no handling a stamp deleted on YouTube. That merge problem is now closed rather than
+deferred. Follows from [[D-002]] and [[D-007]] — the studio store is canonical for clips, and a
+writeback path would make YouTube a second, lossier store.
+
+**The title, the other way.** The lesson gets its real name on YouTube after upload, so that is
+where it is renamed once. The studio follows by joining `run.youtubeId` against the
+`uploads.json` cache — see `CURRENT.md` phase 4. Pull only: push would need the YouTube Data
+API and OAuth, which [[D-005]] parks.
+
+**Why the directions differ.** The studio is where clips are authored and YouTube is where the
+title is authored. Each field flows away from the surface that owns it. There is no case where
+the same field moves both ways, which is exactly what removes the need to reconcile.
+
+**Carve-out, and it is shipped behavior.** `extracted[]` — the description timestamps read at
+ingest by `ingest.py` — is unaffected. `ui/util.js:137 resolvedLabel()` prefers an extracted
+label over the clip's own at export time, so a stamp already published on YouTube does today
+override the studio's text for that row. That is a record of what was already published, read
+once at ingest, not a sync. D-042 prohibits any **new** mechanism that re-reads a description
+after export to update clips; it does not change `extracted[]`.
+
+**Consequence to check, not yet decided.** With markers one-way, `resolvedLabel`'s preference
+for the extracted label is arguably backwards going forward: the app is canonical, so the app's
+label should win. It was right for video 1, whose description stamps predate the studio. Left
+as-is deliberately — changing export behavior is a separate call with its own PR.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

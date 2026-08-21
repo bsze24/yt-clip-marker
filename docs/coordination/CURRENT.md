@@ -137,12 +137,11 @@ GMT20260730 run are visibly the same lesson and the merge is obvious — but it 
 so it is its own task with its own spec. Also out: the YouTube Data API, OAuth, and any
 write-back to YouTube ([[D-005]], parking lot).
 
-Also out, and larger than it looks: **flowing a renamed *marker label* back from the YouTube
-description.** `ingest.py` already reads description stamps into `extracted[]`, so the read
-path exists — but propagating edits back means reconciling a scraped description against the
-clip set: match by timestamp, decide the winner when both sides changed, handle a stamp
-deleted on YouTube. That is a merge problem, not a join, and it needs its own spec. Phase 4
-covers the lesson title only.
+Also out, and now permanently rather than pending a spec: **flowing a renamed *marker label*
+back from the YouTube description.** Markers move one way, app → YouTube ([[D-042]], accepted
+2026-08-21). The reconciliation problem — match by timestamp, pick a winner when both sides
+changed, handle a stamp deleted on YouTube — is closed, not deferred. Phase 4 covers the
+lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 7. Baton
 
