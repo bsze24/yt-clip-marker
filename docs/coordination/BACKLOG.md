@@ -88,6 +88,9 @@ nothing in the store says the two are the same lesson. Decide the relationship b
 
 ## Skill eval — closed 2026-08-21
 
+> Live state, corpus counts and the rung ladder now live in `EVAL.md`. The scored
+> numbers below stay here as the record of what was measured.
+
 Three videos scored with `apps/studio/eval/score_run.py`. Harvested from `CURRENT.md` when the
 task closed; the skill rewrite it authorised is `SKILL.md` v2 and [[D-040]].
 

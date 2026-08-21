@@ -18,6 +18,7 @@ The core rule that follows:
 | `REVIEW.md` | The active review target(s); findings as per-item threads with a status. |
 | `BACKLOG.md` | Roadmap, deferred work, tech debt (`TD-N`), open modeling decisions. |
 | `DECISIONS.md` | Durable architecture and product calls (`D-001`…). |
+| `EVAL.md` | Eval state: the corpus, what the channels mean today, and the roadmap beyond hand-edited rules. |
 
 **On `DECISIONS.md`.** Other files should cite durable calls as `[[D-xxx]]`. Those ids are the contract; do not relitigate a decision silently. If you think you should do so, please flag it before acting.
 
