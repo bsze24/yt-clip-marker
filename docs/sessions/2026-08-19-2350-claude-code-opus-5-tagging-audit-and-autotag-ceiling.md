@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 15:35
+revised: 2026-08-21 16:00
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -989,4 +989,44 @@ in D-042 under "Consequence to check".
   `resolvedLabel` carve-out — the decision would otherwise have outlawed shipped behavior.
 - Grepped `DECISIONS.md` while numbering D-042 and found the D-041 / §7C contradiction. Flagged
   in place rather than resolving it.
+
+---
+
+# Append — 2026-08-21 16:00 — the D-041 conflict is resolved
+
+The previous append lists "Resolve D-041 vs EVAL.md §7C" as the one blocker. **It is closed.**
+Do not pick it up.
+
+- **D-043** supersedes *only* D-041's cadence paragraph; the rest of D-041 stands. The paragraph
+  is struck through in place with a pointer, not deleted.
+- **Resolution: do not mark the next lesson blind.** Smoke-test v2 on video 2 or 3 first, then use
+  it for real while recording four numbers per lesson.
+- `EVAL.md` §7C now reads "Decided — no", and §8's ordering follows.
+
+**Brian's framing was what dissolved it.** He proposed running v2 on *a* video because it still
+had not run at all — which is neither side of the D-041/§7C argument. Both were arguing about
+measurement; the first run is a smoke test. That reframe made the contested part apply only to
+the lesson *after* it.
+
+**The argument that decided the contested part:** blind-marked lessons are manufactured on demand,
+not a depleting stock, so the choice is now-or-later at equal cost. D-041's "zero unspent today"
+implied scarcity that is not there — the scarce resource is Brian's 45 minutes. Given that, measure
+the number that could change the plan: held-out recall would not stop him using the skill, but the
+judge-without-playing fraction could kill the premise outright.
+
+**Cost accepted, stated in D-043:** zero clean test lessons now, zero after. When v3 needs testing
+a lesson gets marked blind then — deferred, not avoided. Two named conditions reverse D-043: a fast
+revision cadence, or Brian already knowing he can judge proposals from labels.
+
+## Next / open threads — replaces the previous append's list
+
+1. **Run `SKILL.md` v2 once on video 2 or 3.** Smoke test. Not a measurement, and the score must
+   not be recorded as a v2 result — every v2 rule derives from videos 1-3.
+2. **Star predictability test** (`EVAL.md` §7E). The only item that can *remove* work: if nothing
+   in the transcript predicts `star`, rung 4 loses its target and the ladder stops at retrieval.
+   Same shape as the `take` test that produced D-040, where all four features were dead.
+3. **Use v2 for real on the next few lessons**, recording proposals offered / accepted without
+   playing / had to scrub / added unprompted.
+4. `CURRENT.md` phases 1-4, baton on implementer. Phase 1 touches `docs/clip-schema.md`.
+5. `EVAL.md` §7 A, B, D still open. §C is closed.
 
