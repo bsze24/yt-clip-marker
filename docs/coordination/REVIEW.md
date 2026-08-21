@@ -41,7 +41,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
-| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLEAN** — 22 unmerged | → planner |
+| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
 
 ---
@@ -370,9 +370,9 @@ resolved file name fixes it. The inline review comment is posted on PR #11.
 
 ---
 
-## Thread 8 — work and lane as sections (PRs 21 + 22) — CLEAN
+## Thread 8 — work and lane as sections (PRs 21 + 22) — CLOSED
 
-**Review both commits as one design.** PR 21 is merged and PR 22 is open, but they are a single
+**Review both commits as one design.** PRs 21 and 22 are merged, but they are a single
 change split in two: sections exist (21), lane joins them (22). Reading 22 alone shows lane
 moving into a structure with no account of why the structure exists.
 
@@ -380,9 +380,9 @@ moving into a structure with no account of why the structure exists.
 git diff 355f216~1..lane-as-section     # both, as one diff
 ```
 
-PR 22 is unmerged, deliberately — Brian's standing instruction from 2026-08-21 is that nothing
-merges without him saying so. PR 21 is not being reverted to re-review it; this repo reviews by
-SHA, and reverting merged code for a second reading is churn against no gain.
+PR 22 was merged as `8d57e37` after Brian's explicit 2026-08-21 authorization. PR 21 is not
+being reverted to re-review it; this repo reviews by SHA, and reverting merged code for a second
+reading is churn against no gain.
 
 **Scope.** PR 21 makes `work` a section break — an event at a timestamp on the run, resolved on
 read, never stored on a clip. Video 1 went from 67 stored copies to 2 events. PR 22 puts `lane`
@@ -480,8 +480,7 @@ fold.
 states the complete-pair rule and that both values must be empty to remove a
 break.
 
-**Baton: → planner** — F26–F28 are resolved; PR 22 remains unmerged pending
-Brian's explicit decision.
+**Closed.** F26–F28 are resolved; PR 22 merged as `8d57e37`.
 
 ---
 
