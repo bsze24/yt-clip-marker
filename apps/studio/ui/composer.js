@@ -9,13 +9,17 @@ import { seek, getCurrentTime } from "./player.js";
 import { renderGrid, updateStats, scrollToActive, displayMarkers, buildRows, rowKey } from "./grid.js";
 import { cancelPendingAddition, cancelPendingMarker, persist } from "./persist.js";
 
+// Lane only. `work` is deliberately NOT inherited any more: copying it onto
+// every new clip is what stored one string 75 times, and it is now resolved
+// from the run's section breaks instead. Lane is deprecated and inherits only
+// so existing values keep flowing until it goes.
 function inheritChapter(start) {
   const markers = displayMarkers()
-    .filter((m) => Number(m.start) < Number(start) && (m.work || m.lane))
+    .filter((m) => Number(m.start) < Number(start) && m.lane)
     .sort((a, b) => a.start - b.start);
   const prev = markers[markers.length - 1];
-  if (prev) return { work: prev.work || "", lane: prev.lane || "" };
-  return { work: S.lastChapter.work || "", lane: S.lastChapter.lane || "" };
+  if (prev) return { work: "", lane: prev.lane || "" };
+  return { work: "", lane: S.lastChapter.lane || "" };
 }
 
 function selectMarkerRow(marker) {

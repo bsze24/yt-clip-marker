@@ -172,28 +172,51 @@ def load_edits(run_id):
     return by_idx
 
 
-def load_run_work(run_id):
-    """The lesson's work — piece and rendition — as one value for the whole run.
+def load_sections(run_id):
+    """Where the lesson's work changes, as [(start, work), ...] ascending.
 
-    It lives here rather than on the run file because `runs/{id}.json` is
-    immutable ingest output ([[D-002]]), and it lives here rather than on every
-    clip because it never varied per clip: across 193 annotated rows it changed
-    5 times on one video and 0 on the other two, where the same string was
-    stored 75 times. Resolved on read, same as media ([[D-034]]).
+    A work change is an event at a timestamp, stored once. It is not a property
+    of a clip: on video 1 the work changes twice across 67 rows, and the old
+    shape stored the string on all 67. One lesson covering two pieces is normal,
+    so the answer is a section break, not a per-clip field.
 
-    A clip that carries its own `work` still wins — one lesson covering two
-    pieces is normal, and video 1 does exactly that.
+    Lives here rather than on the run file because `runs/{id}.json` is immutable
+    ingest output ([[D-002]]). Resolved on read, same as media ([[D-034]]).
+
+    Latest event per `start` wins, so re-setting a break overwrites it and
+    clearing its work removes it.
     """
-    work = ""
+    by_start = {}
     for ev in read_label_events():
         if ev.get("runId") != run_id or ev.get("verdict") != "chapter":
             continue
+        start = ev.get("start")
+        start = 0.0 if start is None else float(start)
         work = (ev.get("work") or "").strip()
-    return work
+        if work:
+            by_start[start] = work
+        else:
+            by_start.pop(start, None)
+    return sorted(by_start.items())
 
 
-def append_run_work(run_id, run, payload):
+def work_at(sections, start):
+    """The work in effect at `start` — the latest break at or before it."""
+    current = ""
+    for at, work in sections:
+        if at <= start:
+            current = work
+        else:
+            break
+    return current
+
+
+def append_section(run_id, run, payload):
     work = payload.get("work") if isinstance(payload.get("work"), str) else ""
+    try:
+        start = float(payload.get("start") or 0)
+    except (TypeError, ValueError):
+        start = 0.0
     event = {
         "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
@@ -203,7 +226,7 @@ def append_run_work(run_id, run, payload):
         "videoTitle": run.get("title"),
         "markerIndex": None,
         "source": "human-chapter",
-        "start": None,
+        "start": start,
         "end": None,
         "description": "",
         "tags": [],
@@ -213,7 +236,7 @@ def append_run_work(run_id, run, payload):
         "verdict": "chapter",
     }
     append_event(event)
-    return load_run_work(run_id)
+    return load_sections(run_id)
 
 
 def load_annotations(run_id):
@@ -759,7 +782,7 @@ class Handler(BaseHTTPRequestHandler):
                     "id": run_id,
                     "run": run,
                     "feedback": load_feedback(run_id),
-                    "runWork": load_run_work(run_id),
+                    "sections": load_sections(run_id),
                     "additions": load_additions(run_id),
                     "edits": load_edits(run_id),
                     "annotations": load_annotations(run_id),
@@ -894,9 +917,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self._json(200, {"ok": True, "annotations": annotations})
             return
-        if parsed.path == "/api/run-work":
-            work = append_run_work(run_id, run, payload)
-            self._json(200, {"ok": True, "runWork": work})
+        if parsed.path == "/api/section":
+            sections = append_section(run_id, run, payload)
+            self._json(200, {"ok": True, "sections": sections})
             return
         self._json(404, {"error": "not found"})
 

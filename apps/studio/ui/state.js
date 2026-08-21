@@ -23,7 +23,9 @@ export const S = {
   selectedKey: null,
   composer: null,
   lastChapter: { lane: "", work: "" },
-  runWork: "",
+  // [[start, work], ...] ascending. A clip's work is resolved from these, never
+  // stored on the clip. See workAt().
+  sections: [],
   liveTax: null,
   pendingCombo: null,
   pendingReason: null,
@@ -136,3 +138,12 @@ export function seedChapterFromRun() {
 }
 
 export function setSave(msg) { $("saveState").textContent = msg; }
+
+// The work in effect at `start` — the latest section break at or before it.
+export function workAt(start) {
+  let current = "";
+  for (const [at, work] of S.sections || []) {
+    if (at <= start) current = work; else break;
+  }
+  return current;
+}
