@@ -240,7 +240,12 @@ function gridKeys(e) {
   }
   if (key === "n" || key === "N") { e.preventDefault(); addAtPlayhead(); return true; }
   if (key === "s") { e.preventDefault(); toggleStar(); return true; }
-  if (key === "g") { e.preventDefault(); toggleCheck(); return true; }
+  // `g` grades a skill marker — eval only ([[D-010]]). With eval mode off it did
+  // nothing visible but still wrote a check event to labels.jsonl, so the store
+  // gained eval judgments during an ordinary annotation pass.
+  if (key === "g") { e.preventDefault(); if (S.evalMode) toggleCheck(); return true; }
+  // `x` is two actions on one key. Deleting an added marker is the product; the
+  // same key rejecting a *skill marker* is eval. Only the first survives the toggle.
   if (key === "x") { e.preventDefault(); rejectOrDelete(); return true; }
   if (key === "h" || key === "H") { e.preventDefault(); toggleHideFiller(); return true; }
   if (key === "f" || key === "F") { e.preventDefault(); toggleFollowPin(); return true; }

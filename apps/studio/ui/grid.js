@@ -296,7 +296,7 @@ function markerCell(row) {
       ? `<input data-miss-desc="${m.start}" value="${escapeAttr(m.description || "")}" />${
           m.why && !S.evalMode ? `<div class="why-note">${escapeHtml(m.why)}</div>` : ""
         }`
-      : isWrong(fb)
+      : isWrong(fb) && S.evalMode
         ? `<input data-wrong-reason="${m.index}" value="${escapeAttr(feedbackWhy(fb))}" placeholder="why reject? e.g. Heat is caption noise" />
           <div class="desc-orig">${escapeHtml(m.description || orig)}</div>`
         : `<input data-desc="${m.index}" value="${escapeAttr(m.description || "")}" />${
