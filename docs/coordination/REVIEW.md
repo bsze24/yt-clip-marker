@@ -1,9 +1,8 @@
 # Review
 
-Active target: **review-only PR 23** at `97c0f22f66d6508519ad2608b1ebba6f52d5d439`, covering
-the already-merged appification range `5c0c64d..97c0f22`. It is not a merge candidate: close it
-when the review lands. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and
-`BACKLOG.md`.
+Active target: **PR 24** at `dd4b23301f903e73958a4d84f92fbd0726dd16ee`, the repair for the
+review-only PR 23 appification audit. PR 23 is not a merge candidate: close it after the repair
+lands. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
 
 Roles stay reversed on this thread at Brian's instruction: Claude Code implemented, **Codex
 reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cursor usage limit.
@@ -40,7 +39,7 @@ reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cur
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
-| 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — F29 blocking; review-only PR #23 | → implementer |
+| 9 — running the studio as an app | PRs 18-20 + PR 24, `5c0c64d..dd4b233` | **no blocking findings** — F29 resolved; F30 optional open | → planner |
 
 ---
 
@@ -517,7 +516,7 @@ rather than through the keyboard. Worth a real keypress before merge.
 
 ---
 
-## Thread 9 — running the studio as an app (PRs 18-20) — OPEN
+## Thread 9 — running the studio as an app (PRs 18-20, repair PR 24) — NO BLOCKING FINDINGS
 
 **Already merged. Reviewed anyway**, because this is the only work in the project that touches
 Brian's machine rather than the repo, and it went in unreviewed.
@@ -564,6 +563,15 @@ store state.
 preserving the documented `studio.localhost`, `localhost`, and `127.0.0.1` entry points), and
 exercise the button in a real browser after the guard is in place.
 
+**Implementer response — `dd4b233` (PR 24).** The POST dispatcher now rejects any non-JSON
+request and, when `Origin` is present, requires its host and port to match the request `Host`.
+This covers both `/api/quit` and `/api/ingest`; PUT routes remain unreachable from an HTML form.
+
+**Reviewer re-review — 2026-08-21 at `dd4b233`. Resolved.** In an isolated exact handler,
+cross-site form and JSON POSTs to both routes return 403, while same-origin JSON quit returns 200
+and reaches a harmless shutdown hook. The unchanged UI fetch wrapper already sends JSON from the
+same origin. Python compilation, `node --check`, `bash -n`, and the whitespace diff pass.
+
 ### F30 — generated launch artifacts do not survive moving the repo — optional · open
 
 `install` writes the current `$APP_DIR` into the launch agent's `ProgramArguments`, and `app`
@@ -580,9 +588,19 @@ and `studio app`.
 **Suggested repair.** Either document those two required re-install steps after relocation, or
 change the launch design to use a stable, move-safe launcher path.
 
-**Reviewer checks at `97c0f22`.** Exact base/head ancestry and whitespace diff pass; Python
-compilation, `node --check` for the changed module, and `bash -n` for `studio` pass. The app
-bundle was built and linted in a disposable home. GitHub has no commit-status checks; BugBot did
-not run because of its usage limit.
+**Implementer response — `dd4b233` (PR 24).** `studio status` now detects a stale launch-agent
+plist and `studio open` reinstalls it from the script's current location.
 
-**Baton: → implementer** — F29 blocks closure. F30 is optional and may be batched with it.
+**Reviewer re-review — 2026-08-21 at `dd4b233`. Still open, optional.** The launch-agent half
+now heals, but the existing `Clip Studio.app` launcher still executes the old absolute script path
+after a move and never reaches `studio open`'s recovery. The claim that moving the repo is fully
+handled is too broad. This does not hold the security merge, but it needs either the promised
+move-safe launcher or documentation that rebuilding the app bundle is still required.
+
+**Reviewer checks at `dd4b233`.** Exact base/head ancestry and whitespace diff pass; Python
+compilation, `node --check`, and `bash -n` pass. The request guard was exercised against a
+disposable exact handler and moved-clone recovery against disposable launch artifacts. GitHub has
+no commit-status checks; BugBot did not run because of its usage limit.
+
+**Baton: → planner** — F29 is resolved and PR 24 has no blocking finding. F30 remains optional;
+PR 23 stays review-only and must never merge.
