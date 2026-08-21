@@ -795,8 +795,39 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._json(404, {"error": "not found"})
 
+    def same_origin(self):
+        """Reject a request a browser could make on another site's behalf.
+
+        Binding to 127.0.0.1 is not an authorization boundary. Any page can
+        submit a plain HTML form to a fixed localhost URL: it needs no CORS
+        permission because it never reads the response, and the side effect
+        lands anyway. Reproduced against /api/quit with
+        `Origin: https://unrelated.example` — 200, and the server stopped.
+
+        Two independent checks, because either alone has a gap:
+        - `Origin` must match this request's own `Host` when present. Absent is
+          allowed: curl and same-origin GETs omit it, and a cross-site *form*
+          POST always sends it.
+        - Content type must be JSON. The three form-encodable types are exactly
+          the ones that skip a CORS preflight, so requiring JSON blocks the
+          form shape even if a browser ever omits Origin.
+        """
+        origin = self.headers.get("Origin")
+        if origin:
+            host = (self.headers.get("Host") or "").strip()
+            if urlparse(origin).netloc != host:
+                return False
+        ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        return ctype == "application/json"
+
     def do_POST(self):
         parsed = urlparse(self.path)
+        # Both POST routes have side effects — /api/quit stops the server and
+        # /api/ingest shells out to yt-dlp. PUT routes are unreachable from a
+        # form, so the guard belongs here.
+        if not self.same_origin():
+            self._json(403, {"error": "cross-site request refused"})
+            return
         if parsed.path == "/api/quit":
             # Quit for real. Under launchd, KeepAlive means simply exiting gets
             # us restarted a second later, so the agent has to be booted out
