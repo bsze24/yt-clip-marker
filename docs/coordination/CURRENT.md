@@ -2,15 +2,13 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ Brian, for one decision only.**
+**→ implementer, Phase 1.**
 
-The work is specced and the contracts are settled. What is not settled is the **order**. Two
-candidate sequencings are laid out in §4 and §5. They deliver identical code and differ only in
-which PR lands first and in how phase 1 is justified. Pick one, delete the other, and the baton
-goes to the implementer.
+The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
+on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
 
-Everything in §3 applies to both candidates. Read it first — the phase lists deliberately do not
-repeat it.
+Everything in §3 applies to the chosen sequence. Read it first — the phase list deliberately
+does not repeat it.
 
 ---
 
@@ -25,10 +23,9 @@ Eval state and the roadmap live in `docs/reference/EVAL.md`. Two decisions lande
 [[D-042]] (markers flow app → YouTube only; the video title is the one field flowing back) and
 [[D-043]] (use v2 for real before preserving held-out data, superseding D-041's cadence).
 
-**Step 0, before any phase, under either candidate.** `REVIEW.md` thread 9 still calls PR 25 a
-draft with the baton at reviewer, but `git merge-base --is-ancestor b2a3943 HEAD` passes. Record
-PR 24 at `9ae0345`, F30's delivery at `02e0dfb`, both findings resolved, PR 23 closed, then reset
-the thread per the `README.md` wrap-up. The review ledger and this baton must not disagree.
+**Step 0 completed 2026-08-21.** `REVIEW.md` thread 9 now records PR 24 at `9ae0345`, F30's
+delivery at `02e0dfb`, both findings resolved and PR 23 closed, then collapses the thread per the
+`README.md` wrap-up. The review ledger and this baton agree.
 
 ## 1. Why this exists, with the real numbers
 
@@ -92,7 +89,7 @@ then checked against the code and the live data by Claude Code. Both passes are 
   URL, not different flags; `player.js` cues the synthetic id at YouTube today; and phase 1 as
   written frees none of the 783 MB it was justified by.
 
-## 3. Contracts — these apply to both candidates
+## 3. Contracts
 
 ### 3.1 Effective YouTube id
 
@@ -258,7 +255,7 @@ case.
 Do every destructive acceptance on the four zero-clip runs first. The two GMT runs hold 266 clips
 between them and are not fixtures.
 
-## 4. Candidate A — resequenced, five phases
+## 4. Chosen sequence — resequenced, five phases
 
 Ordered by disk freed per line of code. Phase 1 frees 783 MB with a warning condition; the phase
 that adds the new event field comes after the cache that makes it usable.
@@ -294,33 +291,7 @@ updates after the next background refresh. Kill the network and reopen: the last
 the cache's age, and nothing alarming in the console. Cold cache offline falls back to the run
 title.
 
-**Cost of choosing A.** The phase numbers no longer match Codex's reviewed build sequence, so his
-five-step plan has to be re-read against this order rather than followed by number.
-
-## 5. Candidate B — original four phases, corrected in place
-
-Keeps the reviewed numbering so Codex's build sequence maps one-to-one.
-
-| # | Phase | Contracts delivered | What it frees |
-| --- | --- | --- | --- |
-| 1 | A run learns its YouTube id | §3.1, §3.2, §3.3 | 783 MB via §3.3; the 368 MB becomes disposable |
-| 2 | Inventory and guarded delete | §3.7 | the 368 MB, safely, in-app |
-| 3 | Uploads cache | §3.4, §3.5, §3.6, §3.9 | nothing; upgrades phase 1's id entry |
-| 4 | Title join | §3.8 | — |
-
-**Phase 1 acceptance.** Move the four zero-clip `.mp4`s out of `media/`: all four runs still play
-from YouTube with no warning. Then link the GMT20260730 run to `Oa0wqetkNcg` through a free-text
-id field, break its symlink, and the run still plays — from YouTube — with all 179 clips intact
-and no warning. Set the lesson's work label, write the link, and confirm the work label survives.
-Restore the symlink and it plays locally again without touching the run file.
-
-**Phases 2, 3 and 4 acceptance.** Identical to candidate A's phases 4, 2 and 5 respectively.
-
-**Cost of choosing B.** Phase 1 keeps a disk-pressure justification that is only true of its
-warning-suppression half, and it ships a free-text id field that phase 3 immediately replaces with
-the duration-matched candidate list from §3.9.
-
-## 6. Out of scope, under either candidate
+## 5. Out of scope
 
 Deleting or merging the duplicate runs. Once the link lands, `Oa0wqetkNcg` and the local
 GMT20260730 run are visibly the same lesson and the merge is obvious — but it destroys data, so it
@@ -333,10 +304,10 @@ from the YouTube description.** Markers move one way, app → YouTube ([[D-042]]
 changed, handle a stamp deleted on YouTube — is closed, not deferred. The title join covers the
 lesson title only, and the title is the only field that moves YouTube → app.
 
-## 7. Baton
+## 6. Baton
 
-**→ Brian.** Choose §4 or §5, delete the other, and the baton moves to the implementer with one
-reviewed PR per phase. `REVIEW.md` gets reconciled first either way (§0).
+**→ implementer.** Build Phase 1 from §4 as its own reviewed PR. Stop with the PR open; merging
+requires Brian's explicit approval.
 
 ---
 
@@ -367,7 +338,13 @@ reviewed PR per phase. `REVIEW.md` gets reconciled first either way (§0).
   The two options are not comparable in cost.
 - **The ambiguity that was flagged rather than assumed.** "Rename" could mean the lesson title or
   a marker label edited in the YouTube description. The first is the title join; the second is a
-  reconciliation problem and is closed in §6.
+  reconciliation problem and is closed in §5.
+
+### 2026-08-21 — Brian, choosing the build order
+
+Candidate A accepted. The cache and duration-matched choice land before the link event; guarded
+cleanup follows only after that stronger identity check exists. Candidate B is deleted rather
+than retained as a second source of implementation order. Baton → implementer, Phase 1.
 
 ### 2026-08-21 — Codex, implementation-readiness review
 

@@ -1,11 +1,9 @@
 # Review
 
-Active target: **draft PR 25** at `b2a3943120242c634d01f85aba17371304a0fd7d`, the move-safe
-app-bundle repair stacked on PR 24. PR 23 is not a merge candidate: close it after the repairs
-land. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
-
-Roles stay reversed on this thread at Brian's instruction: Claude Code implemented, **Codex
-reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cursor usage limit.
+Active target: **none**. Thread 9 closed 2026-08-21 after PR 24 landed at `9ae0345`, F30's
+move-safe app bundle landed through PR 26 at `02e0dfb`, both findings were resolved, and the
+review-only PR 23 was closed rather than merged. Durable outcomes live in `DECISIONS.md` and
+`BACKLOG.md`.
 
 > ## Concurrency protocol — read before editing
 >
@@ -39,7 +37,7 @@ reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cur
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
-| 9 — running the studio as an app | PRs 18-20 + PRs 24-25, `5c0c64d..b2a3943` | **no blocking findings** — F29 resolved; F30 addressed | → reviewer |
+| 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
 
 ---
 
@@ -541,111 +539,7 @@ rather than through the keyboard. Worth a real keypress before merge.
 
 ---
 
-## Thread 9 — running the studio as an app (PRs 18-20, repair PRs 24-25) — NO BLOCKING FINDINGS
+## Thread 9 — running the studio as an app — CLOSED 2026-08-21
 
-**Already merged. Reviewed anyway**, because this is the only work in the project that touches
-Brian's machine rather than the repo, and it went in unreviewed.
-
-**Mechanism: a review-only PR (#23).** A throwaway branch `review-base-appification` sits at the
-commit before the range and `review-appification` at the end of it, so GitHub renders exactly
-`5c0c64d..97c0f22` and findings can be inline. Merging #23 would be a no-op into the throwaway
-base; `main` is untouched. Close it when the review lands.
-
-This is the pattern to reuse for any merged range worth a second reader — it is cheaper and
-safer than reverting merges to re-open them.
-
-**Scope.** 188 lines, 5 files. A launchd agent with `RunAtLoad` and `KeepAlive`; the
-`apps/studio/studio` script; `http://studio.localhost:8765`; a `Clip Studio.app` bundle; and a
-`quit` button backed by `POST /api/quit`.
-
-**Where to look hardest** — named in the PR body, in short: `/api/quit` has no auth beyond the
-127.0.0.1 bind and calls `os._exit(0)`, which bypasses the labels lock teardown; `KeepAlive`
-means `pkill` no longer stops the server, so a debugger may think their change did not take; and
-PR 19 exists because PR 18 was not idempotent, which raises the question of what else in the
-script is not.
-
-**Historical overlap.** Thread 8 later changed `server.py`'s taxonomy fold, but it did not alter
-the app lifecycle paths reviewed here. PR 23 remains anchored to its own historical SHA; its
-findings must be checked again against current `main` when repaired.
-
-### F29 — any website can stop the studio with a cross-site form POST — blocking · open
-
-`/api/quit` treats every POST as authorized. Binding the listener to `127.0.0.1` prevents a
-remote host from connecting directly, but it does not prevent a page in Brian's browser from
-submitting a normal HTML form to the fixed local URL. Same-origin policy hides the JSON response;
-it does not block that form's side effect.
-
-**Measured at the target SHA.** In a disposable server using the exact `97c0f22` handler, a
-form-shaped `POST /api/quit` with `Content-Type: application/x-www-form-urlencoded` and
-`Origin: https://unrelated.example` returned `200 {"ok": true, "quitting": true}` and invoked
-the shutdown function. No CORS preflight is involved.
-
-**Cost.** Visiting a hostile or compromised page can silently stop the studio and discard any
-unsaved in-progress edit. This is a live risk whenever the app is running, not a constructed
-store state.
-
-**Required repair.** Accept the quit request only from the studio page's own origin (while
-preserving the documented `studio.localhost`, `localhost`, and `127.0.0.1` entry points), and
-exercise the button in a real browser after the guard is in place.
-
-**Implementer response — `dd4b233` (PR 24).** The POST dispatcher now rejects any non-JSON
-request and, when `Origin` is present, requires its host and port to match the request `Host`.
-This covers both `/api/quit` and `/api/ingest`; PUT routes remain unreachable from an HTML form.
-
-**Reviewer re-review — 2026-08-21 at `dd4b233`. Resolved.** In an isolated exact handler,
-cross-site form and JSON POSTs to both routes return 403, while same-origin JSON quit returns 200
-and reaches a harmless shutdown hook. The unchanged UI fetch wrapper already sends JSON from the
-same origin. Python compilation, `node --check`, `bash -n`, and the whitespace diff pass.
-
-### F30 — generated launch artifacts do not survive moving the repo — optional · addressed
-
-`install` writes the current `$APP_DIR` into the launch agent's `ProgramArguments`, and `app`
-writes the same path into `Clip Studio.app/Contents/MacOS/launch`. Neither `open` nor launchd
-rewrites either artifact later. The PR description's claim that generating the plist from the
-script's location makes a move safe is therefore false.
-
-**Measured at the target SHA.** I installed and built the app under a disposable old path, then
-made that path disappear while the same studio tree remained at a new path. Both generated files
-still named the vanished old path. Brian's current checkout has not moved, so this is optional;
-the concrete cost is a broken app and login agent after a move until he re-runs `studio install`
-and `studio app`.
-
-**Suggested repair.** Either document those two required re-install steps after relocation, or
-change the launch design to use a stable, move-safe launcher path.
-
-**Implementer response — `dd4b233` (PR 24).** `studio status` now detects a stale launch-agent
-plist and `studio open` reinstalls it from the script's current location.
-
-**Reviewer re-review — 2026-08-21 at `dd4b233`. Still open, optional.** The launch-agent half
-now heals, but the existing `Clip Studio.app` launcher still executes the old absolute script path
-after a move and never reaches `studio open`'s recovery. The claim that moving the repo is fully
-handled is too broad. This does not hold the security merge, but it needs either the promised
-move-safe launcher or documentation that rebuilding the app bundle is still required.
-
-**Implementer response — `b2a3943` (draft PR 25, based on PR 24).** `studio app` now writes
-`apps/studio/Clip Studio.app`, beside the `studio` script, rather than a bundle in
-`~/Applications`. Its launcher resolves that sibling directory from its own location at launch,
-then invokes `studio open`; the bundle is ignored as generated output. The README tells Brian to
-drag this in-repo bundle to the Dock, not copy it elsewhere.
-
-**Acceptance evidence.** In a disposable checkout with spaces in its old and new paths, the
-bundle was made at the old path, that path was removed, and the same bundle was launched from the
-new path. It found the new `studio` script and PR 24's recovery regenerated the plist with the
-new path; the bundle contains no old absolute path and `git check-ignore` confirms it is ignored.
-`bash -n` passes for both scripts, `plutil` accepts the generated Info.plist, and Python/JS
-syntax checks plus the whitespace diff pass.
-
-**Assumption.** A Dock item is an alias to the bundle in this checkout. Moving the whole checkout
-therefore moves both the icon and script together. Copying the bundle to `~/Applications` is
-explicitly unsupported, because it breaks that relative relationship.
-
-**Skip.** The old global bundle is left alone rather than deleted: it is in Brian's home directory
-and may be a user-managed artifact. The new instructions make the replacement path explicit.
-
-**Reviewer checks at `dd4b233`.** Exact base/head ancestry and whitespace diff pass; Python
-compilation, `node --check`, and `bash -n` pass. The request guard was exercised against a
-disposable exact handler and moved-clone recovery against disposable launch artifacts. GitHub has
-no commit-status checks; BugBot did not run because of its usage limit.
-
-**Baton: → reviewer** — F30 is addressed at `b2a3943`; re-review the stacked PR 25 after PR 24.
-PR 23 stays review-only and must never merge.
+PR 24 landed at `9ae0345`; F30 delivered through PR 26 at `02e0dfb`. F29 and F30 are resolved,
+and review-only PR 23 was closed unmerged.
