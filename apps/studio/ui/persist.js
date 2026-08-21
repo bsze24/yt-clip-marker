@@ -71,6 +71,20 @@ async function persistAddition(runId, addition) {
   setSave("saved");
 }
 
+// A work edit on a row is a SECTION BREAK — "work changes from here" — not a
+// property of that clip. One event per change instead of the string on every
+// row. Everything after it inherits by resolution, so nothing to re-enter.
+export async function persistSection(start, work, runId = S.currentId) {
+  if (!runId) return;
+  setSave("saving…");
+  try {
+    const res = await api("/api/section", "PUT", { runId, start: Number(start) || 0, work });
+    S.sections = res.sections || [];
+    setSave("saved");
+    renderGrid();
+  } catch (err) { saveFailed(err); }
+}
+
 export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
   if (!tax || tax.type === "none" || !runId) return;
   const snapshot = {
@@ -78,7 +92,6 @@ export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
     id: tax.id,
     tags: [...(tax.tags || [])],
     lane: tax.lane || "",
-    work: tax.work || "",
   };
   if (snapshot.type === "miss") {
     cancelPendingAddition(snapshot.id, runId);
@@ -86,7 +99,6 @@ export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
     if (!existing) return;
     existing.tags = snapshot.tags;
     existing.lane = snapshot.lane;
-    existing.work = snapshot.work;
     await persistAddition(runId, additionSnapshot(existing));
   } else if (snapshot.type === "model") {
     cancelScheduled(`${runId}:taxonomy:${snapshot.id}`);
@@ -95,7 +107,7 @@ export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
     try {
       res = await api("/api/annotate", "PUT", {
         runId, index: Number(snapshot.id),
-        tags: snapshot.tags, lane: snapshot.lane, work: snapshot.work,
+        tags: snapshot.tags, lane: snapshot.lane,
       });
     } catch (err) {
       saveFailedForRun(err, runId);
@@ -106,7 +118,7 @@ export async function persistTaxonomy(tax = S.liveTax, runId = S.currentId) {
     S.current.annotations = S.annotations;
     setSave("saved");
   }
-  if (isCurrentRun(runId)) rememberChapter(snapshot.lane, snapshot.work);
+  if (isCurrentRun(runId)) rememberChapter(snapshot.lane, "");
 }
 
 export function queueTaxonomy() {
@@ -124,7 +136,6 @@ export function queueTaxonomy() {
     if (!existing) return;
     existing.tags = snapshot.tags;
     existing.lane = snapshot.lane;
-    existing.work = snapshot.work;
     const addition = additionSnapshot(existing);
     scheduleSave(`${runId}:miss:${Number(snapshot.id)}`, 400, () => persistAddition(runId, addition));
     return;

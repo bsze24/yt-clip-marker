@@ -56,23 +56,27 @@ A "current clip set" for a video is a fold over the run file plus its label even
 1. **Description timestamps** — `M:SS Title` lines, ends dropped. YouTube auto-links them. Primary near-term output.
 2. **JSON for media-scraper** — array of clip objects as above plus `videoUrl`/`videoTitle`. **Draft** — freeze when the export button lands, not before. Keep it generic enough that a future PKM could ingest clips alongside other annotated content.
 
-## Run-level `work`  (2026-08-21)
+## `work` is a section break, not a clip field  (2026-08-21)
 
-`work` was stored on every clip and never varied like clip data: across 193 annotated rows it
-changed 5 times on one video and **0** on the other two, where the same string was recorded 75
-times. It is lesson metadata, not clip metadata.
+`work` was stored on every clip and never behaved like clip data. On video 1 it changed twice
+across 67 rows and the string was written on all 67; on video 2 one value was stored 75 times.
+A lesson covering two pieces is normal — it is a *section*, and sections have boundaries.
 
-It now lives once per run. Because `runs/{id}.json` is immutable ingest output ([[D-002]]) it
-cannot be written there, so it is a label event — `verdict: "chapter"`, latest wins — and the
-server resolves it on read and returns it as `runWork` on `/api/run`. Same shape as media
-([[D-034]]).
+A work change is now one event at a timestamp, on the run. Because `runs/{id}.json` is
+immutable ingest output ([[D-002]]) it lives in `labels.jsonl`:
 
 ```json
-{"verdict": "chapter", "runId": "...", "work": "Pennies from Heaven | Stan Getz"}
+{"verdict": "chapter", "runId": "...", "start": 0,    "work": "Pennies from Heaven | Stan Getz"}
+{"verdict": "chapter", "runId": "...", "start": 4582, "work": "Eb Blues | 1 bar, 1 chord exercise"}
 ```
 
-**A clip's own `work` still wins.** One lesson covering two pieces is normal — video 1 does
-exactly that, and its export keeps both section headers. The run-level value is the default for
-every clip that does not say otherwise, which is now every newly added clip.
+Two events for video 1 instead of 67 copies. Latest event per `start` wins; an empty `work`
+removes that break.
 
-Consumers should read `clip.work || run.work`.
+**A clip's work is resolved, never stored** — the latest break at or before its start.
+`/api/run` returns `sections` as `[[start, work], ...]` ascending; consumers resolve from that.
+`clip.work` still appears on events written before this date and is no longer read.
+
+Set the lesson's piece once in the header. When it changes, `Tab` then `w` on the row where it
+changes — the field is labelled *changes work from here* and is prefilled with what is
+currently in effect, so you can see what you are overriding.

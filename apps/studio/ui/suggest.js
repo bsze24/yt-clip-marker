@@ -3,7 +3,7 @@
 import { $, TAGS, normalizeTag, escapeHtml, escapeAttr, typingInField } from "./util.js";
 import { S } from "./state.js";
 import { keepKeysOnPage } from "./player.js";
-import { persistTaxonomy } from "./persist.js";
+import { persistTaxonomy, persistSection } from "./persist.js";
 import { onEnter } from "./composer.js";
 
 let suggestHi = -1;
@@ -208,8 +208,15 @@ function renderTagChips(wrap) {
 export function finishComboEdit() {
   const input = document.activeElement;
   if (S.liveTax && input && input.dataset.combo === "lane") S.liveTax.lane = input.value.trim();
-  if (S.liveTax && input && input.dataset.combo === "work") S.liveTax.work = input.value.trim();
-  persistTaxonomy();
+  if (input && input.dataset.combo === "work") {
+    // "work changes from here" — one section break on the run, not a value on
+    // this clip. Everything after inherits it by resolution.
+    const row = input.closest("tr");
+    const start = row ? Number(row.dataset.start) : NaN;
+    if (Number.isFinite(start)) persistSection(start, input.value.trim());
+  } else {
+    persistTaxonomy();
+  }
   document.querySelectorAll(".suggest").forEach((el) => { el.hidden = true; });
   // keepKeysOnPage refuses to steal focus from a text field (that guard exists
   // for real typing), so the combo input must blur itself first or Escape

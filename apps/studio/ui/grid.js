@@ -2,7 +2,7 @@
 // Selection is by row identity (rowKey), never start time alone — duplicate
 // timestamps are real.
 import { $, hms, fbClass, evalMark, isWrong, isCheck, feedbackWhy, isBackchannel, escapeHtml, escapeAttr, missId, MATCH, typingInField, resolvedLabel, extractedList } from "./util.js";
-import { S, rememberCursor, FOLLOW_KEY } from "./state.js";
+import { S, rememberCursor, FOLLOW_KEY, workAt } from "./state.js";
 import { seek, scrubTo, keepKeysOnPage, isPlaying, getCurrentTime } from "./player.js";
 import { renderSuggest, resetSuggestHi } from "./suggest.js";
 import { renderTimeline } from "./timeline.js";
@@ -352,7 +352,7 @@ function taxonomyCells(row, selected) {
   const tax = taxonomyOf(row);
   if (!selected || S.composer) {
     return `<td class="col-tags"><span class="tax-text">${escapeHtml((tax.tags || []).join(" · "))}</span></td>
-      <td class="col-work"><span class="tax-text">${escapeHtml(tax.work)}</span></td>
+      <td class="col-work"><span class="tax-text">${escapeHtml(workAt(row.start))}</span></td>
       <td class="col-lane"><span class="tax-text">${escapeHtml(tax.lane)}</span></td>`;
   }
   // Hitchhiking while playing would orphan combo inputs as the playhead
@@ -360,7 +360,7 @@ function taxonomyCells(row, selected) {
   // video is rolling.
   if (!S.followPinned && isPlaying()) {
     return `<td class="col-tags"><span class="tax-text">${escapeHtml((tax.tags || []).join(" · "))}</span></td>
-      <td class="col-work"><span class="tax-text">${escapeHtml(tax.work)}</span></td>
+      <td class="col-work"><span class="tax-text">${escapeHtml(workAt(row.start))}</span></td>
       <td class="col-lane"><span class="tax-text">${escapeHtml(tax.lane)}</span></td>`;
   }
   const chips = (tax.tags || []).map((tag) =>
@@ -372,7 +372,7 @@ function taxonomyCells(row, selected) {
       <div class="suggest" hidden></div>
     </div></td>
     <td class="col-work"><div class="combo">
-      <input data-combo="work" autocomplete="off" value="${escapeAttr(tax.work)}" />
+      <input data-combo="work" autocomplete="off" value="${escapeAttr(workAt(row.start))}" placeholder="changes work from here" />
       <div class="suggest" hidden></div>
     </div></td>
     <td class="col-lane"><div class="combo">

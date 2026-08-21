@@ -3,7 +3,7 @@
 // Nearby rows collapse to one line; extracted title and start win when present.
 // Taxonomy still comes from the studio clip (added or skill marker) in that cluster.
 import { MATCH, STAR_TAG, isCheck, isWrong, resolvedLabel, ytStamp, extractedList } from "./util.js";
-import { S, setSave } from "./state.js";
+import { S, setSave, workAt } from "./state.js";
 
 const RANK = { extracted: 0, miss: 1, skill: 2 };
 
@@ -123,7 +123,7 @@ function formatClip(c, sectionLane) {
 }
 
 function sectionLaneFor(clips, work) {
-  const hit = clips.find((c) => (c.work || "") === work && c.lane);
+  const hit = clips.find((c) => workAt(c.start) === work && c.lane);
   return (hit && hit.lane) || "";
 }
 
@@ -135,10 +135,10 @@ export function descriptionTimestampText() {
   let lastWork = "";
   let sectionLane = "";
   for (const c of clips) {
-    // A clip's own work still wins — one lesson covering two pieces is normal,
-    // and video 1 does it. The run-level value is the default for everything
-    // that does not say otherwise, which is now every newly added clip.
-    const work = (c.work || "").trim() || (S.runWork || "").trim();
+    // Resolved from the section breaks, never read off the clip. `c.work` is
+    // legacy — video 1 stored the string on all 67 of its rows before the
+    // breaks existed, and its two rows were migrated to two events.
+    const work = workAt(c.start);
     if (work && work !== lastWork) {
       sectionLane = sectionLaneFor(clips, work);
       if (lines.length) lines.push("");
@@ -151,7 +151,7 @@ export function descriptionTimestampText() {
   // header so that header isn't swallowed as the chapter title.
   if (clips[0].start > 0) {
     const zero = `${ytStamp(0)} Start`;
-    if (((clips[0].work || "").trim() || (S.runWork || "").trim())) lines.splice(1, 0, zero);
+    if (workAt(clips[0].start)) lines.splice(1, 0, zero);
     else lines.unshift(zero);
   }
   return lines.join("\n");
