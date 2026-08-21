@@ -53,7 +53,13 @@ def _run_ytdlp(cmd):
 
 
 def fetch_captions(video_id):
-    """Auto/manual caption track as [(start_seconds, text), ...] via json3."""
+    """Auto/manual caption track via json3.
+
+    Returns `(pairs, source)`. `source` names the track that was actually used —
+    yt-dlp writes `{id}.en-orig.json3` for the original and `{id}.en.json3` for
+    the auto-translated one, and which you got changes what the transcript says.
+    It is recorded on the run so that stays answerable later.
+    """
     with tempfile.TemporaryDirectory() as td:
         proc = _run_ytdlp([
             "yt-dlp", "--skip-download",
@@ -69,6 +75,7 @@ def fetch_captions(video_id):
             raise IngestError(
                 f"no captions found (yt-dlp exit {proc.returncode}). {tail}"
             )
+        source = os.path.basename(files[0])
         with open(files[0], encoding="utf-8") as fh:
             data = json.load(fh)
     cues = []
@@ -82,7 +89,7 @@ def fetch_captions(video_id):
         cues.append((ev.get("tStartMs", 0) / 1000.0, " ".join(text.split())))
     if not cues:
         raise IngestError("caption track was empty")
-    return cues
+    return cues, source
 
 
 def build_cues(pairs, gap_seconds=DEFAULT_GAP_SECONDS):
@@ -146,7 +153,8 @@ def create_run(url_or_id, runs_dir, gap_seconds=DEFAULT_GAP_SECONDS):
         raise IngestError(f"could not parse a video id from: {url_or_id!r}")
 
     title, description = fetch_title_and_description(video_id)
-    cues = build_cues(fetch_captions(video_id), gap_seconds)
+    caption_pairs, transcript_source = fetch_captions(video_id)
+    cues = build_cues(caption_pairs, gap_seconds)
 
     run = {
         "videoId": video_id,
@@ -155,6 +163,7 @@ def create_run(url_or_id, runs_dir, gap_seconds=DEFAULT_GAP_SECONDS):
         "createdAt": datetime.now().astimezone().isoformat(),
         "markers": [],
         "cues": cues,
+        "transcriptSource": transcript_source,
         "descriptionText": description,
         "extracted": parse_description_timestamps(description),
     }

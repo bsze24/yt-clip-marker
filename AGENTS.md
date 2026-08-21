@@ -193,5 +193,13 @@ Run the pre-SHA checklist in `docs/coordination/README.md` — it is the one cop
 session was driven by a prompt file, the same three-part audit (acceptance criteria with
 evidence, assumptions, skips and divergences) applies before you commit.
 
-There is no test suite. The floor is: the studio boots and a label save round-trips; the
-extension still loads unpacked with a clean console on a watch page.
+There is one test file, `apps/studio/tests/test_sidecars.py` — stdlib `unittest`, no
+dependencies, covering the sidecar matching that F18 and F20 were both filed against. Run it:
+
+```bash
+python3 apps/studio/tests/test_sidecars.py
+```
+
+Everything else is unverified by machine. The floor is: that file passes, the studio boots and a
+label save round-trips, and the extension still loads unpacked with a clean console on a watch
+page.
