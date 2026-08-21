@@ -518,9 +518,13 @@ They remain a permanent, honest **v1 baseline** (94% and 81% star recall). They 
 set. Record both facts on those runs; without the second, someone scores v3 against video 3 in
 three months and concludes the skill improved.
 
-**The cadence.** Keep a small stock of unspent blind-marked lessons — roughly one in four or
+**The cadence.** ~~Keep a small stock of unspent blind-marked lessons — roughly one in four or
 five. Spend one per skill revision. There are **zero unspent today** and v2 is untested, so the
-next lesson marked is the held-out one, and it has to be marked before v2 runs on it.
+next lesson marked is the held-out one, and it has to be marked before v2 runs on it.~~
+**Superseded by [[D-043]] (2026-08-21).** The rest of D-041 stands; only this paragraph is
+retired. It treated blind-marked lessons as a depleting stock when they are manufactured on
+demand — every future lesson is a candidate, so the scarce resource is Brian's time, not the
+data.
 
 
 ### D-042 — markers flow one way, app → YouTube; the video title flows the other way  (Accepted 2026-08-21)
@@ -560,6 +564,48 @@ after export to update clips; it does not change `extracted[]`.
 for the extracted label is arguably backwards going forward: the app is canonical, so the app's
 label should win. It was right for video 1, whose description stamps predate the studio. Left
 as-is deliberately — changing export behavior is a separate call with its own PR.
+
+
+### D-043 — use the skill for real before preserving held-out data  (Accepted 2026-08-21)
+
+Supersedes the cadence paragraph of [[D-041]], which required the next lesson to be marked blind
+before `SKILL.md` v2 could run on it. Reverses that ordering.
+
+**The first v2 run is a smoke test, not a measurement.** v2 has never executed — written
+2026-08-20 23:40, newest proposals file 23:23. Run it on video 2 or 3, which are already marked
+and already contaminated, to confirm it produces sane output and obeys its own rules. **Do not
+record that score as a v2 result.** Every v2 rule was derived from videos 1-3; `R-COVERAGE`
+exists because video 3 had a five-minute hole, so re-running fills the hole by construction.
+
+**Then use v2 for real on the next few lessons rather than marking one blind.** Record four
+numbers per lesson, which takes a minute:
+
+| # | What | Why |
+|---|---|---|
+| 1 | proposals offered | denominator |
+| 2 | **accepted without playing the video** | **the number that matters** |
+| 3 | had to scrub to check | the cost side |
+| 4 | clips added that nothing proposed | free recall proxy |
+
+**Why this ordering.** Measure what could change the plan. Held-out recall on v3 versus v2 is
+nice to have — a bad number would not stop Brian using the skill. The fraction of proposals
+judgeable from the label alone could kill the premise: 15 lessons at 45 minutes is 11 hours, at
+10 minutes it is 2.5, and if authoring time does not fall the data scale for rungs 3 and 4 is
+never reached. Only real use produces that number.
+
+**The cost, stated.** There are zero clean test lessons and there will still be zero after this.
+Videos 1-3 are contaminated permanently, because a rule derived from them stays in the skill.
+When v3 exists and the question is whether it beat v2, a lesson has to be marked blind then —
+roughly 45 minutes, deferred rather than avoided. Accepted because the iteration rate is three
+lessons in two weeks against one skill revision that has never run; held-out data is not the
+binding constraint at that rate.
+
+**What would reverse this.** Several skill revisions landing in a month, which makes held-out
+data binding sooner. Or Brian already knowing he can judge proposals from labels without
+playing the video, which makes the number above worthless and D-041's ordering correct again.
+
+**Reinstate blind marking** when a revision worth testing exists and the workflow has settled —
+expected around v3. Not scheduled here.
 
 
 ## Process

@@ -200,17 +200,16 @@ Confidence: high that the toggle should go, moderate on what replaces the two wr
 does. `x` survives and gets reinterpreted as the rejection channel. Confidence: high on `keep`,
 moderate on `g`.
 
-**C. Should the next lesson be marked blind?** Recommend no — use v2 for real instead. You have
-hand-marked three lessons and used the tool zero times. The missing number is not recall; you have
-that from two blind videos. It is *what fraction of proposals you can judge from the label without
-playing the video*, and only real use produces it. Confidence: high.
+**C. Should the next lesson be marked blind?** **Decided 2026-08-21 — no. See [[D-043]].**
 
-> **This contradicts [[D-041]] and has not been resolved.** D-041's "cadence" paragraph says the
-> opposite in as many words: *"There are zero unspent today and v2 is untested, so the next lesson
-> marked is the held-out one, and it has to be marked before v2 runs on it."* One of the two is
-> wrong and neither has been retired. Do not act on this recommendation as though it were settled
-> — either supersede D-041 with a dated entry, or strike this recommendation. Flagged
-> 2026-08-21.
+Use v2 for real instead and record four numbers per lesson: proposals offered, accepted without
+playing the video, had to scrub to check, clips added that nothing proposed. The second is the
+one that matters — it is the only number here that could kill the premise, because if authoring
+time does not fall from 45 minutes the data scale for rungs 3 and 4 is never reached.
+
+The cost is real and was accepted: zero clean test lessons exist and zero will exist after this.
+When v3 needs testing, a lesson gets marked blind then — about 45 minutes, deferred rather than
+avoided. D-043 carries the full argument and the two conditions that would reverse it.
 
 **D. Is re-running v2 on videos 2 and 3 worth it?** Recommend a single unmodified v2 run for an
 unconfounded baseline, then stop. Beyond that it is near-tautological — every v2 rule was derived
@@ -224,9 +223,12 @@ roadmap and the ladder stops at 3. **Run this before planning around rung 4.** R
 
 ## 8. Next actions, ordered
 
-1. **Star predictability test** (§7E). An hour, and it gates the top of the ladder.
-2. **Run `SKILL.md` v2 once, unmodified**, for the first v2 baseline that has ever existed.
-3. **Use v2 for real on the next lesson** and record the judge-without-playing fraction.
+1. **Run `SKILL.md` v2 once on video 2 or 3** — a smoke test that it executes and obeys its own
+   rules, not a measurement. Do not record the score as a v2 result ([[D-043]]).
+2. **Star predictability test** (§7E). An hour, and the only item that can *remove* work: if
+   nothing in the transcript predicts `star`, rung 4 loses its most valuable target and the
+   ladder stops at 3.
+3. **Use v2 for real on the next few lessons** and record the four numbers ([[D-043]] §C).
 4. **Fix `score_run.py`'s `annotated` proxy** — one line, `if not truth.get("markers"):`.
 5. **Add the "was a proposal in front of me" boolean** next time the write path is open.
 6. **Display fixes**: stop printing `MISS.` under your own clips; show eval counters only when the
