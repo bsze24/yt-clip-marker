@@ -6,6 +6,7 @@
 # dock icon and no URL bar — as close to a native app as a local web app gets.
 #
 #   apps/studio/studio install    write and load the launch agent (once)
+#   apps/studio/studio app        build "Clip Studio.app" in ~/Applications
 #   apps/studio/studio open       app window, starting the server if needed
 #   apps/studio/studio start|stop|restart|status|logs|uninstall
 #
@@ -75,8 +76,40 @@ case "${1:-open}" in
     launchctl print "$DOMAIN/$LABEL" 2>/dev/null | awk '/state = |pid = |last exit/ {print "  " $0}' || echo "  agent not loaded — run: $0 install"
     ;;
   logs)   tail -n "${2:-40}" "$LOG" ;;
+  app)
+    # A real double-clickable bundle, so this does not depend on a Chrome menu
+    # path — those move between versions. It just runs `studio open`.
+    BUNDLE="$HOME/Applications/Clip Studio.app"
+    mkdir -p "$BUNDLE/Contents/MacOS"
+    cat > "$BUNDLE/Contents/Info.plist" <<INFO
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key><string>Clip Studio</string>
+  <key>CFBundleIdentifier</key><string>$LABEL.launcher</string>
+  <key>CFBundleExecutable</key><string>launch</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>LSUIElement</key><true/>
+</dict>
+</plist>
+INFO
+    printf '#!/bin/sh\nexec "%s" open\n' "$APP_DIR/studio" > "$BUNDLE/Contents/MacOS/launch"
+    chmod +x "$BUNDLE/Contents/MacOS/launch"
+    plutil -lint "$BUNDLE/Contents/Info.plist" >/dev/null
+    echo "built $BUNDLE"
+    echo "drag it to the Dock, or open it from Launchpad."
+    ;;
   open)
-    up || { launchctl kickstart "$DOMAIN/$LABEL" 2>/dev/null || true; wait_up; }
+    # bootstrap if the agent was booted out (by the quit button, or by hand);
+    # kickstart alone fails when the label is not loaded at all.
+    up || {
+      launchctl kickstart "$DOMAIN/$LABEL" 2>/dev/null \
+        || launchctl bootstrap "$DOMAIN" "$PLIST" 2>/dev/null \
+        || true
+      wait_up
+    }
     open -na "Google Chrome" --args --app="$URL" 2>/dev/null || open "$URL"
     ;;
   uninstall)
