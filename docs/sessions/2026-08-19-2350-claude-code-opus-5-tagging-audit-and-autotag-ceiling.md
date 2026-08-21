@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 16:00
+revised: 2026-08-21 16:25
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -1029,4 +1029,62 @@ revision cadence, or Brian already knowing he can judge proposals from labels.
    playing / had to scrub / added unprompted.
 4. `CURRENT.md` phases 1-4, baton on implementer. Phase 1 touches `docs/clip-schema.md`.
 5. `EVAL.md` §7 A, B, D still open. §C is closed.
+
+---
+
+# Append — 2026-08-21 16:25 — stale-pointer audit before handoff
+
+Brian asked whether a fresh session could pick this up. Audited the docs a fresh session actually
+reads first, rather than assuming. Four things were stale and one bug was hiding behind a fixed one.
+
+## What changed
+
+- `AGENTS.md` §"Repo state" claimed `main` is `5af3e13` (2026-08-18). It was 18 PRs behind.
+  Replaced with a pointer to `git log` rather than another SHA that goes stale on the next merge.
+- `AGENTS.md` §"Session logs" named only the `studio-workspace` head. Added the live thread:
+  `track: reduce-manual-tagging`, this file, read the last two appends first.
+- `CURRENT.md` §0 said "Review-only PR #23 is open... it must be closed" and named PR 22 as the
+  latest merge. PR 23 was closed; 24, 25, 26 landed. Rewritten, with pointers to D-042 and D-043
+  since both post-date the spec body.
+- `REVIEW.md` thread 6 was marked **OPEN** with F24 "blocking · open" — but F24's own body already
+  recorded the repair and ended "**Resolved.**" Only the headings were stale. Both fixed.
+- `REVIEW.md` F25 marked resolved; **F31 filed.**
+
+## The finding worth keeping
+
+**F25 is fixed and there is a second bug that looks exactly like it.** F25 was a `NameError` in
+`make_transcript.py`'s zero-cue refusal. Verified fixed — it now prints the concise message.
+
+While verifying it I ran the *other* eval CLI against the same zero-cue run and got a crash:
+
+```
+ValueError: min() iterable argument is empty
+  apps/studio/eval/score_run.py:84, in nearest()
+```
+
+Different file, different exception, same trigger — a run with no human rows to score against.
+Never filed. It is now **F31**, optional, baton on implementer.
+
+**The lesson.** I nearly closed F25 by pattern-match: I reproduced *a* crash on *a* zero-cue run
+and started writing "F25 still live, misdescribed". Reading F25's actual text — which names
+`make_transcript.py:78` — is what separated them. A finding that names a file and a line is
+checkable against that file and line, not against the general area.
+
+## Learning arc
+
+- **"Is it documented?" is a checkable question, not a judgment call.** The answer was no, and the
+  way to find that was to open what a fresh session opens rather than recall what was written.
+- Staleness clusters at the *entry points*. The deep docs were fine; `AGENTS.md` and `CURRENT.md`
+  §0 — the two things read first — were the wrong ones.
+
+## Coaching hooks
+
+- **Do not restate a SHA in prose.** `AGENTS.md` carried one for three days past its truth. Point
+  at the command instead. Same class as the earlier session-log filename-vs-content trap.
+- **Verify a finding against the line it names.** F25/F31 would have merged into one wrong entry.
+
+## Next / open threads — unchanged from the 16:00 append, plus
+
+6. **F31** — `score_run.py` refuses cleanly when there are no human rows. Optional. Same pass as
+   the `annotated` proxy fix (`docs/reference/EVAL.md` §4); both are in `score_run.py`.
 
