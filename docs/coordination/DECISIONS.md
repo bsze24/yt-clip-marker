@@ -608,6 +608,57 @@ playing the video, which makes the number above worthless and D-041's ordering c
 expected around v3. Not scheduled here.
 
 
+### D-044 — nothing in the transcript predicts `star`, so rung 4 loses its target  (Accepted 2026-08-21)
+
+Answers the question `docs/reference/EVAL.md` §7E left open, and it is the same answer [[D-040]]
+gave for `take`. Re-run the evidence with
+`python3 apps/studio/eval/star_predictability.py`.
+
+**The measurement** (script open in PR 27). 147 clips Brian created himself, 66 starred, base rate 45%. Ten features a
+model could compute from the transcript — talk density, teacher share, theory-word density,
+instruction words, emphasis words, question rate, mean cue length, vocabulary richness, proximity
+to a silence gap, position in the lesson — scored between 0.44 and 0.60 AUC pooled. Not one keeps
+its sign across all three lessons. The best, mean cue length, is 0.603 at p=0.035, which survives
+neither ten comparisons nor video 1, where it reverses to 0.48.
+
+**The test that carries the decision is the ceiling, not the feature table.** A model scored all
+75 of video 2's clips from **Brian's own labels** with the stars hidden — a strictly richer input
+than the transcript, because the label is his description of the moment written after he watched
+it. AUC 0.513 against a coin flip's 0.500, p=0.86. Its top 10 picks were 60% starred against a
+48% base; its top 20 were 45%, below base. A property his own words cannot express is not one a
+transcript classifier is going to find.
+
+**Why, and it is the same wall as D-040.** `star` marks the demonstration, not the idea. `demo`
+in his own label runs 86% starred (1.91×), the `take` tag 78% (1.73×), the `chord exercise` tag
+73% (1.63×) — while `barry`/`harris` runs 40%, `fingering` 0 of 7 and `technique` 0 of 5. The
+model's errors say it from the other side: it ranked *General rule louder for higher notes* and
+*This technique is called a line cliche* at the top and neither is starred, and ranked *Line 2 —
+jake take* at the bottom, which is. D-040 already established that whether a passage is a
+demonstration cannot be recovered from a transcript, measured four ways.
+
+**One feature did beat chance and it is not text.** Position in the lesson: 0.671, p<0.001. It is
+the annotation pass, not the lesson. On video 1 the first half holds 0 stars in 11 clips and the
+second holds 9 in 10 — a change in how he was working. Video 2, the largest sample, shows nothing
+at all. Not usable, and not transcript-derived even if it were.
+
+**What this changes.** Rung 4 of the ladder — a classifier or fine-tune trained on his labels —
+loses `star`, which was its most valuable target. What remains for rung 4 is placement, and
+placement has no headroom: `R-CONCEPT` already reaches 100% region recall within 30s. **The
+ladder therefore stops at rung 3 (retrieval over past labels), and rung 2 (few-shot placement
+examples) is the top of it still worth building.** Removing rung 4 removes the argument for
+collecting 12–20 lessons of labels to train on, which was the largest piece of speculative work
+on the roadmap.
+
+**What would reverse this.** Audio. Music-versus-speech analysis would recover demonstration
+directly, and it is the only route left to `star`. It is a new dependency and a real project
+against [[D-005]], not a rule edit — record it as an option with a price, not a plan. The other
+reversal is a new tag that turns out to be text-expressible; nothing in the taxonomy currently
+looks like one.
+
+**The honest limit.** 147 clips with 66 positives cannot rule out a weak real effect around
+AUC 0.58. That is why the ceiling test decides this and not the feature table.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

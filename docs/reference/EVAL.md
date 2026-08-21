@@ -4,7 +4,8 @@ What the eval channels are, what they have produced, and what would make the ski
 Live record: edit in place, commit straight to `main`.
 
 Companion docs: `BACKLOG.md` "Skill eval" holds the scored numbers; `DECISIONS.md` holds
-[[D-010]], [[D-021]], [[D-040]], [[D-041]]. This file is the one that answers "where are we".
+[[D-010]], [[D-021]], [[D-040]], [[D-041]], [[D-043]], [[D-044]]. This file is the one that
+answers "where are we".
 
 Numbers below were recomputed from the store on 2026-08-21 at `3f87bd8`. Where they disagree
 with an earlier note, this file is right — the store has grown.
@@ -30,13 +31,19 @@ Everything in this file is about making 1 cheap enough that 2 becomes reachable.
 | Length (last cue) | — | 3870s | 2640s |
 | Skill markers in the run | 64 | 0 | 0 |
 | Human-created clips | 21 | 75 | 51 |
-| Starred rows | 11 | 36 | 21 |
-| Tagged rows | 34 | 75 | 21 |
+| Starred rows | 17 | 36 | 21 |
+| Tagged rows | 59 | 75 | 21 |
 | Label events | 566 | 191 | 96 |
 | **Anchoring** | **anchored** | **blind** | **blind** |
 
 853 label events total. **147 human-created clips** across three lessons, plus 64 judged
-proposals on video 1. **68 starred rows.**
+proposals on video 1. **74 starred rows** — 66 on clips he built, 8 on skill markers he
+annotated.
+
+Video 1's two counts were corrected on 2026-08-21 (starred 11 → 17, tagged 34 → 59). The
+earlier pair matched no fold of the store: 9 of his own clips are starred and 8 of the skill
+markers he annotated are, and neither 11 nor any sum reaches it. `eval/star_predictability.py`
+recomputes all of these, so the table can be checked rather than trusted.
 
 **Anchored vs blind is the distinction that matters.** Video 1 was marked with the skill's
 proposals already on screen, so its negatives only cover places the model spoke — never the
@@ -67,6 +74,12 @@ fixes.
   from a transcript. Four features were tested against `take` and all four were dead.
 - **[[D-041]]** — eval is what you do anyway, not a separate pass. Supersedes [[D-010]].
 - **Section breaks** (PRs 21, 22): `work` and `lane` moved off the clip onto the run.
+- **`SKILL.md` v2 ran, once, on video 3** (2026-08-21). Smoke test only — the score is not a v2
+  result ([[D-043]]). It executes and it obeys its own rules: 99 proposals over 44 minutes
+  (2.25/min against `R-COPIOUS`'s floor of 1), 99/99 on exact cue starts (`R-CUE-EXACT`), no
+  gap over 60s (`R-COVERAGE`). Artifacts: `/tmp/video3-proposals-v2.json`.
+- **`eval/star_predictability.py`** (2026-08-21) — the §7E test, re-runnable. See [[D-044]].
+  Open in PR 27, so it is not on `main` yet.
 
 ## 4. Current state of the code — verified 2026-08-21
 
@@ -118,10 +131,12 @@ ran, so nothing was missed. `score_run.py` printed `0 of 65 proposals earned a s
 which reads as failure and means undefined; a special case now prints "not applicable". Do not
 rename in the store — 853 append-only events, and the word is only wrong in the UI.
 
-### `SKILL.md` v2 has never been run
+### `SKILL.md` v2 has now been run once — 2026-08-21
 
-`SKILL.md` was last written 2026-08-20 23:40. The newest proposals file, `/tmp/video3-proposals.json`,
-is 23:23. Every scored number on record came from v1. **There is no v2 measurement of any kind.**
+Closed. It had never executed: `SKILL.md` was written 2026-08-20 23:40 and every proposals file
+predated it, so every scored number on record came from v1. The smoke test in §3 fixed that.
+**There is still no v2 *measurement*, and by [[D-043]] there should not be one until v2 is used
+on a lesson it did not help design.**
 
 Also confirmed: `Backdoor dominant is iv–I (plagal)` is already in `SKILL.md` at lines 95 and 105.
 The label half of that edit is in v2; the earlier doubt about it was unfounded.
@@ -142,7 +157,7 @@ you sat down.
 | 1 — hand-edited rules | where you are | now; saturates ~5–8 lessons |
 | 2 — few-shot placement examples | learning from labels, in-context | **available now** |
 | 3 — retrieval over past labels | show the model what you did at similar past moments | ~10–15 lessons (700–1000 markers) |
-| 4 — classifier / fine-tune | trained on your labels | ~8–15 lessons; `star` needs 12–20 |
+| 4 — classifier / fine-tune | trained on your labels | **off the roadmap for `star` — [[D-044]]** |
 
 Rungs 3 and 4 are estimates from measured rates, not measurements. Confidence: moderate on the
 ordering, low on the thresholds.
@@ -217,23 +232,70 @@ from those two videos. `R-COVERAGE` exists because video 3 had a five-minute hol
 the hole fills because the rule was written to fill it. That is a smoke test that the model obeys
 its own instructions, not evidence. Confidence: high.
 
-**E. Does anything in the transcript predict `star`?** Untested. `take` was tested four ways and
-all four features were dead. If `star` is the same, rung 4's most valuable target is off the
-roadmap and the ladder stops at 3. **Run this before planning around rung 4.** Roughly an hour.
+**E. Does anything in the transcript predict `star`? Tested 2026-08-21 — no. See [[D-044]].**
+
+147 clips, 66 of them starred, base rate 45%. Re-run it with
+`python3 apps/studio/eval/star_predictability.py`.
+
+| What was tested | Result |
+|---|---|
+| ten transcript features, pooled AUC | 0.44–0.60; not one keeps its sign across all three lessons |
+| best of them, `mean_cue_chars` | 0.603, p=0.035 — which is nothing after ten comparisons, and it reverses on video 1 (0.48) |
+| `position_in_lesson` | 0.671, p<0.001 — the only one that beat chance, and it is not text |
+| **ceiling: a model reading Brian's own labels** | **AUC 0.513, p=0.86** |
+
+**The ceiling test is what decides it.** The model scored all 75 of video 2's clips from Brian's
+own label text with the stars hidden. His label is a *richer* input than the transcript — it is
+his description of the moment, written after he watched it. It scored 0.513 against a coin flip's
+0.500. Its top 10 picks were 60% starred against a 48% base; its top 20 were 45%, below base.
+
+**`position_in_lesson` is the annotation pass, not the lesson.** On video 1 the first half holds
+0 stars in 11 clips and the second holds 9 in 10 — a regime change in how he was working, not a
+lesson that got important at the 45-minute mark. Video 2, the largest sample, shows nothing
+(0.50). Video 3 shows the drift, but he labelled it 48/50 steps front-to-back, so video position
+and labelling order are the same variable there and cannot be separated.
+
+**What `star` actually tracks, and why that closes the question.** It is not the idea, it is the
+demonstration:
+
+| Signal | n | starred | lift |
+|---|---|---|---|
+| `demo` in his own label | 21 | 86% | 1.91× |
+| the `take` tag | 18 | 78% | 1.73× |
+| the `chord exercise` tag | 15 | 73% | 1.63× |
+| `barry` / `harris` in his label | 10 | 40% | 0.89× |
+| the `fingering` tag | 7 | 0% | 0.00× |
+| the `technique` tag | 5 | 0% | 0.00× |
+
+The model's errors say the same thing from the other side. It ranked *General rule louder for
+higher notes*, *Barry Harris advance mode, drop 2* and *This technique is called a line cliche*
+at the top; none is starred. It ranked *Line 2 — jake take* and *Line 5 — kick off + jake take*
+at the bottom; both are. Star marks where someone played, and [[D-040]] already established that
+whether a passage is a demonstration is not recoverable from a transcript, measured four ways.
+
+**Silence gaps are dead here too**, which independently re-confirms `R-TAKE-GAP`'s retirement: a
+clip landing exactly on a gap cue is starred 38% of the time against the 45% base, and only 8 of
+61 gap cues in the whole corpus ever became a clip.
+
+**The honest limit.** 147 clips with 66 positives cannot rule out a weak real effect of AUC
+around 0.58. That is why the ceiling test carries the verdict rather than the feature table — a
+signal his own words cannot express is not one a transcript classifier will find.
 
 ## 8. Next actions, ordered
 
-1. **Run `SKILL.md` v2 once on video 2 or 3** — a smoke test that it executes and obeys its own
-   rules, not a measurement. Do not record the score as a v2 result ([[D-043]]).
-2. **Star predictability test** (§7E). An hour, and the only item that can *remove* work: if
-   nothing in the transcript predicts `star`, rung 4 loses its most valuable target and the
-   ladder stops at 3.
-3. **Use v2 for real on the next few lessons** and record the four numbers ([[D-043]] §C).
-4. **Fix `score_run.py`'s `annotated` proxy** — one line, `if not truth.get("markers"):`.
-5. **Add the "was a proposal in front of me" boolean** next time the write path is open.
-6. **Display fixes**: stop printing `MISS.` under your own clips; show eval counters only when the
+~~1. Run `SKILL.md` v2 once~~ — **done 2026-08-21** on video 3. See §3.
+~~2. Star predictability test~~ — **done 2026-08-21.** See §7E and [[D-044]]. It did what it was
+   supposed to do: it removed work.
+
+1. **Use v2 for real on the next few lessons** and record the four numbers ([[D-043]] §C). This
+   is now the only open item that can change the plan, because §7E closed the other one.
+2. **Fix `score_run.py`'s `annotated` proxy** — one line, `if not truth.get("markers"):`. Same
+   pass as **F31**, which is the other zero-cue crash in that file.
+3. **Add the "was a proposal in front of me" boolean** next time the write path is open (§6).
+4. **Display fixes**: stop printing `MISS.` under your own clips; show eval counters only when the
    run holds skill markers; then decide A and B above.
-7. **Build rung 2 placement examples** from the 147, sampled across all three lessons.
+5. **Build rung 2 placement examples** from the 147, sampled across all three lessons. This is
+   now the top of the ML ladder that is still worth climbing, not a step toward rung 4.
 
 The recall test comes free from normal use — every clip you add is a place the skill proposed
 nothing. Biased, because you cannot count what nothing prompted you to notice, but directional and

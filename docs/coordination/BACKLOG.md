@@ -108,6 +108,12 @@ task closed; the skill rewrite it authorised is `SKILL.md` v2 and [[D-040]].
 **`R-CUE-EXACT` holds on all three.** [[D-032]] does not revert; `TD-6` is closed by
 measurement — every proposal on every video lands on an exact cue start.
 
+**Do not add a v2 column to this table from `/tmp/video3-proposals-v2.json`.** That file is the
+2026-08-21 smoke test — 99 proposals on video 3, 100% star recall at 30s — and its numbers look
+excellent because every v2 rule was derived from video 3. `R-COVERAGE` exists *because* video 3
+had a five-minute hole. Recording it as a v2 result is the exact error [[D-043]] forbids. The
+first real v2 numbers come from a lesson v2 did not help design.
+
 **`R-CONCEPT` is the rule that works.** 95% on video 2 and 95% on video 3, on lessons whose
 content could hardly differ more. It carried 22 of video 3's 31 proposals.
 
