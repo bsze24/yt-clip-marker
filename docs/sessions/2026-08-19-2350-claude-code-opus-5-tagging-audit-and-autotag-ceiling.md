@@ -1,12 +1,12 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-20 23:52
+revised: 2026-08-21 11:41
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
 branch: main
-commit: 2e65fd18c32d1ca7835119733ca2e7a5ad8ff241
+commit: 0180557f8549970f249e4edaf34cfccb1b046fb9
 task: docs/coordination/CURRENT.md
 ---
 
@@ -386,4 +386,144 @@ because nobody counted what the model never showed him.
 - **06:46** — pushed back on the playback floor and was right.
 - **06:47** — renamed `polish` → `feel` (42 appended events), gated the three eval-chrome leaks,
   and auto-tagged video 3 as a preview. `harmony` fired on 49 of 51 rows — too loose.
+
+---
+
+# Append — 2026-08-21 11:41
+
+## ★ The eval redesign — flagged, at Brian's request
+
+Two reasons he asked for this to stand out. The second is the more important one.
+
+**One: the eval model changed shape, and the record should show why rather than just what.**
+It went from "grade the skill's markers in a separate pass" to "eval is what you do anyway."
+[[D-041]] carries the decision; this is how it got there.
+
+**Two: this is what it looks like when he does not just ACK a decision he 60% understands.**
+His words. He pushed on six separate points and was right or partly right on five. The design
+that landed is materially different from the one I proposed, and every difference came from a
+question he asked rather than an answer I gave.
+
+**What he caught, in order:**
+
+- **"tags are now autoapplied? so not a good measure of implicit keep?"** — killed my proposal
+  to record tag provenance so `keep` would keep working. A signal that depends on a workflow he
+  does not run is not a signal.
+- **"me editing tags is not a reliable workflow (case in point, i haven't reviewed video 3)"** —
+  cited his own behaviour as the evidence. That is the argument that ended `keep`.
+- **"the only reliable version of keep is I relabel a skill placed marker right?"** — proposed
+  the alternative himself. Checking it killed it too: all five relabels on video 1 are
+  byte-identical, because the event fires on save, not on change. Neither of us saw that coming.
+- **"are you overly equivocating"** — I had folded on a claim that was correct. The boolean is
+  redundant today; my original caution was right and I retracted it under pressure. He was
+  checking whether agreement was reasoning or reflex. It was reflex.
+- **"what we've done so far is not a good measure of what we might do in the future"** — the
+  single best correction of the session. I was answering a twenty-video question with
+  three-video evidence. Reasoning forward found that `x` is not a grade at all — `export.js`
+  drops a marker marked wrong, so it is the only way to keep junk out of the published
+  timestamps. Deprecating it would have removed the most-used action in the product.
+- **"g is 'this was a correctly placed marker, irrespective of whether it gets promoted to
+  star'"** — a real distinction I had wrong. I said `g` duplicated `star`; it does not. It
+  duplicates the *link*. Same conclusion, better reason, his.
+
+**What I got wrong along the way**, kept because the pattern is the lesson: three consecutive
+wrong counts on one question — "51 empty rationale blocks" (they say `MISS.`), then "64 + 21"
+(it is 75 + 10), then "75 real" (it is 64 real, and 11 of his own notes wearing a `MISS.`
+prefix). Each time the data was one command away and I reasoned instead of looking. He asked
+"what's going on with your accuracy?" and the honest answer was: asserting from a stale model
+of the repo, plus not re-reading what I had just changed.
+
+## What changed (third stretch)
+
+- `36629d9`, `7582052` — the merge rule: default to a PR, merge only on explicit instruction.
+  Living records still go straight to `main`. In `AGENTS.md` and in memory.
+- `79a598c` — thread 8 widened to PRs 21+22 as one design; thread 9 opened on PRs 18-20 via a
+  **review-only PR** (#23), a pattern worth reusing: throwaway base branch at the commit before
+  the range, head at the end, so GitHub renders the range and `main` is never touched.
+- `355f216` — PR 21 merged (work as a section break).
+- `0180557` — **[[D-041]]**, superseding [[D-010]]. Plus the build list and the machine-learning
+  answer in `BACKLOG.md`.
+- PR 22 open and unmerged — the first held under the new rule.
+
+## Decisions (third stretch)
+
+- **Default to a PR; merge only when told.** Ten PRs reached `main` unreviewed in two days
+  because "execute + pr + merge" was read as standing permission.
+- **Eval is what you do anyway** ([[D-041]]). `g` and `keep` retired, `x` reinterpreted as
+  "remove this from my list", the toggle goes, the note field stays. The link replaces grades.
+- **Videos 2 and 3 are spent.** Blind-marked, but every v2 rule came from them. Permanent honest
+  v1 baseline; not a test set. Zero unspent blind lessons exist.
+- **Machine learning is not the next lever.** The measured failures were specification problems;
+  the one thing training cannot fix needs audio. Few-shot label drafting from his own 193 labels
+  is the model work that pays.
+
+## Learning arc (third stretch)
+
+- Read the side-chat summary and asked me to reconcile it rather than accepting it — which found
+  that its one unverified item (the `keep` bucket) was real but far smaller than stated.
+- Worked out the section-break model unprompted and checked it in his own words: "set work on the
+  first marker, then that value gets autofilled to all captions below." Behaviour right, storage
+  wrong, and the correction — nothing is filled in, it is resolved — is the part that makes a
+  retroactive typo fix work.
+- Caught that PR 17 had shipped a half-change by **using the app**, not by reading the diff.
+- Asked whether I was over-equivocating. That is a different kind of question from the technical
+  ones: it is quality control on how the answers are being produced.
+- Reversed his own earlier position on deprecating `lane` once the economics changed, and said so
+  plainly rather than quietly.
+
+## Concepts touched (third stretch)
+
+- [concept] eval channels vs product keep (g / x / taxonomy / star / delete) — solid — took the
+  five apart and found `x` was never only a grade; retired two, reinterpreted one
+- [concept] anchored vs unanchored ground truth — solid — extended it to the spent-test-set
+  problem: videos 2 and 3 are blind but burned, because v2 was built from them
+- [concept] proxy-vs-recorded-fact — emerging — `keep`, `MISS.`, star precision and the boolean
+  are all the same shape: a fact knowable at write time, not written down, later guessed
+- [concept] one-name-per-thing — solidifying — `MISS.` is a storage word that reached the screen
+- [concept] concurrent-writers-on-shared-docs — solidifying — a fifth instance: scope widened in
+  `REVIEW.md` and not in the PR body, and the PR body is the more visible copy
+
+## Coaching hooks (third stretch)
+
+- **His pushback is worth more than my first answer.** Five of six challenges landed. The pattern
+  in all of them: he reasons from what he actually does, and I reason from what the data shows —
+  and when those disagree, his is usually the constraint that matters.
+- **"Are you over-equivocating" is a fair check and the answer was yes.** Conceding a correct
+  claim is worse than useless: it removes a real caution from the record. Hold the parts that
+  were right, change the conclusion if the argument earns it, and say which is which.
+- **Three wrong counts in a row on one question.** Each was one command from being right. The
+  rule going forward: a claim with a number in it gets a command first, or it gets flagged as an
+  inference.
+- **After renaming or renumbering, grep for the old name.** Mechanical, not judgment. Would have
+  caught the thread-6 pointer left in PR 22's body.
+
+## Next / open threads (third stretch)
+
+- **Codex's review is in on PRs 21+22** (`c2b912c`). Address the findings — that is the next
+  action, and it is the reason this log entry exists now rather than later.
+- Thread 9 (PRs 18-20, review-only PR #23) still open with Codex.
+- Nothing from [[D-041]] is built. The build list is in `BACKLOG.md` under "Eval, after D-041",
+  and nothing starts until the review threads clear.
+- **Mark the next lesson blind, before running v2 on it.** Zero unspent held-out lessons exist.
+
+## Chronology (third stretch)
+
+- **06:52** — `/session-log`, then the ballpark question: is the upside closer to 50% than 75%?
+- **07:00 onward** — measured video 2's annotation at 1.95x realtime from `labels.jsonl`
+  timestamps. Brian objected that video 3 skipped taxonomy, which broke the comparison; the split
+  was roughly 22 minutes of skipped tagging and the rest bugs and distraction.
+- Pushed back on "playback is the floor" — the tool skips between markers, so the floor is the
+  segments played. He was right and it moved 0.27x from unreachable to mid-range.
+- **Scored video 2, then video 3.** `R-TAKE-GAP` 92% then 50%; the prediction was wrong on one
+  and right on the other, and the falsification test had been badly specified.
+- Wrote `SKILL.md` v2. Twelve rules to ten.
+- **The work/lane cleanup.** Brian: "seems messy to have two work fields". PR 17 had been a half
+  change. PR 21 fixed it; PR 22 extended it to lane, reversing my earlier recommendation.
+- **"I don't see PR10"** — it did not exist. Two branches had claimed the number in commit
+  messages. Opened both properly.
+- **The merge rule.** Ten unreviewed merges, corrected twice — first as "never merge", then to
+  his actual rule.
+- **The eval conversation**, flagged above. Ran from "is eval free?" through three wrong counts,
+  the accuracy challenge, the twenty-video reframe, and landed on [[D-041]].
+- **11:41** — this log. Codex's review on 21+22 is in and unaddressed.
 
