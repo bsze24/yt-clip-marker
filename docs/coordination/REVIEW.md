@@ -38,9 +38,10 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 2 — video 1 store | `43c99dd` (PR 4) | **CLOSED** 2026-08-19 — merged; F17's cause is `TD-10` | — |
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 | 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
-| 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **resolved** — F20–F23 verified | → planner |
-| 6 — matching-label export fold | `e8d206c` (PR 10) | **open** — F24 blocking | → implementer |
-| 7 — eval scoring scripts | `e8943cd` (PR 11) | **open** — F25 optional | → implementer |
+| 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
+| 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
+| 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
+| 8 — lane as a section break | PR 22, `lane-as-section` | **open** — unmerged, awaiting review | → reviewer |
 
 ---
 
@@ -335,6 +336,12 @@ the code path is ready. The review comment is posted on PR #10.
 
 **Baton: → implementer.**
 
+**Implementer repair — merged `be32232`.** Taken as required. The `BACKLOG.md` and
+`DECISIONS.md` changes were reverted out of the branch and `main` merged in so the diff showed
+five lines rather than 106 — the stale merge base was attributing `main`'s own edits to this
+branch. The outcome is recorded on `main` as `D-039`, and `TD-16` cites it. Verified: exactly
+one `D-035` in `DECISIONS.md`, and `D-039` exists. **Resolved.**
+
 ---
 
 ## Thread 7 — eval scoring scripts (`e8943cdb67964a00b30a2893c1bdf83884c8244f`, PR 11) — OPEN
@@ -359,3 +366,38 @@ produce a bad transcript and does not affect video 2, so this is optional; using
 resolved file name fixes it. The inline review comment is posted on PR #11.
 
 **Baton: → implementer (optional; does not hold a merge).**
+
+---
+
+## Thread 8 — lane as a section break (PR 22, `lane-as-section`) — OPEN
+
+**Unmerged, deliberately.** Brian's standing instruction from 2026-08-21: nothing merges without
+him saying so. This is the first PR held for that.
+
+**Scope.** `lane` joins `work` on the same `chapter` event. On video 1 the two change at exactly
+the same two timestamps, which is the tell that they are one thing — a section has a piece and a
+mode. `sections` becomes `[[start, work, lane], ...]`; neither is stored on a clip.
+
+It reverses a recommendation. Deprecating `lane` was right when it was a per-clip field costing a
+keystroke per marker; as a section property it costs one entry per section.
+
+**What the implementer verified**, so the review need not re-derive it: export byte-equal on all
+three videos — same headers with their lane suffixes, 74/77/53 lines; grid renders 688 rows;
+sidecar tests 15/15; the migration reused the three existing breaks rather than adding events.
+
+**Where to look hardest**
+
+- `persistSection` merges `{work, lane}` over the **currently resolved** values before writing,
+  so editing one field must not blank the other. That is the regression this shape invites.
+- `load_sections` drops a break when both fields are empty — the undo path. Confirm it cannot
+  drop one that still carries the other field.
+- A clip **before** the first break resolves to `""`. The header supplies the break at 0:00;
+  confirm a run carrying only a later break degrades sensibly rather than printing a blank
+  header.
+
+**Context the reviewer should have.** This sits on PR 21, which exists because PR 17 shipped a
+half-change — a new run-level path added on top of the old per-clip path, both live at once.
+Brian found it by using the app, not by reading the diff. The same shape is the thing worth
+looking for here.
+
+**Baton: → reviewer.**

@@ -182,6 +182,11 @@ The suggester skill lives outside the repo at `~/.claude/skills/yt-clipper/` and
   would this doc be wrong once some open PR merges? Yes → it belongs in that PR. The cost of
   going straight to `main` is that nobody else reads it, so re-read before you push.
 - A new branch per change; never reuse a branch name. One PR per change, even a small one.
+- **Never merge a PR. Brian merges.** Standing instruction, 2026-08-21. Open it, hand it to a
+  reviewer, and stop. "Execute and PR" does not include merging, and a merge authorised once
+  does not authorise the next. This exists because ten PRs went to `main` unreviewed in two
+  days, and the one bug in them — PR 17 shipping a new code path over a live old one — was
+  found by Brian using the app, not by the author who wrote and merged it.
 - **Never `git add -A`.** Run data and session logs are not the product PR.
 - Do not push while BugBot is mid-review — the review restarts.
 - Commit messages: a single-line title prefixed with the PR number (`PR 1: skeleton extension
