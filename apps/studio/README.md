@@ -26,6 +26,15 @@ points a Chrome app window at it — dock icon, no URL bar, closest thing to a
 native app for a local web app. Also `start`, `stop`, `restart`, `status`,
 `logs`, `uninstall`; logs go to `~/Library/Logs/yt-clip-studio.log`.
 
+**Moving the repo is handled.** The launch agent bakes in an absolute path, so a moved clone
+would otherwise point at a directory that no longer exists. `studio status` warns and
+`studio open` reinstalls from wherever the script now lives.
+
+**`/api/quit` and `/api/ingest` require a same-origin JSON request.** Binding to 127.0.0.1 is
+not an authorization boundary — any web page can submit a plain form to a fixed localhost URL,
+and it needs no CORS permission because it never reads the response. Before the guard, a form
+POST carrying `Origin: https://unrelated.example` stopped the server.
+
 **Use `studio restart` after editing `server.py`.** `KeepAlive` means `pkill`
 just makes launchd start it again. `index.html` and everything in `ui/` are read
 from disk on every request, so those changes only need a browser refresh.

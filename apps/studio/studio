@@ -49,6 +49,22 @@ PLIST
 
 up() { curl -fsS -o /dev/null --max-time 2 "$URL/" 2>/dev/null; }
 
+# The plist and the app launcher both bake in an absolute path, resolved when
+# they were generated. Move the clone and they point at a directory that is no
+# longer there, and nothing rewrites them — `open` only bootstraps what exists.
+# So check before using them, and regenerate rather than fail confusingly.
+stale_plist() {
+  [ -f "$PLIST" ] || return 1
+  ! grep -q "<string>$APP_DIR/server.py</string>" "$PLIST"
+}
+
+heal_if_moved() {
+  if stale_plist; then
+    echo "the launch agent points at an old path — reinstalling from $APP_DIR" >&2
+    "$0" install >/dev/null
+  fi
+}
+
 wait_up() {
   for _ in $(seq 1 20); do up && return 0; sleep 0.3; done
   echo "server did not come up — check: $0 logs" >&2; return 1
@@ -72,6 +88,7 @@ case "${1:-open}" in
   stop)    launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true; echo "stopped" ;;
   restart) launchctl kickstart -k "$DOMAIN/$LABEL"; wait_up && echo "restarted" ;;
   status)
+    if stale_plist; then echo "WARNING: launch agent points at an old path — run: $0 install"; fi
     if up; then echo "running   $URL"; else echo "not running"; fi
     launchctl print "$DOMAIN/$LABEL" 2>/dev/null | awk '/state = |pid = |last exit/ {print "  " $0}' || echo "  agent not loaded — run: $0 install"
     ;;
@@ -102,6 +119,7 @@ INFO
     echo "drag it to the Dock, or open it from Launchpad."
     ;;
   open)
+    heal_if_moved
     # bootstrap if the agent was booted out (by the quit button, or by hand);
     # kickstart alone fails when the label is not loaded at all.
     up || {
