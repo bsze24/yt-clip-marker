@@ -1,11 +1,12 @@
 ---
 date: 2026-08-19
 time: "23:50"
+revised: 2026-08-20 23:52
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
 branch: main
-commit: 1daecd8e260902ac43a29eea4a27c04121504a41
+commit: 2e65fd18c32d1ca7835119733ca2e7a5ad8ff241
 task: docs/coordination/CURRENT.md
 ---
 
@@ -233,3 +234,156 @@ the steering. It is *unanchored* when they chose with nothing in front of them. 
 anchored (he graded 64 skill markers), video 2 is unanchored (75 rows, no proposals). It is NOT
 about label quality: an anchored corpus can be perfectly labelled and still overstate recall,
 because nobody counted what the model never showed him.
+
+---
+
+# Append — 2026-08-20 23:52
+
+## What changed (second stretch)
+
+- **PRs 10-15, all merged.** `10` merge only entries that print the same words (`TD-16`);
+  `11` the eval scripts; `12` `transcriptSource` on the run plus the repo's first test file;
+  `13` report the proposals kept in place; `14` star precision is undefined, not zero;
+  `15` the eval keys obey the eval toggle.
+- `563e5b8` — video 3 marked, 51 rows, star only.
+- `4bfc52c` — three videos scored. `1e6a76b` — `D-040`.
+- **`SKILL.md` v2**, outside the repo. Twelve rules to ten: `R-TAKE-GAP`, `R-TAKE-CLUSTER`,
+  `R-TAKE-LABEL` and `R-NO-MUSIC-TAG` retired; `R-COVERAGE`, `R-LEAD`, `R-SKIP-PREAMBLE`,
+  `R-BIZ-BOUNDARY` added; `R-COPIOUS` raised from 20-30 per 90 min to one per minute.
+- **Uncommitted:** `labels.jsonl` carries the `polish` → `feel` rename (42 appended events) and
+  one event restoring video 1's marker 0 after a UI test overwrote it.
+
+## Decisions (second stretch)
+
+- **The skill detects concepts only** ([[D-040]]). Deleting the three take rules stranded zero
+  starred moments across both unanchored lessons. Retired ids stay readable and are never
+  reused — `labels.jsonl` cites `R-TAKE-GAP` 130 times.
+- **Recall is bought with a spacing cap, not a density target.** `R-COVERAGE`: never more than
+  60 seconds without a proposal. The one real recall failure was a single 5-minute unproposed
+  stretch holding four of 21 stars.
+- **The export merges only entries that would print the same words** ([[D-039]]).
+- **Star recall is the primary metric, precision is a budget constraint.** An extra marker is
+  one keypress; under review-by-reading the list length is what has to stay inside 20 minutes.
+- **Assign a PR number when the PR exists**, not when the commit message is written. Two
+  branches claimed "PR 10" and neither was a pull request.
+
+## Learning arc (second stretch)
+
+- Read `SKILL.md`'s negative-rule block and asked what it was for, rather than taking it as
+  given. That question found `R-NO-SPEAKER`'s premise had expired.
+- Then found the root cause before I did: the skill was developed against an incompletely
+  marked video **and** the workflow has since reversed to Zoom → tool → YouTube.
+- Caught that 1.07× was not comparable to 1.95× because video 3 skipped work, lane and tags.
+  I had swapped one baseline for another without noticing they measured different jobs.
+- Pushed back on "playback is the floor" — the tool skips between markers, so the floor is the
+  segments actually played, not the lesson. Correct, and it moved the target from unreachable
+  to mid-range.
+- Argued the 8 excluded stars were being thrown away. Half right: they belong in the score, not
+  in recall. The set labels were also swapped — the "nails" are the 8, not the 9.
+- Asked whether the skill is shipped and the eval layer can go, which is the right question at
+  the right time and closed the thread rather than extending it.
+
+## Concepts touched (second stretch)
+
+- [concept] anchored vs unanchored ground truth — solid — video 2 and 3 both marked before the
+  skill ran; that property is what made the recall numbers mean anything
+- [concept] feature problem vs data problem — solid — four more angles tested on diarization,
+  all dead; stopped proposing rules that assume takes are detectable
+- [concept] rule premise vs rule conclusion — solidifying — `R-NO-SPEAKER`'s reason was wrong
+  and its advice right; kept the rule, replaced the justification
+- [concept] concurrent-writers-on-shared-docs — solidifying — third and fourth instances (two
+  branches claiming PR 10, two entries claiming `D-035`), now named inside `D-039` itself
+- [concept] eval channels vs product keep (g / x / taxonomy / star / delete) — solid — found
+  `g` and `x` writing eval verdicts during ordinary annotation with the toggle off
+- [concept] one-name-per-thing — emerging — `polish` → `feel` done as appended events, because
+  an append-only store cannot be renamed in place
+
+## Coaching hooks (second stretch)
+
+- **A green test proves nothing until it fails on the bug it guards.** I nearly shipped
+  `test_sidecars.py` on a passing run; deliberately reverting F18 and F20 first showed 4 and 1
+  failures. Do the reversion before claiming a test works.
+- **Run the thing rather than reasoning about it — it changed the answer four times.** The
+  lexicon test produced the ceiling split; generating the transcript showed "teach the skill to
+  read a run" was overstated; running old `local.py` showed the `.info.json` fix was hardening
+  not a bug; scoring video 3 falsified my own `R-TAKE-GAP` prediction.
+- **Specify a falsification test so one sample cannot settle it.** I wrote "if `R-TAKE-GAP`
+  fires well on video 2, half the rewrite case is wrong" while already knowing lesson type was
+  a confound. Video 2 said 92%, video 3 said 50%.
+- **`/plain-english` fired three times.** The fix was never vocabulary: wrong order once, an
+  undefined term ("sidecar") used all day once, and a table with an empty column once.
+
+## Next / open threads (second stretch)
+
+- **Brian uses v2 on the next few lessons and reports back.** Not an eval — work normally, note
+  the clock and roughly what fraction of markers needed playing versus judging from the label.
+  That ratio decides whether anything remains.
+- **Commit `labels.jsonl`** — the `polish` → `feel` rename and the marker-0 restore are
+  uncommitted.
+- **Domain auto-tagging is half-working and unsettled.** On video 3 `harmony` fired on 49 of 51
+  rows: too loose to discriminate on a harmony lesson. `exercise`, `comping` and `fingering`
+  looked right. The untried fix is a relative test — tag when a window is denser in the
+  vocabulary than the lesson's own average — rather than an absolute keyword hit.
+- **Schema change, specced but not built:** `work` moves to the run, `lane` deprecated, tag
+  input narrows to `star`.
+
+## Open questions / blockers (second stretch)
+
+- Whether a review pass lands near 0.27× or 0.67×. Every timing measurement so far is Brian
+  authoring markers; none is him reviewing them.
+- The right `R-LEAD` value. Video 1 says 30s, video 2 says 45s. Two videos disagree.
+- Zoom diarization is unreliable, which was not known when "record through Zoom cloud" was
+  written as step 1. Video 3 names Brian as speaker for 57% of a lesson Jake taught, and calls
+  him `jakesherman` where video 2 says `Jake Sherman`.
+
+## Chronology (second stretch)
+
+- **05:12** — `/plain-english` on the corpus passage. Rebuilding by running the thing showed
+  "teach the skill to read a run" was overstated; fifteen lines produced the transcript file.
+- **05:28** — asked what `SKILL.md`'s three negative rules were for. Measured all three:
+  `R-NO-TALK-DETECT` confirmed on video 2, `R-NO-SPEAKER`'s premise dead. Found the
+  junk-caption labelling gap behind 9 of video 1's 24 rejections.
+- **06:27** — "should we start the skill from fresh?" Checked his premise: `SKILL.md`'s
+  43-minute claim is 21.9 minutes in the store. Then found the stronger reason.
+- **06:34** — scoping the finish line. Lexicon test: `harmony` 89% vs 42%, `comping` 100% vs
+  14%, no lexicon at all for `take` or `star`.
+- **06:41-06:49** — corrected my own ordering (video 2 was already the held-out test, so the
+  skill run goes first). Landed the ceiling table and the eval spec. Restored `AGENTS.md`,
+  which had lost the rationale sentence naming PRs 5 and 6 to an editor reflow.
+- **06:50** — first `/session-log`. Then committed video 2's store, which had never been backed
+  up.
+- **06:54** — "upside is closer to 50% than 75%?" Measured video 2's annotation at 1.95×
+  realtime from `labels.jsonl` timestamps, split it into watching and stopped time.
+- **06:57** — the "jake sherman brain" question. Tested whether the repository needs the
+  tagging: a finger-number regex finds 8 of 9 fingering rows at 10% false positive, with no
+  training examples.
+- **07:06** — phone access. Checked `ListAgents` rather than answering from memory: one peer
+  session, no cloud, no Remote Control.
+- *[~16 hour gap]*
+- **23:14** — back on the review-by-reading passage. Built the two eval scripts, found and
+  fixed a location-dependence bug by copying one out of the repo and watching it break.
+- **23:29-23:50** — three rounds of refresher questions: how the transcript got made, what a
+  run file is, the ingestion pipeline end to end, and a restatement of what `local.py` does.
+  Rewriting that last one surfaced a real defect — my generator disagreed with the run about
+  the gap count, three different answers for one transcript.
+- **02:20** — banked the scoring-script explanation as `/plain-english` example 004.
+- **02:29** — argued the 8 excluded stars were being discarded. Correct that they were; wrong
+  that they belong in recall. Also found the 8 and the 9 were labelled backwards.
+- **04:14** — "I don't see PR10." It did not exist. Two branches had claimed the number in
+  commit messages and neither was a pull request.
+- **04:18-04:29** — opened both, addressed both reviews. PR 10's doc changes stripped out and
+  `main` merged in so the diff showed five lines instead of 106. PR 11's `NameError` on a
+  zero-cue run fixed.
+- **04:55-05:30** — `build_cues` is captions, not markers. Then the sidecar hardening question:
+  six adversarial shapes all correct, but no test suite and the provenance note was ephemeral.
+  PR 12 fixed both.
+- **06:30** — "just simplify — what are the concrete changes?" Measured that deleting
+  `R-TAKE-GAP` strands zero stars, and that the 90-second tail is one 325-second hole.
+- **06:39** — wrote `SKILL.md` v2. Checked every historical rule id is accounted for.
+- **06:42** — work/lane. Measured they never vary per marker: video 2 carries one value 75
+  times. They are section metadata on the wrong object.
+- **06:44** — "are we shipped?" Yes, with the caveat that no timing measurement is of reviewing.
+- **06:46** — pushed back on the playback floor and was right.
+- **06:47** — renamed `polish` → `feel` (42 appended events), gated the three eval-chrome leaks,
+  and auto-tagged video 3 as a preview. `harmony` fired on 49 of 51 rows — too loose.
+
