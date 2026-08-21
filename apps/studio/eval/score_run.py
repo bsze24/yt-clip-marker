@@ -126,7 +126,16 @@ def main(argv):
     all_starred = len(own_stars) + len(starred_markers)
 
     print("\nSTAR PRECISION — proposals kept exactly where the skill put them")
-    if proposals and all_starred:
+    if not annotated:
+        # Undefined, not zero. This metric counts stars the human put ON a skill
+        # marker, so it needs a run he annotated that already CONTAINED markers.
+        # On an unanchored corpus — marked before the skill ever ran, which is
+        # what makes it a fair recall test — there is nothing he could have
+        # starred in place. Printing 0% here reads as a failure of the skill.
+        print("   not applicable — this run holds no skill markers, so the human")
+        print("   never had a proposal in front of him to star. That absence is")
+        print("   what makes the recall number below trustworthy.")
+    elif proposals and all_starred:
         print("   %d of %d proposals earned a star in place (%.0f%%)" % (
             len(starred_markers), len(proposals), 100 * len(starred_markers) / len(proposals)))
         print("   for scale, %d of %d human rows are starred (%.0f%%)" % (
@@ -138,7 +147,10 @@ def main(argv):
             print("      %s  %s" % (hms(e["start"]), (e.get("description") or "")[:56]))
         print("   ^ few-shot material for a skill revision. Excluded from recall below,")
         print("     because their distance to a proposal is zero by construction.")
-    recall_table(own_stars, proposals, "STAR RECALL — moments he built himself, so the skill did NOT place them well")
+    heading = ("STAR RECALL — every starred moment (none were skill markers)"
+               if not annotated else
+               "STAR RECALL — moments he built himself, so the skill did NOT place them well")
+    recall_table(own_stars, proposals, heading)
     recall_table(human_all, proposals, "REGION RECALL (every human row)")
 
     print("\nPRECISION — proposals with no human row nearby")
