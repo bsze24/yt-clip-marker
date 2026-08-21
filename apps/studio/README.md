@@ -7,16 +7,33 @@ It began as an eval harness for the yt-clipper skill; the skill-scoring chrome (
 ## Run
 
 ```
-python3 apps/studio/server.py
+apps/studio/studio install     # once — writes and loads a launchd agent
+apps/studio/studio open        # app window, starts the server if needed
 ```
 
-Open http://127.0.0.1:8765. Ingesting a YouTube URL needs `yt-dlp` on PATH and network.
+`install` registers a launch agent that starts the studio at login and restarts
+it whenever it exits, so a crash or a stray `kill` does not take it down. `open`
+points a Chrome app window at it — dock icon, no URL bar, closest thing to a
+native app for a local web app. Also `start`, `stop`, `restart`, `status`,
+`logs`, `uninstall`; logs go to `~/Library/Logs/yt-clip-studio.log`.
+
+**Use `studio restart` after editing `server.py`.** `KeepAlive` means `pkill`
+just makes launchd start it again. `index.html` and everything in `ui/` are read
+from disk on every request, so those changes only need a browser refresh.
+
+The URL is **http://studio.localhost:8765**. Chrome resolves any `*.localhost`
+name to 127.0.0.1 with no hosts-file entry and no sudo, so this needs no setup
+and is easier to type than the numbers. `http://127.0.0.1:8765` still works.
+
+To run it in the foreground instead — handy when you want the traceback on
+screen — `python3 apps/studio/server.py`, after `studio stop`. Ingesting a YouTube URL needs `yt-dlp` on PATH and network.
 Ingesting a file already on disk needs neither — see **Local video mode** below.
 
 ## Layout
 
 ```
 apps/studio/
+  studio                                start/stop/open as an app (launchd agent)
   server.py                             HTTP server + label-event store
   ingest.py                             URL → captions, gaps, description, extracted → run file
   local.py                              file on disk + sidecars → run file (no network)
