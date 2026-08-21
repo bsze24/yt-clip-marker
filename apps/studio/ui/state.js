@@ -139,11 +139,16 @@ export function seedChapterFromRun() {
 
 export function setSave(msg) { $("saveState").textContent = msg; }
 
-// The work in effect at `start` — the latest section break at or before it.
-export function workAt(start) {
-  let current = "";
-  for (const [at, work] of S.sections || []) {
-    if (at <= start) current = work; else break;
+// The work and lane in effect at `start` — the latest section break at or
+// before it. Both are section properties: on video 1 they change at exactly the
+// same two timestamps, which is the tell that they belong to the same event.
+export function sectionAt(start) {
+  let current = { work: "", lane: "" };
+  for (const [at, work, lane] of S.sections || []) {
+    if (at <= start) current = { work, lane }; else break;
   }
   return current;
 }
+
+export function workAt(start) { return sectionAt(start).work; }
+export function laneAt(start) { return sectionAt(start).lane; }
