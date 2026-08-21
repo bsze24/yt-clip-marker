@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 15:05
+revised: 2026-08-21 15:35
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -882,4 +882,111 @@ Unchanged from the previous record, plus:
 - Four corrections found (see Coaching hooks). One suspicious number chased and cleared: the
   688/688 cue coincidence.
 - Wrote `docs/coordination/EVAL.md`, added two pointers, committed to `main`.
+
+---
+
+# Append — 2026-08-21 15:35 — sync direction fixed, and one live contradiction flagged
+
+Closing state for this thread. Written so the next session does not have to reconstruct it.
+
+## What changed
+
+- `docs/reference/EVAL.md` — Brian moved it out of `docs/coordination/`. The move is now in git;
+  the two pointers that named the old path were repointed (`README.md`, `BACKLOG.md`).
+- `DECISIONS.md` — **D-042** added.
+- `CURRENT.md` §6 — marker-label writeback firmed from "needs its own spec" to closed, citing D-042.
+- `EVAL.md` §7C — carries a blockquote flagging that it contradicts D-041.
+
+## Decisions
+
+- **D-042 — markers flow one way, app → YouTube; the video title flows YouTube → app.** Brian's
+  call, verbatim: *"markers should always be one way from app to youtube."* Each field flows away
+  from the surface that owns it, which is what removes the reconciliation problem rather than
+  deferring it. The description-scraping merge is closed, not parked.
+- **Phase 4 is the lesson title only.** Confirmed against the ambiguity raised earlier: he meant
+  the video name, not marker labels inside the description.
+
+## The thing most likely to be lost — read this first
+
+**`EVAL.md` §7C and `D-041` say opposite things and both are live.**
+
+- D-041: *"the next lesson marked is the held-out one, and it has to be marked before v2 runs on it."*
+- EVAL.md §7C: *"Should the next lesson be marked blind? Recommend no — use v2 for real instead."*
+
+I wrote §7C from the eval side chat without noticing it reversed a decision recorded hours
+earlier in the same session. `AGENTS.md` requires superseding a decision with a dated entry, not
+silently contradicting it. A blockquote now sits in §7C saying so. **Neither has been retired —
+this needs Brian's call before the next lesson is marked**, because the two answers lead to
+different work on the very next action.
+
+## A second thing that will bite quietly
+
+D-042 has a carve-out that is easy to miss and is **shipped behavior**, not theory:
+`ui/util.js:137 resolvedLabel()` prefers an `extracted[]` description label over the studio
+clip's own text at export time. So a stamp already published on YouTube does today override the
+app's label for that row — which reads like a violation of "markers are one way" and is not one.
+It is a record of what was published, read once at ingest.
+
+With markers now formally one-way, that preference is arguably backwards going forward: the app
+is canonical, so the app's label should win. It was correct for video 1, whose description stamps
+predate the studio. **Deliberately left alone** — changing export behavior is its own PR. Recorded
+in D-042 under "Consequence to check".
+
+## Learning arc
+
+- **Brian caught the scope question before it turned into work.** The two readings of "rename"
+  were flagged rather than assumed, and his answer collapsed a merge problem into nothing. Cheaper
+  than discovering it mid-implementation.
+- **Moving a doc is a two-part change.** The move landed in the working tree but the two pointers
+  naming the old path did not follow, and `README.md`'s table listed it as a coordination doc it
+  no longer is.
+
+## Concepts touched
+
+- [concept] canonical-store — solidifying — extended cleanly from clips to a second field moving
+  the other way, without weakening D-002
+- [concept] eval-channels — solidifying — no movement this append; the open contradiction above is
+  the live edge
+
+## Coaching hooks
+
+- **Check new recommendations against `DECISIONS.md` before writing them down.** The §7C/D-041
+  clash came from folding in side-chat analysis without grepping the decisions file. Both were
+  written the same day, hours apart.
+- **When closing a deferred item, say "closed" not "needs a spec".** `CURRENT.md` §6 read as a
+  future task until it was firmed; a later session would have picked it up as work.
+
+## Next / open threads
+
+1. **Resolve D-041 vs EVAL.md §7C.** Blocks the next lesson being marked. Brian's call.
+2. **Star predictability test** (`EVAL.md` §7E) — about an hour, and the only item that can
+   *remove* work: if nothing predicts `star`, rung 4 is off and the ladder stops at retrieval.
+3. **Run `SKILL.md` v2 once, unmodified.** Confirmed it has never been run — written 2026-08-20
+   23:40, newest proposals file 23:23. Every scored number on record is v1.
+4. **`CURRENT.md` phases 1-4**, baton on implementer. Phase 1 touches `docs/clip-schema.md` and
+   wants Brian's eyes before 2-4 build on it.
+5. Remaining `EVAL.md` §8 items: `score_run.py`'s `annotated` proxy, the "was a proposal in front
+   of me" boolean, three display fixes, rung 2 exemplars.
+
+## Open questions / blockers
+
+- **D-041 vs §7C** — the only real blocker, and it gates item 3 above.
+- `EVAL.md` §7 A, B, D, E remain open by design.
+- Whether `resolvedLabel` should stop preferring extracted labels — see the carve-out above.
+
+## Chronology (the record)
+
+- Confirmed nothing was blocking: clean tree, no open PRs (PR 23 was closed rather than merged,
+  which was correct), 15/15 tests, and all six Codex worktree commits already in `main`.
+- Mapped Brian's YouTube asks against `CURRENT.md`: three of four were already phases 1-3; the
+  rename was new.
+- Worked out that the rename is a join between `run.youtubeId` (phase 1) and `uploads.json`
+  (phase 3), not new machinery. Wrote it as phase 4 with a precedence rule and pull-only direction.
+- Flagged the two readings of "rename". Brian: the video name only, markers always one-way.
+- Discovered he had moved `EVAL.md` to `docs/reference/`. Recorded the move in git and repointed
+  `README.md` and `BACKLOG.md`.
+- Read `export.js` and `util.js:137` before writing D-042, which is what surfaced the
+  `resolvedLabel` carve-out — the decision would otherwise have outlawed shipped behavior.
+- Grepped `DECISIONS.md` while numbering D-042 and found the D-041 / §7C contradiction. Flagged
+  in place rather than resolving it.
 
