@@ -9,7 +9,7 @@ import {
 } from "./suggest.js";
 import {
   persistUnmiss, queueSave, queueWrongReason, queueRelabel, queueMissDesc, persistTaxonomy,
-  queueTaxonomy,
+  queueTaxonomy, persistSection,
 } from "./persist.js";
 import { submitComposer, openEditor } from "./composer.js";
 import { refreshRuns, openRun, renderRunSelect } from "./runs.js";
@@ -59,11 +59,10 @@ $("copyTsBtn").addEventListener("click", () => {
 $("runWork").addEventListener("change", async (e) => {
   const work = e.target.value.trim();
   if (!S.currentId) return;
-  try {
-    const res = await api("/api/run-work", "PUT", { runId: S.currentId, work });
-    S.runWork = res.runWork || "";
-    setSave("saved");
-  } catch (err) { saveFailed(err); }
+  // The one section writer, so the header cannot blank the lane it shares the
+  // break with. Writing {start, work} alone sent lane:"" and wiped it (F26) —
+  // and pointed at /api/run-work, a route PR 22 deleted, so it 404'd as well.
+  persistSection(0, { work });
 });
 $("quitBtn").addEventListener("click", async () => {
   if (!confirm("Quit Clip Studio?\n\nThe server stops and stays stopped. Reopen with:\n  apps/studio/studio open")) return;
@@ -172,14 +171,10 @@ $("tbody").addEventListener("input", (e) => {
   if (e.target.dataset.combo) {
     resetSuggestHi();
     renderSuggest(e.target.dataset.combo, e.target);
-    if (S.liveTax && e.target.dataset.combo === "lane") {
-      S.liveTax.lane = e.target.value;
-      queueTaxonomy();
-    }
-    if (S.liveTax && e.target.dataset.combo === "work") {
-      S.liveTax.work = e.target.value;
-      queueTaxonomy();
-    }
+    // work and lane are section properties. Debouncing them into the clip's
+    // taxonomy wrote an annotate event alongside the intended chapter break —
+    // two live paths, which is the shape PR 21 existed to remove (F27).
+    // finishComboEdit routes both to persistSection on commit.
   }
 });
 $("tbody").addEventListener("submit", (e) => {

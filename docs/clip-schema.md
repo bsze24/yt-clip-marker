@@ -75,8 +75,10 @@ which is the tell that they are one thing: a section has a piece and a mode. `la
 be deprecated when it was a per-clip field costing a keystroke per marker; as a section property
 it costs one entry per section, so it stays.
 
-Two events for video 1 instead of 67 copies. Latest event per `start` wins; an empty `work`
-removes that break.
+Two events for video 1 instead of 67 copies. Latest event per `start` wins. A break is removed
+only when **both** `work` and `lane` are empty — clearing one leaves the other, because a
+lane-only section is a state this design supports. Every writer must therefore send the complete
+pair; sending `{start, work}` alone blanks the lane it shares the break with.
 
 **A clip's work is resolved, never stored** — the latest break at or before its start.
 `/api/run` returns `sections` as `[[start, work, lane], ...]` ascending; consumers resolve from
