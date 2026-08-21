@@ -1,196 +1,163 @@
 # Current task
 
-**Review PR 9 — Zoom exports ingest, and reruns pick up late captions.** Baton:
-**→ implementer**, on `5eb55d2`.
+**Score the existing `yt-clipper` skill against video 2.** Baton: **→ Brian**, to run it.
 
-Roles are reversed again for this round, same as PR 8 and for the same reason: Claude Code
-implemented, **Codex reviews**. The code is written, committed and pushed on
-`zoom-export-ingest`; nothing here asks anyone to rebuild it.
+This is an experiment, not a build. No product code changes. The output is a number and a
+rejection taxonomy, and it decides how much of the skill gets rewritten — so doing it before
+touching `SKILL.md` is the whole point.
 
 ---
 
-## 0. State as of 2026-08-19
+## 0. State as of 2026-08-20
 
 | Item | Where | Status |
 | --- | --- | --- |
-| **PR 9 — Zoom export ingest** | `zoom-export-ingest`, `5eb55d2` | **under review**, this task |
-| PR 8 — local video mode | merged `71b9d82` on `main` | closed; decisions harvested as [[D-034]]–[[D-038]] |
-| PR 4 — video 1 store | merged `43c99dd` on `main` | closed |
+| PR 9 — Zoom export ingest | merged `2ee9cc9` | closed; F20-F23 resolved at `8a47c2b` |
+| PR 8 — local video mode | merged `71b9d82` | closed; [[D-034]]-[[D-038]] |
+| PR 4 — video 1 store | merged `43c99dd` | closed |
 | PR 3 | merged `5af3e13` | closed |
-| PR 5 | `949cb7b` | closed, superseded — do not merge |
-| PR 6 + `docs/remove-coordination-md` | `e158710` | **close, do not merge** — ~1,000 lines stale |
+| PR 5, PR 6 | `949cb7b`, `e158710` | closed, superseded — do not merge |
 
-`main` is `d2ad793`. PR 9 branches from exactly that commit and carries **five product
-commits** plus one duplicate session-log commit and one merge of `main` back in. The branch
-head is `6ef767c`; the last product commit is `5eb55d2`. Verify before reviewing:
+No PR is open. `REVIEW.md` has no active thread.
 
-```bash
-git merge-base --is-ancestor 5eb55d2 HEAD
-git log --oneline main..zoom-export-ingest
-```
+**Why this task and not a code task.** The goal is **0.27x realtime** — 20 minutes to review
+a 75-minute lesson, against 2.0x measured today (`BACKLOG.md`, "Reducing manual tagging"). Every remaining engineering step — rewriting the
+skill, building the review loop, drafting labels — is sized by one number nobody has: how well
+the skill places markers on a video it did not influence. The only measurement so far is video
+1, where Brian judged markers the model proposed, so its 100% region recall may be anchoring
+rather than skill.
 
-**Why this exists.** Every one of the five commits is a defect found by *using* PR 8 on a real
-flight, not by reading it. PR 8 shipped the offline path; PR 9 is what happened when the first
-real Zoom export met it.
-
-**BugBot did not run.** Seven attempts on PR #9, seven `usage limit reached` failures against
-the Cursor spend cap. The automated pass that normally covers this repo produced nothing, so
-this review is the only review PR 9 gets.
+Video 2 is the test, and **it needs no new marking.** Its run holds zero skill markers; all 75
+rows are Brian's, chosen with no proposal in front of him.
 
 ## 1. The task
 
-Review `5eb55d2` per the `README.md` review loop. `docs/prs/pr-9-zoom-export-ingest.md` is the
-spec — **but it is incomplete, and that is itself a finding worth confirming**: it describes
-`247f7b3` and `b0c4dd3` only. Three of the five commits are undocumented there. Review the
-diff, not the spec:
+Run `/yt-clipper` against video 2's transcript, then score its output against the 75 existing
+human markers.
 
-| Commit | What | Covered by the spec? |
-| --- | --- | --- |
-| `247f7b3` | Zoom sidecar stem variants; `prefetch.py` fetches subs independently of media and writes a **new** run when late captions arrive | yes |
-| `b0c4dd3` | `docs/reference/**` media gitignored; `.aider*` added | partly — the `.aider*` line is not mentioned |
-| `4b3ee5d` | Sticky header so the run picker stops scrolling out of reach | **no** |
-| `cae20a2` | `run_warnings` reports a declared-but-missing media file | **no** |
-| `5eb55d2` | `k` no longer sticks when playhead and selection share a second | **no** |
+**Step 1 is substituted, deliberately.** The skill normally fetches captions from a YouTube URL.
+Video 2 came from a Zoom export and has no captioned YouTube identity ([[D-036]]) — and none of
+the four YouTube uploads has captions at all, re-checked 2026-08-19 (`BACKLOG.md`, "The corpus,
+and the one blocker"). The skill does not need the URL; it needs the text file that script
+emits. A run already holds everything in it. Generate:
 
-**Where to look hard.** Places this change could plausibly be wrong, not a generic checklist:
+```
+HH:MM:SS<TAB>text
+>>> GAP <n>s @ HH:MM:SS
+```
 
-- `local.py` `stem_variants` / `find_sidecars` — this widens F18's matching surface, which is
-  the exact thing F18 was filed about. The `.` boundary must hold on **every** variant, not
-  just the bare stem. Construct the adversarial cases yourself rather than trusting the ones
-  in the spec: `Lesson 1_640x360.mp4` against `Lesson 10.vtt`, a file that legitimately ends
-  in `_1920x1080`, a name carrying both ` (1)` and a resolution suffix, and a stem that after
-  stripping becomes empty or a prefix of a sibling.
-- `prefetch.py` — subtitle fetching now runs independently of the media download, and a
-  zero-cue run whose captions arrived later causes a **new** run file to be written. Check
-  that the old run is never mutated ([[D-002]]), that the superseded run id is named in the
-  output, and that this cannot fire repeatedly and mint a run per invocation. Idempotence was
-  an acceptance criterion on PR 8; confirm it survived.
-- `server.py` `run_warnings` — it now calls `resolve_run_media` on every warnings pass. Confirm
-  that adding a second warning did not change the shape consumers read (`runs.js` renders the
-  list), that a run with **both** faults reports both, and that a missing-media warning does not
-  fire for a run that never declared media.
-- `grid.js` `navOriginIndex` — the fix compares `dataset.start` between the playhead row and
-  the selected row. `dataset.start` is a render snapshot ([[D-029]]); confirm it is populated on
-  every row shape the grid builds, including the synthetic composer row and a
-  description-only row, and that a missing/`NaN` value degrades to the old behaviour rather
-  than to a stuck cursor. **This one needs a browser.** Reading the dispatcher is not checking
-  it — see `README.md`, "Having the source files is not having the tab."
-- `styles.css` — the header fix changes the page's scroll container. Check the grid's
-  `scrollIntoView` still works, at a non-100% browser zoom (that is how it was found), and that
-  the player column cap does not clip the composer at small viewport heights.
-- The gitignore has a hole: `docs/reference/**/*.mp4|m4a|mkv|mov` covers 368 MB of media, but
-  the `.transcript.vtt` files sit beside them untracked, so both export directories still show
-  as `??`. Decide whether transcripts should be tracked reference or ignored; right now they are
-  neither. Non-blocking by construction — the exposure is two small text files, not the media.
+from `runs/GMT20260730-155336_Recording_640x360-1-20260819-0903.json` with
+`apps/studio/eval/make_transcript.py` (PR 11): **714 lines, 26 GAP flags**, speaker names on
+every line. Hand the skill that file and run steps 2-6.
 
-**Out of scope.** End collection, JSON export, in-app suggest, extension→studio handoff, the
-copy-timestamps fold ([[D-022]]), `TD-11`, `TD-12`, and the whole tagging-schema path now on
-the `BACKLOG.md` roadmap. None of it is in this diff.
+The GAP count has to match the run's own `gapBefore` flags — 26 here, 27 on video 1. An earlier
+throwaway version hardcoded a 20s threshold against ingest's 18s, and recomputed gaps from
+rounded starts, giving three different answers for one transcript (20, 26, 28). `R-TAKE-GAP`
+fires off those exact lines, so the skill would have been scored on a transcript that disagreed
+with the studio it is being compared against.
 
-## 2. Acceptance criteria
+**Two ways to destroy this test, both easy:**
 
-1. Pointing the ingest at a Zoom cloud export's `.mp4` finds the sibling
-   `.transcript.vtt` and produces a run with real cues — and `Lesson 1.mp4` still adopts
-   nothing.
-2. `prefetch.py` on a video whose captions arrived after the media download leaves a new,
-   cue-bearing run behind, names the superseded zero-cue run, and does not edit it.
-3. A run whose `media` file has been moved or whose symlink dangles surfaces a warning naming
-   the file and the repoint command, and still loads its captions and markers.
-4. `k` and `j` step off a pair of cues sharing a start second instead of sticking, with follow
-   on and with follow off.
-5. The header and run picker stay reachable when the header wraps.
-6. No regression on the YouTube path: video 1 loads with a clean console and its counts
-   unchanged (64 markers · 21 added · 24 extracted · 1464 cues).
+1. **Writing skill markers onto video 2's run.** That mixes proposals into ground truth and the
+   test can never be run again. `SKILL.md` asks before creating a duplicate run — answer no.
+   Score in a scratch file.
+2. **Reading the results before recording the deviation.** Write down that steps 2-6 were
+   tested and step 1 was substituted, before looking at the output.
 
-## 3. Baton
+## 2. What to measure
 
-**→ implementer**, from `5eb55d2`. Two findings are open in `REVIEW.md` thread 5: F21 is
-blocking (the grid collapses at a real small viewport); F20 is non-blocking (an exact
-resolution-suffixed sidecar can lose to a normalized-base sibling). F22–F23 are optional
-review/documentation polish.
+**Star recall is the primary number. Not precision, not overall recall.** Brian's
+constraint, 2026-08-20: extra markers are close to costless — flipping past one is a
+keypress — but a starred moment with no marker near it puts him back into manual culling,
+which is the whole cost being removed. So the tool is bought on recall of the moments he
+cared about, and everything else is secondary.
+
+Do not compute this by hand. `apps/studio/eval/score_run.py` produces every number below
+from the skill's output plus the ground-truth run id, and refuses to run if the proposals
+file is sitting in `runs/`:
+
+```
+python3 apps/studio/eval/make_transcript.py GMT20260730-155336_Recording_640x360-1-20260819-0903 > /tmp/video2-transcript.txt
+python3 apps/studio/eval/score_run.py /tmp/video2-proposals.json GMT20260730-155336_Recording_640x360-1-20260819-0903
+```
+
+**Video 1 baseline, from the same script**, so the comparison is like-for-like:
+
+| | 20s | 30s | 45s | 60s |
+| --- | --- | --- | --- | --- |
+| **Star recall** (self-created only) | 56% | 89% | **100%** | 100% |
+| Region recall (all 67 rows) | 84% | 93% | 97% | 100% |
+| Precision (proposals near a human row) | — | 81% | 84% | — |
+
+Two confounds the script already handles, both of which inflate the score if ignored:
+
+1. **A star on a skill marker is covered by definition.** Only stars on clips Brian created
+   himself are evidence. On video 1 that cuts the sample from 17 to 9 — and `n = 9` is why
+   the 100% needs video 2 before anyone leans on it.
+2. **Ground truth folds in file order**, last event per row identity wins. Sorting by
+   `recordedAt` eventually picks the wrong record; video 1's store has three pairs written
+   out of timestamp order.
+
+Also produced, in descending order of how much they change a decision:
+
+3. **Direction and lead time.** Brian, 2026-08-20: not knowing whether to scrub forward or
+   back is its own cost, separate from distance. On video 1 the nearest proposal was earlier
+   14 times and later 7 — so a third of the time he moves the wrong way first. The script
+   prints what a deliberate lead would buy. Video 1 says **−30s takes it from 7 of 21 down to
+   2, at a median 42s of lead-in** — which at 1.5× is 28 seconds of run-up, roughly what a
+   clip wants anyway. If video 2 agrees, placing markers early stops being a hack and becomes
+   the rule: the marker means "the clip starts here", not "the moment is here".
+4. **Candidate count and `R-CUE-EXACT`** — [[D-032]]'s revert signal. The script reports how
+   many proposals miss an exact cue start; any that do mean the rule is being ignored, which
+   is a finding rather than a curiosity. Closes `TD-6`.
+5. **A rejection taxonomy.** The script lists every proposal more than 45s from a human row.
+   Sort each into a named class the way video 1's 24 were sorted. That list, not the
+   percentage, is what rewrites the skill.
+
+**One prediction to falsify, filed 2026-08-19.** `R-TAKE-GAP` should fail here. Zoom
+transcribes the playing instead of leaving silence — at a moment Brian labelled `Line 1 -
+jake demo` the transcript reads `Jake Sherman: Ba-ba-do da.` Gaps >=30s: 14 on video 1, 5 on
+video 2, and gaps do not track his takes (4 of 13 tagged rows near one, against 19 of 62
+untagged). **If `R-TAKE-GAP` fires well anyway, half the rewrite case is wrong and should be
+dropped.**
+
+**Settled 2026-08-20, do not re-litigate:** diarization does not rescue `take`. Four angles
+tested on video 2 and all dead — scat syllables (one line in 64 minutes), longest Jake-only
+cue run (2.9 against 2.9), Jake's share of the window (68% against 62%), and talk-density
+dips (39% precision against a 32% base rate). Speaker labels say who is *talking*; a demo is
+someone *not talking*. What works is what Brian already does — writing "jake take" into the
+label, which 24 of video 2's 75 labels carry in prose.
+
+## 3. After this, in order
+
+Neither is part of this task. Recorded so the result has somewhere to go.
+
+- **Mark `GMT20260712`** — placement and label only, keeping `star` and who-was-playing in the
+  label text. Scope and reasoning in `BACKLOG.md`. It resolves the lesson-type confound under
+  the prediction above; it is *not* for training data, which the ceiling table rules out.
+- **Then decide the `SKILL.md` rewrite.** Six rules are keepers on evidence, four are premised
+  on YouTube auto-captions and are dead on a Zoom transcript. The split is in the 2026-08-19
+  analysis; do not act on it before this task returns.
+
+## 4. Baton
+
+**→ Brian**, to run the skill. Nothing is blocked on an agent.
 
 ---
 
 ## Handoff notes
 
-### 2026-08-19 — implementer, PR 9 Zoom export ingest (`247f7b3` … `5eb55d2`)
+### 2026-08-20 — planner, scoping the eval
 
-Written up after the fact, from the session record at
-`docs/sessions/2026-08-19-1656-claude-code-opus-5-local-video-mode-and-field-fixes.md`, by a
-later session that did not write the code. Treat the receipts below as that log's claims,
-recorded here so the reviewer knows what was and was not exercised. Where the log gives no
-receipt, this note says so rather than inventing one.
-
-- **Acceptance criteria and evidence.**
-  (1) Verified on the real export: 688 cues with speaker attribution, 26 silence-gap rows,
-  playing in the browser. A second export at `docs/reference/GMT20260712` gave 688 cues and 8
-  gap rows; both landing on 688 was checked rather than assumed — the raw VTTs hold 690 each
-  and the rolling dedupe drops 2. Regression-checked that `Lesson 1.mp4` adopts nothing and
-  that `Talk_640x360.mp4` picks up `Talk.transcript.vtt` but not `Talk2.vtt`.
-  (2) **No receipt in the log.** The defect is described precisely and the fix is stated, but
-  no run of the late-caption path is recorded. Four of four videos hit the defect; whether the
-  fix was exercised end to end is not written down. Review this one from the code.
-  (3) Found by a real failure: renaming the export left the `media/` symlink dangling and a run
-  carrying 52 markers went to a black player. Fixed by repointing the symlink rather than
-  re-ingesting, which would have minted a new run id and orphaned the markers. The warning was
-  then added so the next occurrence explains itself.
-  (4) Reproduced and then driven directly rather than reasoned about: two cues share start
-  2018, five presses of `k` produced no movement. Systemic, not a one-off — 25 such pairs in
-  one lesson and 64 in the other. A second bug fell out of the same read: `j` had been silently
-  skipping the first row of every duplicate pair.
-  (5) Found from a screenshot, not a report — the run dropdown was off-screen because
-  `calc(100% - 49px)` hardcoded a one-row header, the header wraps at non-default zoom, the
-  document became scrollable and the grid's `scrollIntoView` carried the header off the top.
-  Body is now a flex column with `html` clipped, and the player column is capped at 62vh
-  because `minmax(0, auto)` did not help — an `auto` max still resolves to max-content.
-  (6) **No receipt in the log** for a post-`5eb55d2` video-1 regression pass. PR 8's merge
-  receipt covers video 1 at `fced73f`; four commits landed after that.
-
-- **Assumptions.** (a) Stem variants were added rather than the `.` boundary relaxed — F18
-  established that a bare prefix match lets `Lesson 1.mp4` adopt `Lesson 10.vtt`, and the
-  boundary was carried onto each new variant instead. (b) Late captions write a **new** run
-  rather than editing the old one, because runs are immutable ([[D-002]]) and label events are
-  keyed by run id, so annotations cannot follow an edit. (c) The `k` fix prefers the selection
-  over the playhead only when both sit on the same second, leaving follow behaviour otherwise
-  untouched; the alternative — storing fractional cue starts — was rejected for this PR because
-  it changes the stored shape of every existing run, and is filed as `TD-13`.
-
-- **Skips and divergences.** The spec doc was never extended past the first two commits. The
-  three later fixes are real product changes with no written spec, which is why §1 above tells
-  the reviewer to work from the diff. Nothing was cut from what the spec does describe.
-
-- **What nobody has checked.** A post-`5eb55d2` browser pass over the YouTube path, and the
-  late-caption rerun end to end. Both are cheap for a reviewer with network and a tab.
-
-Each turn appends here: role, surface, SHA, what was verified, assumptions made, anything
-skipped. See `README.md`, "Before recording a SHA".
-
-### 2026-08-19 — reviewer, PR 9 Zoom export ingest (`5eb55d2`)
-
-- **Acceptance criteria and evidence.** (1) The two real local Zoom runs render with 688
-  cues; one contains speaker attribution. A disposable adversarial fixture preserved F18's
-  `Lesson 1_640x360.mp4` / `Lesson 10.vtt` boundary and the empty-normalized-stem case. It
-  also exposed F20: an exact `Lecture_1920x1080.vtt` loses to `Lecture.vtt`. (2) A disposable
-  late-caption fixture left the original zero-cue run byte-for-byte unchanged, printed its id,
-  wrote one cue-bearing successor, and returned that successor without writing again on the
-  next invocation. (3) Direct `run_warnings` exercise returned both
-  `deprecated-run-key` and `missing-media` for a doubly faulty run, and no missing-media
-  warning for a run with no declared `media`. (4) In the browser on video 2's real duplicate
-  `1:42` pair, follow-on `k` moved the first cue to `1:41` while the playhead sat on the
-  second; follow-off `j` moved from the second cue to `1:46`. (5) A 760×520 viewport kept the
-  wrapped header fixed and the document unscrollable, but failed F21: the grid had 0px client
-  height and the composer was inaccessible. (6) Video 1 loaded with no console errors and
-  exactly 64 markers, 21 added, 24 extracted, and 1464 cues.
-- **Checks.** `python3 -m compileall -q apps/studio`, `node --check` on the changed JS modules,
-  and `git diff --check d2ad793..5eb55d2` passed. The browser was a local real-player pass,
-  not a source-only inference.
-- **Assumptions.** No new product choice made. F22 recommends ignoring raw `.vtt` source
-  exports, because they are local reference artifacts (and full meeting transcripts), not
-  product fixtures; Brian can choose to retain them intentionally instead.
-- **Skips and divergences.** I exercised a wrapped narrow viewport, not an actual browser zoom
-  control. That is enough to expose the stronger F21 failure, but the exact non-100%-zoom
-  visual path remains unverified. I made no code changes and preserved all untracked runs,
-  labels, source exports, and Aider files.
-
-**Baton: → implementer** — address F21 before another review pass; F20 should travel with that
-fix if practical. See thread 5 in `REVIEW.md`.
+- **Why an experiment holds the one active-task slot.** Four backlog items and both halves of
+  the skill rewrite are waiting on the same measurement, and it is cheap. Building first means
+  building against video 1's n=1.
+- **The correction this spec carries.** An earlier version of the roadmap put marking a third
+  video ahead of this run, on the belief that a held-out placement test needed new marking. It
+  does not — video 2 already qualifies. Running the skill is free and may change what is worth
+  marking, so it goes first.
+- **A second correction.** The roadmap called this step blocked on teaching the skill to read a
+  run's `cues[]`. Overstated: the skill consumes a text file, and a run holds everything that
+  file needs. The substitution is a scratch script, not a feature.
+- **What could make this task worthless.** Merging skill output into video 2's run. Said twice
+  above because it is irreversible.

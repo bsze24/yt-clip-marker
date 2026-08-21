@@ -147,3 +147,21 @@ browser — `yt-dlp --list-impersonate-targets`. A Homebrew install ships withou
 "Create audio transcript" enabled; local recordings have none unless "Save closed
 caption as a VTT file" was on. Plan on the zero-cue path for anything recorded to
 your own disk.
+
+A cloud export drops three files with names that do not share a stem:
+
+```
+GMT20260730-155336_Recording_640x360.mp4     the video, with a resolution suffix
+GMT20260730-155336_Recording.m4a             audio only
+GMT20260730-155336_Recording.transcript.vtt  the transcript
+```
+
+Point the ingest at the `.mp4` (or the `.m4a`) and the transcript is found anyway:
+sidecar matching also tries the stem with a trailing `_{W}x{H}` and a browser's
+`" (1)"` duplicate marker removed. The `.` boundary rule from F18 still applies to
+every variant, so `Talk_640x360.mp4` picks up `Talk.transcript.vtt` but never
+`Talk2.vtt`.
+
+A Zoom transcript is usually the *better* artifact: it carries speaker names, which
+YouTube's auto-captions do not, and it exists as soon as the recording processes
+rather than whenever YouTube gets round to it.
