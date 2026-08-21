@@ -319,10 +319,12 @@ def create_local_run(spec, runs_dir, media_dir, gap_seconds=ingest.DEFAULT_GAP_S
         title = source_path.stem
 
     cues = []
+    transcript_source = ""
     if subs:
         pairs = read_cue_pairs(subs[0])
         if pairs:
             cues = ingest.build_cues(pairs, gap_seconds)
+            transcript_source = subs[0].name
             notes.append(f"captions from {subs[0].name} ({len(cues)} cues)")
         else:
             notes.append(f"{subs[0].name} parsed to zero cues")
@@ -339,6 +341,10 @@ def create_local_run(spec, runs_dir, media_dir, gap_seconds=ingest.DEFAULT_GAP_S
         "media": media_name,
         "markers": [],
         "cues": cues,
+        # Which file this grid actually came from. The ingest note saying the
+        # same thing is shown once and never stored, so a wrong sidecar match
+        # was only ever discoverable in the second it happened (F18, F20).
+        "transcriptSource": transcript_source,
         "descriptionText": description,
         "extracted": ingest.parse_description_timestamps(description),
     }

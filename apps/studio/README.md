@@ -36,6 +36,7 @@ apps/studio/
     util.js                             pure helpers, constants
     styles.css
   runs/{videoId}-{YYYYMMDD-HHMM}.json   ingest/model output + caption cues (immutable)
+  tests/test_sidecars.py                stdlib unittest: sidecar matching, F18 + F20 regressions
   labels.jsonl                          append-only human judgments
   media/                                video/audio files for offline playback (gitignored)
   attach_cues.py                        CLI: merge a fetch_transcript.py dump into a run
@@ -46,7 +47,7 @@ UI files are read from disk on every request and sent with `Cache-Control: no-st
 
 The durable record is git-tracked JSON here. Commit `runs/` and `labels.jsonl` to back up work. The append-only labels can later score a new skill version against `check` labels, or train auto-mark from `(videoId, start, description, verdict)`.
 
-A run's `cues` array is the YouTube caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `extracted[]` holds timestamps parsed from the public YouTube description. A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`. The grid time-aligns all three: caption, marker, and extracted share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
+A run's `cues` array is the caption track; `gapBefore` on a cue is seconds of silence before it (a likely playing/demo boundary). `transcriptSource` names where that track came from — the sidecar filename for a local run, the yt-dlp track name (`{id}.en-orig.json3` vs `{id}.en.json3`) for a URL run, and `""` for a run with no transcript. Runs written before 2026-08-21 do not carry the key; treat it as absent, not empty. `extracted[]` holds timestamps parsed from the public YouTube description. A `gold[]` key is a visible load fault, not an alias; migrate it with `attach_extracted.py`. The grid time-aligns all three: caption, marker, and extracted share a row when their starts are within 2 seconds. Selection is by **row identity**, not start time — duplicate timestamps are real.
 
 Runs come from two doors:
 
