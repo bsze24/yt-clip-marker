@@ -6,7 +6,7 @@
 # dock icon and no URL bar — as close to a native app as a local web app gets.
 #
 #   apps/studio/studio install    write and load the launch agent (once)
-#   apps/studio/studio app        build "Clip Studio.app" in ~/Applications
+#   apps/studio/studio app        build "Clip Studio.app" beside this script
 #   apps/studio/studio open       app window, starting the server if needed
 #   apps/studio/studio start|stop|restart|status|logs|uninstall
 #
@@ -49,10 +49,10 @@ PLIST
 
 up() { curl -fsS -o /dev/null --max-time 2 "$URL/" 2>/dev/null; }
 
-# The plist and the app launcher both bake in an absolute path, resolved when
-# they were generated. Move the clone and they point at a directory that is no
-# longer there, and nothing rewrites them — `open` only bootstraps what exists.
-# So check before using them, and regenerate rather than fail confusingly.
+# The launch-agent plist bakes in an absolute path. Move the clone and it
+# points at a directory that is no longer there, so regenerate it before
+# bootstrapping. The app bundle below does not have this problem: it finds this
+# script relative to itself and moves with the checkout.
 stale_plist() {
   [ -f "$PLIST" ] || return 1
   ! grep -q "<string>$APP_DIR/server.py</string>" "$PLIST"
@@ -95,8 +95,9 @@ case "${1:-open}" in
   logs)   tail -n "${2:-40}" "$LOG" ;;
   app)
     # A real double-clickable bundle, so this does not depend on a Chrome menu
-    # path — those move between versions. It just runs `studio open`.
-    BUNDLE="$HOME/Applications/Clip Studio.app"
+    # path — those move between versions. It stays beside `studio`, so the
+    # launcher can find this script relative to itself after the repo moves.
+    BUNDLE="$APP_DIR/Clip Studio.app"
     mkdir -p "$BUNDLE/Contents/MacOS"
     cat > "$BUNDLE/Contents/Info.plist" <<INFO
 <?xml version="1.0" encoding="UTF-8"?>
@@ -112,11 +113,19 @@ case "${1:-open}" in
 </dict>
 </plist>
 INFO
-    printf '#!/bin/sh\nexec "%s" open\n' "$APP_DIR/studio" > "$BUNDLE/Contents/MacOS/launch"
+    cat > "$BUNDLE/Contents/MacOS/launch" <<'LAUNCH'
+#!/bin/sh
+STUDIO_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+if [ ! -x "$STUDIO_DIR/studio" ]; then
+  echo "Clip Studio.app must remain beside the studio script in this checkout." >&2
+  exit 1
+fi
+exec "$STUDIO_DIR/studio" open
+LAUNCH
     chmod +x "$BUNDLE/Contents/MacOS/launch"
     plutil -lint "$BUNDLE/Contents/Info.plist" >/dev/null
     echo "built $BUNDLE"
-    echo "drag it to the Dock, or open it from Launchpad."
+    echo "drag it to the Dock, but leave the bundle in this checkout."
     ;;
   open)
     heal_if_moved
