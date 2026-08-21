@@ -45,8 +45,8 @@ export function openComposer(start, fromGap, cueText, gapBefore, extractedLabel)
     cueText: cueText || "",
     gapBefore: gapBefore === "" || gapBefore == null ? null : Number(gapBefore),
     tags: existing ? (existing.tags || []) : (fromGap ? ["take"] : []),
-    lane: (existing && existing.lane) || inherited.lane,
-    work: (existing && existing.work) || inherited.work,
+    lane: (existing && existing.lane) || "",
+    work: (existing && existing.work) || "",
     label: existing ? resolvedLabel(extracted, start, existing.description) : fallback,
     why: existing ? existing.why : "",
   };
@@ -70,8 +70,8 @@ export function openEditor(marker) {
     cueText: addition ? (addition.cueText || "") : "",
     gapBefore: addition ? addition.gapBefore : null,
     tags: [...(marker.tags || [])],
-    lane: (marker.lane || "").trim() || inherited.lane,
-    work: (marker.work || "").trim() || inherited.work,
+    lane: (marker.lane || "").trim(),
+    work: (marker.work || "").trim(),
     label: resolvedLabel(extractedList(S.current && S.current.run), marker.start, marker.description || ""),
     why: addition
       ? (addition.why || "")

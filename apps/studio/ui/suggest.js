@@ -207,13 +207,14 @@ function renderTagChips(wrap) {
 
 export function finishComboEdit() {
   const input = document.activeElement;
-  if (S.liveTax && input && input.dataset.combo === "lane") S.liveTax.lane = input.value.trim();
-  if (input && input.dataset.combo === "work") {
+  if (input && (input.dataset.combo === "work" || input.dataset.combo === "lane")) {
     // "work changes from here" — one section break on the run, not a value on
     // this clip. Everything after inherits it by resolution.
     const row = input.closest("tr");
     const start = row ? Number(row.dataset.start) : NaN;
-    if (Number.isFinite(start)) persistSection(start, input.value.trim());
+    if (Number.isFinite(start)) {
+      persistSection(start, { [input.dataset.combo]: input.value.trim() });
+    }
   } else {
     persistTaxonomy();
   }

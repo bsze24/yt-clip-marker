@@ -1,7 +1,7 @@
 // Every write to the server. All writers surface failures via saveFailed and
 // leave in-memory state intact so the user can retry.
 import { fbClass, missId, STAR_TAG, isWrong, isCheck, formatWrong, formatCheck, feedbackWhy } from "./util.js";
-import { S, setSave, rememberChapter } from "./state.js";
+import { S, setSave, rememberChapter, sectionAt } from "./state.js";
 import { api, saveFailed } from "./api.js";
 import { renderGrid, updateStats } from "./grid.js";
 
@@ -74,11 +74,14 @@ async function persistAddition(runId, addition) {
 // A work edit on a row is a SECTION BREAK — "work changes from here" — not a
 // property of that clip. One event per change instead of the string on every
 // row. Everything after it inherits by resolution, so nothing to re-enter.
-export async function persistSection(start, work, runId = S.currentId) {
+export async function persistSection(start, fields, runId = S.currentId) {
   if (!runId) return;
+  const at = Number(start) || 0;
+  const cur = sectionAt(at);
+  const body = { runId, start: at, work: cur.work, lane: cur.lane, ...fields };
   setSave("saving…");
   try {
-    const res = await api("/api/section", "PUT", { runId, start: Number(start) || 0, work });
+    const res = await api("/api/section", "PUT", body);
     S.sections = res.sections || [];
     setSave("saved");
     renderGrid();

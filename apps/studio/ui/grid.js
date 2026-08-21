@@ -2,7 +2,7 @@
 // Selection is by row identity (rowKey), never start time alone — duplicate
 // timestamps are real.
 import { $, hms, fbClass, evalMark, isWrong, isCheck, feedbackWhy, isBackchannel, escapeHtml, escapeAttr, missId, MATCH, typingInField, resolvedLabel, extractedList } from "./util.js";
-import { S, rememberCursor, FOLLOW_KEY, workAt } from "./state.js";
+import { S, rememberCursor, FOLLOW_KEY, workAt, laneAt } from "./state.js";
 import { seek, scrubTo, keepKeysOnPage, isPlaying, getCurrentTime } from "./player.js";
 import { renderSuggest, resetSuggestHi } from "./suggest.js";
 import { renderTimeline } from "./timeline.js";
@@ -353,7 +353,7 @@ function taxonomyCells(row, selected) {
   if (!selected || S.composer) {
     return `<td class="col-tags"><span class="tax-text">${escapeHtml((tax.tags || []).join(" · "))}</span></td>
       <td class="col-work"><span class="tax-text">${escapeHtml(workAt(row.start))}</span></td>
-      <td class="col-lane"><span class="tax-text">${escapeHtml(tax.lane)}</span></td>`;
+      <td class="col-lane"><span class="tax-text">${escapeHtml(laneAt(row.start))}</span></td>`;
   }
   // Hitchhiking while playing would orphan combo inputs as the playhead
   // walks; pinned selection is the edit target, so show fields even if the
@@ -361,7 +361,7 @@ function taxonomyCells(row, selected) {
   if (!S.followPinned && isPlaying()) {
     return `<td class="col-tags"><span class="tax-text">${escapeHtml((tax.tags || []).join(" · "))}</span></td>
       <td class="col-work"><span class="tax-text">${escapeHtml(workAt(row.start))}</span></td>
-      <td class="col-lane"><span class="tax-text">${escapeHtml(tax.lane)}</span></td>`;
+      <td class="col-lane"><span class="tax-text">${escapeHtml(laneAt(row.start))}</span></td>`;
   }
   const chips = (tax.tags || []).map((tag) =>
     `<button type="button" tabindex="-1" class="chip" data-remove-tag="${escapeAttr(tag)}">${escapeHtml(tag)} ×</button>`
@@ -376,7 +376,7 @@ function taxonomyCells(row, selected) {
       <div class="suggest" hidden></div>
     </div></td>
     <td class="col-lane"><div class="combo">
-      <input data-combo="lane" autocomplete="off" value="${escapeAttr(tax.lane)}" />
+      <input data-combo="lane" autocomplete="off" value="${escapeAttr(laneAt(row.start))}" placeholder="changes lane from here" />
       <div class="suggest" hidden></div>
     </div></td>`;
 }

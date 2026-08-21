@@ -193,19 +193,20 @@ def load_sections(run_id):
         start = ev.get("start")
         start = 0.0 if start is None else float(start)
         work = (ev.get("work") or "").strip()
-        if work:
-            by_start[start] = work
+        lane = (ev.get("lane") or "").strip()
+        if work or lane:
+            by_start[start] = {"work": work, "lane": lane}
         else:
             by_start.pop(start, None)
-    return sorted(by_start.items())
+    return [[at, v["work"], v["lane"]] for at, v in sorted(by_start.items())]
 
 
-def work_at(sections, start):
-    """The work in effect at `start` — the latest break at or before it."""
-    current = ""
-    for at, work in sections:
+def section_at(sections, start):
+    """The work and lane in effect at `start` — the latest break at or before it."""
+    current = ("", "")
+    for at, work, lane in sections:
         if at <= start:
-            current = work
+            current = (work, lane)
         else:
             break
     return current
@@ -213,6 +214,7 @@ def work_at(sections, start):
 
 def append_section(run_id, run, payload):
     work = payload.get("work") if isinstance(payload.get("work"), str) else ""
+    lane_in = payload.get("lane") if isinstance(payload.get("lane"), str) else ""
     try:
         start = float(payload.get("start") or 0)
     except (TypeError, ValueError):
@@ -230,7 +232,7 @@ def append_section(run_id, run, payload):
         "end": None,
         "description": "",
         "tags": [],
-        "lane": "",
+        "lane": lane_in.strip(),
         "work": work.strip(),
         "feedback": "",
         "verdict": "chapter",

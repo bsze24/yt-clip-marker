@@ -23,7 +23,7 @@ The one record both surfaces (and eventually media-scraper) agree on. Share the 
 | `end` | number \| null | Seconds. Nullable — markers and coarse captures are start-only; ranges get filled in during studio refinement. |
 | `description` | string | The human label. May be empty at capture time. |
 | `work` | string | What piece/rendition the clip belongs to, e.g. `Song` or `Song \| Rendition`. Freeform. **Usually empty on clips written after 2026-08-21** — it is set once per lesson and resolved from the run instead (see below). A clip that carries its own value still wins. |
-| `lane` | string | Chapter lane (e.g. `transcription`). Freeform. **Deprecated 2026-08-21** — no longer collected. Existing values are still read and still print, so nothing already recorded is lost. |
+| `lane` | string | Chapter lane (e.g. `transcription`). Freeform. **A section property since 2026-08-21** — set once per section, resolved from the run, no longer written per clip. |
 | `tags` | string[] | Lowercase, deduped. Seeded vocabulary: `take`, `fingering`, `technique`, `star`; freeform additions allowed. |
 
 Legacy: `kind` (`TAKE` \| `CONCEPT`) appears on old markers and old label events. Readable forever, never required on new writes.
@@ -56,7 +56,7 @@ A "current clip set" for a video is a fold over the run file plus its label even
 1. **Description timestamps** — `M:SS Title` lines, ends dropped. YouTube auto-links them. Primary near-term output.
 2. **JSON for media-scraper** — array of clip objects as above plus `videoUrl`/`videoTitle`. **Draft** — freeze when the export button lands, not before. Keep it generic enough that a future PKM could ingest clips alongside other annotated content.
 
-## `work` is a section break, not a clip field  (2026-08-21)
+## `work` and `lane` are section breaks, not clip fields  (2026-08-21)
 
 `work` was stored on every clip and never behaved like clip data. On video 1 it changed twice
 across 67 rows and the string was written on all 67; on video 2 one value was stored 75 times.
@@ -66,17 +66,26 @@ A work change is now one event at a timestamp, on the run. Because `runs/{id}.js
 immutable ingest output ([[D-002]]) it lives in `labels.jsonl`:
 
 ```json
-{"verdict": "chapter", "runId": "...", "start": 0,    "work": "Pennies from Heaven | Stan Getz"}
-{"verdict": "chapter", "runId": "...", "start": 4582, "work": "Eb Blues | 1 bar, 1 chord exercise"}
+{"verdict": "chapter", "start": 0,    "work": "Pennies from Heaven | Stan Getz",     "lane": "Transcription"}
+{"verdict": "chapter", "start": 4582, "work": "Eb Blues | 1 bar, 1 chord exercise", "lane": "Melodic harmony"}
 ```
 
-Two events for video 1 instead of 67 copies. Latest event per `start` wins; an empty `work`
-removes that break.
+`lane` rides the same break. On video 1 the two change at **exactly the same two timestamps**,
+which is the tell that they are one thing: a section has a piece and a mode. `lane` was going to
+be deprecated when it was a per-clip field costing a keystroke per marker; as a section property
+it costs one entry per section, so it stays.
+
+Two events for video 1 instead of 67 copies. Latest event per `start` wins. A break is removed
+only when **both** `work` and `lane` are empty — clearing one leaves the other, because a
+lane-only section is a state this design supports. Every writer must therefore send the complete
+pair; sending `{start, work}` alone blanks the lane it shares the break with.
 
 **A clip's work is resolved, never stored** — the latest break at or before its start.
-`/api/run` returns `sections` as `[[start, work], ...]` ascending; consumers resolve from that.
-`clip.work` still appears on events written before this date and is no longer read.
+`/api/run` returns `sections` as `[[start, work, lane], ...]` ascending; consumers resolve from
+that. `clip.work` and `clip.lane` still appear on events written before this date and are no
+longer read.
 
 Set the lesson's piece once in the header. When it changes, `Tab` then `w` on the row where it
-changes — the field is labelled *changes work from here* and is prefilled with what is
-currently in effect, so you can see what you are overriding.
+changes — the field is labelled *changes work from here* and is prefilled with what is currently
+in effect, so you can see what you are overriding. `Tab` then `l` does the same for the lane, on
+the same break.

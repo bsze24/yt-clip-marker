@@ -3,7 +3,7 @@
 // Nearby rows collapse to one line; extracted title and start win when present.
 // Taxonomy still comes from the studio clip (added or skill marker) in that cluster.
 import { MATCH, STAR_TAG, isCheck, isWrong, resolvedLabel, ytStamp, extractedList } from "./util.js";
-import { S, setSave, workAt } from "./state.js";
+import { S, setSave, workAt, laneAt } from "./state.js";
 
 const RANK = { extracted: 0, miss: 1, skill: 2 };
 
@@ -118,13 +118,14 @@ function formatClip(c, sectionLane) {
   const star = starred ? "*** " : "";
   const bits = [`${ytStamp(c.start)} ${star}${c.label}`];
   if (tags) bits.push(tags);
-  if (c.lane && c.lane !== sectionLane) bits.push(c.lane);
+  const lane = laneAt(c.start);
+  if (lane && lane !== sectionLane) bits.push(lane);
   return bits.join(" | ");
 }
 
 function sectionLaneFor(clips, work) {
-  const hit = clips.find((c) => workAt(c.start) === work && c.lane);
-  return (hit && hit.lane) || "";
+  const hit = clips.find((c) => workAt(c.start) === work && laneAt(c.start));
+  return (hit && laneAt(hit.start)) || "";
 }
 
 export function descriptionTimestampText() {
