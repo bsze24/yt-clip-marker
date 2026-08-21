@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 13:05
+revised: 2026-08-21 13:40
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -654,4 +654,145 @@ git fetch --prune             # drop stale origin/* caches
 - Whether Codex's worktrees are still lying around. Several were on detached HEAD, and one stale
   worktree already blocked a branch delete earlier today. `git worktree list` and
   `git worktree prune`.
+
+---
+
+# Append — 2026-08-21 13:40 — side chat: worktrees, HEAD, and the reset family
+
+Continues the git mechanics record. Still uncommitted at the time; no tools ran in that fork.
+
+## What `HEAD` actually is
+
+`.git/HEAD` is a persistent one-line text file. Two possible contents:
+
+```
+ref: refs/heads/main        ← attached to a branch
+54903b8f2a1c...             ← detached, pointing straight at a commit
+```
+
+**Correction to the working model:** `HEAD` is not "where the project is." It is where *one
+folder* is standing. The project is the shared history; "which commit are my files showing" is a
+question about a directory on disk, and you can have several.
+
+So: one repository, one set of branches, but **one `HEAD` per worktree**. Today there were three
+at once —
+
+```
+/app-projects/yt-clip-marker   HEAD → ref: refs/heads/main
+/tmp/.../scratchpad/td16       HEAD → ref: refs/heads/merge-only-matching-labels
+/tmp/.../scratchpad/fix33      HEAD → 54903b8...        (detached)
+```
+
+"You are on main or a branch, never both" holds inside one folder. It stops holding across
+folders.
+
+Also: `HEAD` is not necessarily the latest commit. Detached at an old SHA means your files show
+something from days ago.
+
+Naming collision worth knowing: `HEAD` (your position) and `refs/heads/*` (each branch's tip
+commit) share a word and mean different things.
+
+## What a worktree is
+
+A folder of checked-out files. You already had one; `git worktree add` makes more.
+
+| Shared — lives in the original `.git` | Separate per worktree |
+| --- | --- |
+| every commit, tree, blob | the files on disk |
+| every branch ref | `HEAD` |
+| remotes, config, hooks | the index |
+
+**The rule that bit us:** a branch can be checked out in only one worktree at a time. That is the
+error when deleting `merge-only-matching-labels`:
+
+```
+fatal: 'merge-only-matching-labels' is already used by worktree at
+       /tmp/.../scratchpad/td16
+```
+
+Physical giveaway: in the main folder `.git` is a **directory**. In a linked worktree it is a
+**file** containing `gitdir: /path/to/real/.git/worktrees/<name>`.
+
+Why it exists: it replaces stash → checkout → look → checkout back → stash pop. Your folder never
+moves; you get a second one, look, delete it.
+
+## Detached HEAD — why Codex used it, and where it went wrong
+
+Inferring from directory names, but legible. Checkouts named `studio-test` (at PR 4's SHA),
+`fix33`, `d33`, `logmain`, `recover` — task-scoped, disposable.
+
+Three good reasons: isolation (checking out an old commit in the main folder would swap your
+files out from under you), reviewing a specific commit, and no branch-name collision since
+nothing is claimed. All correct instincts. Detached is the right tool for *reading* a commit.
+
+**The mistake was committing there and pushing to `main`.** Detached is the wrong place to author
+something meant to land on a branch, because there is no branch to carry it — GitHub's `main`
+moved, local `main` did not, and nothing signalled it. One command would have prevented it:
+
+```
+git switch -c some-branch    # attach a name before committing
+```
+
+## The four things that move a branch
+
+**`merge`** — two cases, and I had only described one. **Fast-forward** (main has not moved since
+the fork) just rewrites main's id, no new commit. When **both sides have moved** that is
+impossible, so git creates a merge commit with two parents and points main at that. Every "Merge
+pull request #N" here is the second kind. `--ff-only` refuses if a merge commit would be needed.
+
+**`rebase`** — commits are rebuilt, not moved. New ids, same content. Old ones orphaned until GC,
+recoverable via reflog. Normally the branch is rebased onto main, not the reverse.
+
+**`pull`** — fetch then merge. Step 1 never moves `main`; step 2 does. "GitHub's main has moved
+and mine has not." Note it does not matter *who* moved it — today it was our own other agent on
+this same Mac, and from main's point of view that is identical to a stranger pushing.
+
+**`reset`** — point the branch somewhere else, no reconciling. Three flavours differ only in how
+much comes along:
+
+| | Branch | Index | Files |
+| --- | --- | --- | --- |
+| `--soft` | moves | untouched | untouched |
+| `--mixed` (default) | moves | cleared | untouched |
+| `--hard` | moves | cleared | **overwritten** |
+
+## Soft vs mixed — Brian's framing, which is better than mine
+
+- `--soft` = **squash.** Several commits should be one.
+- `--mixed` = **reorganise.** One commit has the wrong stuff in it.
+
+I had described the mechanism ("keeping content vs re-deciding it") when the *situation* is the
+useful handle. Worse, "keeping the content" describes both — `--mixed` keeps your content too, it
+is sitting in your files.
+
+Why they line up that way: the index is a file, `.git/index`, holding path → content for the next
+commit. `--soft` leaves it full with the commit boundaries gone, so the one natural next move is
+committing it as one thing. `--mixed` empties it, forcing you to choose what goes in.
+
+Consequence that falls out of this: `--soft` back over three commits then `git commit` gives one
+commit, because the index never recorded that there was a boundary.
+
+Reset scoped to a path — `git reset path/to/file` — is `--mixed` on one file. That is the unstage
+command, same mechanism.
+
+## What can lose work
+
+Only `git reset --hard` with uncommitted edits. `reflog` recovers orphaned commits for ~90 days;
+uncommitted work was never a commit. `git status` before `--hard` is the whole safeguard.
+
+## Fetch — what it actually downloads
+
+The commit **objects**, not just the pointer. After fetching, `git log origin/main` works offline.
+It transfers only what you are missing, so fetching three new commits moves three commits, not
+134.
+
+It also updates every `origin/*` ref it can see — which is how branches you never checked out
+appear in your list. It does not delete stale ones without `--prune`.
+
+## Next / open threads (from the side chat)
+
+Unchanged from the previous record, plus:
+
+- `git worktree list` then `git worktree prune` — two entries showed prunable (folder deleted,
+  registration left behind), and one of those already blocked a branch delete.
 
