@@ -149,6 +149,58 @@ video 3 with star only. None is him *reviewing* a drafted list, which is the wor
 path assumes. The ratio to bring back from the next few lessons: what fraction of markers needed
 playing versus judging from the label alone.
 
+## Eval, after [[D-041]] — what is left to build
+
+The decision is recorded; none of this is written yet, and nothing starts until the open review
+threads clear.
+
+**Build, in order:**
+
+1. **The link.** A clip records which proposal it replaced, or null. One field on the write path,
+   set at creation, never derived. Reads null on every existing row and on every run marked with
+   no proposals present — that is correct, and it is the fact that stops a later reader treating
+   126 blind-marked clips as misses.
+2. **Retire `g` and `keep`.** Remove the grade key, the keep bucket, and the five-bucket stats
+   line that only exists to show them.
+3. **Reinterpret `x`** as "remove this from my list". Same key, same effect on the export, no
+   longer gated behind a mode.
+4. **Delete the eval toggle.** Falls out of 2 and 3 rather than being a separate call.
+5. **Stop printing `MISS.`** under clips Brian made. A storage word that reached the screen; on
+   video 1 it prefixes eleven of his own notes.
+
+**Mark the runs.** Videos 2 and 3: blind-marked, **and spent on tuning v2**. Both facts, or a
+later reader scores v3 against video 3, sees a good number, and concludes the skill improved.
+
+**The blind cadence.** Roughly one lesson in four or five marked cold, so there is always an
+unspent one. Spend one per skill revision. Zero unspent today and v2 untested — so the next
+lesson marked is the held-out one, and it must be marked before v2 runs on it.
+
+## Does this become machine learning?
+
+Asked 2026-08-21. Short answer: not the next lever, and probably never as fine-tuning.
+
+It is already a model doing the judging — the rules are prompt, not code. The question is whether
+a *trained* model replaces the prompted one. Against that:
+
+- **The measured failures were specification problems, not judgment problems.** `R-CONCEPT` is
+  95% on both unanchored lessons. What failed was `R-TAKE-GAP`, a rule that could not work
+  because the distinction is not in the transcript, and coverage, which a threshold fixed.
+  Neither is "the model cannot tell".
+- **The one thing training cannot fix is the one thing most wanted.** Whether a passage is Jake
+  *demonstrating* is not in the text — four features tested, all dead ([[D-040]]). That needs
+  audio, which is a different modality, not more examples.
+- **Scale.** Twenty lessons is roughly 1,200 positives and no clean negatives. Anchored runs only
+  have negatives where the model proposed; unanchored runs have none at all.
+
+**Where model work does pay, in order:**
+
+1. **Few-shot label drafting from Brian's own corpus.** Producing a terse label in his vocabulary
+   is generation, and his 193 labels are the examples. This is the load-bearing step for the 0.27x
+   target and it is prompt engineering, not training.
+2. **Audio music-vs-speech detection** for `take`. The only real ML project here, and it is a
+   different input rather than a better model.
+3. Fine-tuning the proposer. Last, and only with a reason the prompt could not have been fixed.
+
 ## Reducing manual tagging — the path (agreed 2026-08-19)
 
 Brian's goal, restated as a rate 2026-08-20: **0.27x realtime — 20 minutes to review a

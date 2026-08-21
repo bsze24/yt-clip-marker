@@ -464,6 +464,65 @@ moment has some proposal before it, so a forward-only scan never loses one; what
 far he plays. Anchoring to the start of the speaker's turn shortens that.
 
 
+### D-041 — eval is what you do anyway, not a separate pass  (Accepted 2026-08-21)
+Supersedes [[D-010]], which put eval chrome behind a toggle and said revisit after ~5 labelled
+videos. Revisited at 3, because the thing the toggle hid is being removed.
+
+**`g` and `keep` are retired. `x` stays, reinterpreted. The toggle goes.**
+
+**Why the grades went.** The eval that actually rewrote `SKILL.md` never read one.
+`score_run.py` reads three verdicts — `miss`, `unmiss`, `annotate` — and nothing else. Video 1
+was graded on 54 of 64 markers and still could not answer the recall question; videos 2 and 3
+were graded zero times and answered it cleanly. A grade says a proposal was good. It cannot say
+what the skill *missed*, and the miss is what costs a manual pass.
+
+`g` is not redundant with `star` — Brian's distinction, and he is right: `star` means "come back
+to this moment", `g` means "this marker is correctly placed". They come apart. `g` is redundant
+with **the link** below, which derives the same judgment from what he did rather than an extra
+keystroke.
+
+`keep` has no definition that survives: tags will be auto-applied, `relabel` fires on unchanged
+text (all five on video 1 are byte-identical), and `lane`/`work` moved to section breaks
+([[D-039]]'s neighbours, PRs 21-22).
+
+**Why `x` stays.** It is not only a grade — `export.js` drops any marker marked wrong, so `x` is
+the only way to keep a bad proposal out of the published timestamps. Under the draft loop, where
+the skill puts 60+ proposals in front of Brian, dismissing junk is the most-used action in the
+product. It stops meaning "this proposal was bad" and starts meaning "remove this from my list".
+The eval signal falls out of it for free.
+
+**The note field stays.** Video 1's 24 rejections carried reasons — "hallucinated transcript
+line", "diarization would have caught this", "good hunt, wrong place" — and those produced the
+failure taxonomy that rewrote the rules. The verdict was a container for the sentence.
+
+**What replaces grades: the link.** A clip records which proposal it replaced, or null. That
+separates a *near-miss* (right neighbourhood, wrong second) from a *real miss* (nothing was
+proposed), which proximity cannot. Today `score_run.py` calls a proposal a hit if a human row
+sits within 45s — and video 1 contains the counterexample in Brian's own words: "good hunt,
+wrong place... Same clip; 14s early." Proximity scores that a hit; he called it wrong. At three
+videos that is one row; at twenty it is a systematic overstatement, and it overstates by exactly
+the class that produced `R-LEAD`.
+
+The link is unrecoverable after the fact. Whether a proposal was on screen when a clip was made
+is gone the moment it is not written down. Under the draft loop `len(run.markers) > 0` on a run
+annotated blind, so deriving it lies silently — the same failure as `0 of 65 proposals earned a
+star (0%)`.
+
+**Held-out lessons, and the trap.** A lesson is spent for testing version N once version N's
+proposals have been seen on it. **Videos 2 and 3 are already spent.** They were marked blind,
+but every v2 rule change came from them — `R-TAKE-GAP` retired on their 92%/50% split,
+`R-COVERAGE` from video 3's five-minute hole with four stars in it. Scoring v2 against them
+looks good because v2 was built to fix them.
+
+They remain a permanent, honest **v1 baseline** (94% and 81% star recall). They are not a test
+set. Record both facts on those runs; without the second, someone scores v3 against video 3 in
+three months and concludes the skill improved.
+
+**The cadence.** Keep a small stock of unspent blind-marked lessons — roughly one in four or
+five. Spend one per skill revision. There are **zero unspent today** and v2 is untested, so the
+next lesson marked is the held-out one, and it has to be marked before v2 runs on it.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

@@ -43,12 +43,25 @@ they are three records, not three values of one `type` field. Use these words ex
 (writes `unmiss` — leftover eval slang for the delete button). Do not say **gold** for an
 extracted marker; that word collides with the `g` few-shot grade.
 
-The eval verdicts are five distinct channels and must not be collapsed into "keep vs skip":
+**Superseded 2026-08-21 by [[D-041]]** — kept because `labels.jsonl` still holds all five and
+anything reading history needs the vocabulary. Going forward there are three channels, and none
+of them is a separate grading pass:
 
-- `g` — few-shot exemplar of a **skill marker**. Stingy. This is the positive training signal.
-- `x` — reject this skill marker. The negative signal. The same key on an *added marker* deletes it.
-- taxonomy (work / lane / tags) with no `g` — an ordinary keep, not a blank.
-- `star` — Brian's personal bookmark. A tag, not eval.
+- `x` — **remove this proposal from my list.** A product action, not a grade: `export.js` drops
+  it from the published timestamps. The negative signal falls out for free.
+- `star` — Brian's bookmark: *come back to this moment*. The strongest signal in the store.
+- the note field — free text. Video 1's rejection reasons are what rewrote `SKILL.md`; the
+  verdicts were a container for the sentence.
+
+Retired: `g` (the link supplies it — see [[D-041]]) and `keep` (no definition survives auto-tags,
+and `lane`/`work` moved to section breaks).
+
+The five as they exist in history:
+
+- `g` — few-shot exemplar of a **skill marker**. Stingy. Retired.
+- `x` — reject this skill marker. The same key on an *added marker* deletes it. Reinterpreted.
+- taxonomy (work / lane / tags) with no `g` — an ordinary keep, not a blank. Retired.
+- `star` — Brian's personal bookmark. A tag, not eval. Unchanged.
 - blank feedback and no taxonomy — genuinely unreviewed.
 
 **The standing trap: displayed time is not stored identity.**
