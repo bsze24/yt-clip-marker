@@ -41,7 +41,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
-| 8 — work and lane as sections | PRs 21 + 22, → `2b9bba5` | **addressed** — F26-F28 fixed | → reviewer |
+| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLEAN** — 22 unmerged | → planner |
 | 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
 
 ---
@@ -370,7 +370,7 @@ resolved file name fixes it. The inline review comment is posted on PR #11.
 
 ---
 
-## Thread 8 — work and lane as sections (PRs 21 + 22) — OPEN
+## Thread 8 — work and lane as sections (PRs 21 + 22) — CLEAN
 
 **Review both commits as one design.** PR 21 is merged and PR 22 is open, but they are a single
 change split in two: sections exist (21), lane joins them (22). Reading 22 alone shows lane
@@ -412,7 +412,7 @@ half-change — a new run-level path added on top of the old per-clip path, both
 Brian found it by using the app, not by reading the diff. The same shape is the thing worth
 looking for here.
 
-### F26 — the header work writer blanks its section lane — blocking · open
+### F26 — the header work writer blanks its section lane — blocking · resolved
 
 `main.js`'s `#runWork` change handler is a second `/api/section` writer, but it
 still sends only `{runId, start: 0, work}`. After PR 22, `append_section` treats
@@ -433,7 +433,15 @@ written again.
 remaining section writer before returning a SHA; a section event must carry the
 complete `{work, lane}` pair.
 
-### F27 — in-row lane edits still write the old per-clip taxonomy — blocking · open
+**Reviewer re-review — 2026-08-21 at `2b9bba5`. Resolved.** The header is now
+one of the two `persistSection` callers. That function reads the currently
+resolved pair at 0:00 and sends both fields, so the retained lane cannot be
+blanked by a work-only edit. The server fold test preserved the sibling field
+through both work-only and lane-only updates. The browser harness's text-entry
+shim does not emit a native `change` event on blur, so this verdict is from the
+single-writer code path plus the exercised fold rather than that harness quirk.
+
+### F27 — in-row lane edits still write the old per-clip taxonomy — blocking · resolved
 
 The `tbody` input handler in `main.js` still treats `data-combo="lane"` as a
 clip-taxonomy field: it changes `S.liveTax.lane` and calls `queueTaxonomy()`.
@@ -454,7 +462,13 @@ work and lane only through the merged section writer, and remove the inherited
 work/lane fields from new clip writes. Re-test that one section edit produces
 one `chapter` event and no `annotate` or `miss` event.
 
-### F28 — the section contract says an empty work deletes a lane-only section — optional · open
+**Reviewer re-review — 2026-08-21 at `2b9bba5`. Resolved.** The tbody input
+handler no longer mutates or queues clip taxonomy for work/lane, and the
+composer no longer inherits either value. In an isolated video-1 store, a
+keyboard-committed lane edit appended exactly one `human-chapter` event with
+the inherited work and appended no `human-annotate` event.
+
+### F28 — the section contract says an empty work deletes a lane-only section — optional · resolved
 
 `docs/clip-schema.md` says that an empty `work` removes a break, while the
 implementation correctly removes it only when **both** work and lane are empty.
@@ -462,8 +476,12 @@ That makes the documented undo rule wrong for the lane-only state that PR 22
 explicitly supports. Say `both fields are empty` so the contract matches the
 fold.
 
-**Baton: → implementer** — F26 and F27 block the review; F28 may ride with the
-repair.
+**Reviewer re-review — 2026-08-21 at `2b9bba5`. Resolved.** The contract now
+states the complete-pair rule and that both values must be empty to remove a
+break.
+
+**Baton: → planner** — F26–F28 are resolved; PR 22 remains unmerged pending
+Brian's explicit decision.
 
 ---
 
