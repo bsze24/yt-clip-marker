@@ -51,6 +51,19 @@ note in `apps/studio/README.md`.
 
 A "current clip set" for a video is a fold over the run file plus its label events. Don't over-specify this store — it's JSONL until it hurts.
 
+### Effective YouTube identity
+
+The immutable run's `videoId` is not always a YouTube id. A raw local ingest uses a
+filename-derived value, while a YouTube download ingested from its `.info.json` carries a real
+watch URL even though its `source` is still `local`. Consumers must not infer playability from
+`source` or from the shape of `run.videoId`.
+
+Both `/api/run` and each `/api/runs` row expose `youtubeId`: the valid 11-character id parsed from
+the run's immutable YouTube URL, or `""` when no YouTube fallback exists. The player and
+missing-media warning use this resolved field. Local media still wins when present ([[D-035]]);
+when it disappears, a non-empty `youtubeId` restores the embed without rewriting the run file
+([[D-034]]). A local-only run with no media keeps its warning and does not attempt an embed.
+
 ## Exports (future studio buttons)
 
 1. **Description timestamps** — `M:SS Title` lines, ends dropped. YouTube auto-links them. Primary near-term output.

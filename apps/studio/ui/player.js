@@ -111,7 +111,7 @@ function clampTime(seconds) {
 }
 
 function ready() {
-  return mode === "local" ? mediaReady : playerReady;
+  return mode === "local" ? mediaReady : Boolean(pendingCue.videoId && playerReady);
 }
 
 function playerLayout() {
@@ -226,6 +226,20 @@ export function loadVideo(videoId, startSeconds, mediaSource) {
     return;
   }
   switchMode("yt");
+  // No local file and no resolved YouTube identity is a supported empty
+  // backend. Do not fetch the IFrame API for it, and clear a previous embed so
+  // switching from another run cannot leave the wrong lesson on screen.
+  if (!pendingCue.videoId) {
+    const ytBox = $("player");
+    if (ytBox) ytBox.hidden = true;
+    if (playerReady && player) {
+      try {
+        if (player.clearVideo) player.clearVideo();
+        else if (player.stopVideo) player.stopVideo();
+      } catch (_) {}
+    }
+    return;
+  }
   ensureYouTubeApi();
   if (!playerReady || !pendingCue.videoId) return;
   applyCue();
@@ -310,12 +324,12 @@ export function isPlayerReady() { return ready(); }
 
 export function isPlaying() {
   if (mode === "local") return Boolean(media && !media.paused && !media.ended);
-  return playerReady && player && player.getPlayerState() === YT.PlayerState.PLAYING;
+  return ready() && player && player.getPlayerState() === YT.PlayerState.PLAYING;
 }
 
 export function getCurrentTime() {
   if (mode === "local") return media ? media.currentTime || 0 : 0;
-  return playerReady && player ? player.getCurrentTime() : 0;
+  return ready() && player ? player.getCurrentTime() : 0;
 }
 
 export function seekRaw(seconds) {
@@ -343,7 +357,7 @@ export function getDuration() {
     const d = media ? media.duration : 0;
     return Number.isFinite(d) ? d : 0;
   }
-  if (!playerReady || !player || !player.getDuration) return 0;
+  if (!ready() || !player || !player.getDuration) return 0;
   return player.getDuration() || 0;
 }
 

@@ -108,7 +108,11 @@ export async function openRun(id) {
     ? ` · <span class="src-local" title="${escapeAttr(media.name)}">local file</span>`
     : "";
   $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div>${idHtml}${sourceHtml} · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
-  loadVideo(run.videoId, S.selectedStart, media);
+  // The run's `videoId` may be a filename-derived local identity. Only the
+  // server-resolved YouTube id is safe to hand to the embed; a local-only run
+  // with missing media should stay empty and show its warning, not cue a
+  // synthetic id and misleadingly render "video unavailable".
+  loadVideo(S.current.youtubeId || null, S.selectedStart, media);
   renderGrid();
   updateStats();
 }
