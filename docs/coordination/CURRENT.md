@@ -47,7 +47,7 @@ HH:MM:SS<TAB>text
 ```
 
 from `runs/GMT20260730-155336_Recording_640x360-1-20260819-0903.json` with
-`apps/studio/eval/make_transcript.py` (PR 10): **714 lines, 26 GAP flags**, speaker names on
+`apps/studio/eval/make_transcript.py` (PR 11): **714 lines, 26 GAP flags**, speaker names on
 every line. Hand the skill that file and run steps 2-6.
 
 The GAP count has to match the run's own `gapBefore` flags — 26 here, 27 on video 1. An earlier
