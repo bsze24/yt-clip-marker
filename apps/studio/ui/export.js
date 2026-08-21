@@ -94,7 +94,11 @@ export function mergeNearby(items) {
   const clusters = [];
   for (const it of sorted) {
     const cluster = clusters[clusters.length - 1];
-    if (cluster && it.start - cluster.firstStart <= MATCH) {
+    // Two entries only collapse when they would print the same words. Merging on
+    // time alone would delete a label (D-033). Video 1 never hits this — every
+    // close pair there contains an extracted marker, which rewrites both labels
+    // to the same text first — so this condition is a no-op on that data.
+    if (cluster && it.start - cluster.firstStart <= MATCH && it.label === cluster.clip.label) {
       const keep = RANK[it.source] < RANK[cluster.clip.source] ? it : cluster.clip;
       const other = keep === it ? cluster.clip : it;
       cluster.clip = mergePair(keep, other);
