@@ -9,11 +9,14 @@ It began as an eval harness for the yt-clipper skill; the skill-scoring chrome (
 ```
 apps/studio/studio install     # once — writes and loads a launchd agent
 apps/studio/studio open        # app window, starts the server if needed
+apps/studio/studio app          # builds the dockable app icon beside this script
 ```
 
-`app` builds `~/Applications/Clip Studio.app` — a real double-clickable bundle
+`app` builds `apps/studio/Clip Studio.app` — a real double-clickable bundle
 that just runs `studio open`, so it needs no Chrome menu and survives Chrome
-changing its UI. Drag it to the Dock.
+changing its UI. Drag it to the Dock, but leave the bundle in this checkout:
+its launcher finds `studio` relative to itself, so moving the whole repo keeps
+the icon working. Do not copy the bundle into `~/Applications`.
 
 The header's **quit** button stops the server for real: it boots the launch
 agent out before exiting, because `KeepAlive` would otherwise restart it a
@@ -26,9 +29,9 @@ points a Chrome app window at it — dock icon, no URL bar, closest thing to a
 native app for a local web app. Also `start`, `stop`, `restart`, `status`,
 `logs`, `uninstall`; logs go to `~/Library/Logs/yt-clip-studio.log`.
 
-**Moving the repo is handled.** The launch agent bakes in an absolute path, so a moved clone
-would otherwise point at a directory that no longer exists. `studio status` warns and
-`studio open` reinstalls from wherever the script now lives.
+**Moving the repo is handled.** The app bundle moves with the checkout and finds `studio`
+relative to itself. The launch agent still bakes in an absolute path, so `studio status` warns
+and `studio open` reinstalls it from wherever the script now lives.
 
 **`/api/quit` and `/api/ingest` require a same-origin JSON request.** Binding to 127.0.0.1 is
 not an authorization boundary — any web page can submit a plain form to a fixed localhost URL,
