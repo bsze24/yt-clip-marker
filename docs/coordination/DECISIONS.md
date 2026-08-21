@@ -405,6 +405,37 @@ edit. Deleting the superseded run is safe only if nothing was annotated on it, a
 so rather than deciding for you.
 
 
+### D-039 — the export merges only entries that would print the same words  (Accepted 2026-08-21)
+`mergeNearby` requires `it.label === cluster.clip.label` alongside the 2-second window. Entries
+close in time but carrying different wording each get their own line.
+
+[[D-033]] says every marker Brian made reaches the exported description. Until now the code did
+not enforce it: the merge compared times and ranks and never read the text, so two entries inside
+the window collapsed to one and the loser's wording vanished with no warning.
+
+**Measured before shipping.** Byte-identical output on video 1 — 71 timestamps either way. The
+condition changes nothing on the only dataset that exists.
+
+**The loss it prevents has never occurred, and that is not the reason to ship it.** Across video
+1's 64 skill markers and 21 added markers there are zero skill+skill, zero added+added and zero
+skill+added pairs within 2 seconds. In the 42 minutes carrying no extracted markers, 44 markers
+sit there and the tightest pair is 7 seconds apart. Every one of the 15 collisions on that video
+was a marker meeting an **extracted marker**, which rewrites both labels to the same text first,
+so the merge only ever collapsed duplicates.
+
+The reason to ship it is that the alternative was a check to run after every annotated video — a
+recurring cost forever, against a one-time ten-minute change. `TD-16` is closed.
+
+**Exact string comparison, deliberately.** "Freedom Demo c1" and "Freedom demo C1" would both
+print. Lowercasing and trimming first is a one-line change if that shows up in practice; it has
+not yet.
+
+**Numbered D-039, not D-035.** The branch that carried this proposed `D-035`, which already means
+"Local playback wins over the YouTube embed" ([[D-035]], harvested from PR 8 the same day). Two
+sessions were writing to `DECISIONS.md` without seeing each other. Take the next free id at the
+moment of writing, not the next one you remember.
+
+
 ## Process
 
 Git workflow is not a decision entry — it lives in `AGENTS.md` §"Git workflow" and the

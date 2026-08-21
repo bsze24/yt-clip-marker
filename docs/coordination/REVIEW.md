@@ -1,7 +1,10 @@
 # Review
 
-No active review. PR 9's F20-F23 are resolved at `8a47c2b` (2026-08-20). Threads 1-4
-are closed and collapsed to an index; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
+Active targets: **PR 10** at `e8d206ca9c715643764e21ded55a9d248c6cda08` and **PR 11** at
+`e8943cdb67964a00b30a2893c1bdf83884c8244f`. PR 10 has one blocking record conflict;
+PR 11 has one optional error-path fix. PR 9's F20-F23 are resolved at `8a47c2b`.
+Threads 1-4 are closed and collapsed to an index; durable outcomes live in `DECISIONS.md` and
+`BACKLOG.md`.
 
 Roles stay reversed on thread 5, same as thread 4 and at Brian's instruction: Claude Code
 implemented, **Codex reviews**. BugBot is not a second pair of eyes on this one — it failed
@@ -36,6 +39,8 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 3 — session write-head | `949cb7b` (PR 5) | **CLOSED** 2026-08-19 — superseded, do not merge | — |
 | 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **resolved** — F20–F23 verified | → planner |
+| 6 — matching-label export fold | `e8d206c` (PR 10) | **open** — F24 blocking | → implementer |
+| 7 — eval scoring scripts | `e8943cd` (PR 11) | **open** — F25 optional | → implementer |
 
 ---
 
@@ -301,3 +306,56 @@ YouTube uploads still have none — re-checked against YouTube today. See `BACKL
 "The corpus, and the one blocker". Not fixable by trying harder.
 
 **Baton: → planner** — review clean at `8a47c2b`; scope the next task.
+
+---
+
+## Thread 6 — matching-label export fold (`e8d206ca9c715643764e21ded55a9d248c6cda08`, PR 10) — OPEN
+
+**Scope.** `mergeNearby` only folds entries inside the two-second window when they would print
+the same label. The intention is to enforce [[D-033]] without changing video 1's known export.
+The branch's two coordination-document edits are not product code.
+
+**Verification.** Exact head is present on `origin/merge-only-matching-labels`; whitespace check
+passes. The one-condition code change preserves the existing time-window and rank behavior, and
+the changed condition is a no-op for video 1's known extracted-marker collisions. GitHub has no
+CI workflow or commit-status checks configured for this repository.
+
+### F24 — PR 10 creates a second, incompatible `D-035` — blocking · open
+
+`main` already assigns `D-035` to local playback winning over the YouTube embed. This PR adds a
+different `D-035` for matching-label folding and changes `TD-16` to cite that new meaning. After
+merge, `[[D-035]]` would be ambiguous and a reader following TD-16 could land on the unrelated
+playback decision. That breaks the coordination records Brian and later agents use to avoid
+silently relitigating decisions.
+
+**Required repair.** Keep the `apps/studio/ui/export.js` condition in the product PR, but remove
+the `BACKLOG.md` and `DECISIONS.md` changes from it. Those living records travel directly on
+`main`; record the outcome there with the next free ID, `D-039`, and update TD-16's citation when
+the code path is ready. The review comment is posted on PR #10.
+
+**Baton: → implementer.**
+
+---
+
+## Thread 7 — eval scoring scripts (`e8943cdb67964a00b30a2893c1bdf83884c8244f`, PR 11) — OPEN
+
+**Scope.** Two offline CLIs: render a studio run as the transcript accepted by `yt-clipper`, and
+score a scratch proposal file without contaminating a canonical run. No product runtime code is
+changed.
+
+**Verification.** Exact head is present on `origin/eval-scoring-scripts`; whitespace check
+passes. The real video-2 transcript emits **714 lines and 26 GAP flags**, matching the run. A
+scratch copy of video 1's 64 proposals reproduces the claimed 45-second results: 9/9 self-created
+star recall, 65/67 region recall, and 54/64 precision. The proposal-in-`runs/` guard and current
+CI absence were inspected; the guard's rejection path was already covered by the implementer's
+recorded check.
+
+### F25 — the intended zero-cue refusal raises `NameError` — optional · open
+
+At `make_transcript.py:78`, the zero-cue branch interpolates `run_id`, but `main` never defines
+that name. The existing zero-cue run `Oa0wqetkNcg-20260819-0858` therefore exits 1 with a Python
+traceback, not the concise `has zero cues — nothing to hand the skill` explanation. It cannot
+produce a bad transcript and does not affect video 2, so this is optional; using `argv[0]` or the
+resolved file name fixes it. The inline review comment is posted on PR #11.
+
+**Baton: → implementer (optional; does not hold a merge).**

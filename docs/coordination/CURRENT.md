@@ -46,9 +46,15 @@ HH:MM:SS<TAB>text
 >>> GAP <n>s @ HH:MM:SS
 ```
 
-from `runs/GMT20260730-155336_Recording_640x360-1-20260819-0903.json`. A throwaway script did
-this on 2026-08-19: 708 lines, 20 GAP flags, speaker names on every line. Hand the skill the
-file and run steps 2-6.
+from `runs/GMT20260730-155336_Recording_640x360-1-20260819-0903.json` with
+`apps/studio/eval/make_transcript.py` (PR 11): **714 lines, 26 GAP flags**, speaker names on
+every line. Hand the skill that file and run steps 2-6.
+
+The GAP count has to match the run's own `gapBefore` flags — 26 here, 27 on video 1. An earlier
+throwaway version hardcoded a 20s threshold against ingest's 18s, and recomputed gaps from
+rounded starts, giving three different answers for one transcript (20, 26, 28). `R-TAKE-GAP`
+fires off those exact lines, so the skill would have been scored on a transcript that disagreed
+with the studio it is being compared against.
 
 **Two ways to destroy this test, both easy:**
 
