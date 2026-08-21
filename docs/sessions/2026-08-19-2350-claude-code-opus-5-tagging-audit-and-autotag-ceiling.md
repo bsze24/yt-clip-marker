@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 13:40
+revised: 2026-08-21 15:05
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -795,4 +795,91 @@ Unchanged from the previous record, plus:
 
 - `git worktree list` then `git worktree prune` — two entries showed prunable (folder deleted,
   registration left behind), and one of those already blocked a branch delete.
+
+---
+
+# Append — 2026-08-21 15:05 — PR 24/25 close-out, and eval state pulled into a doc
+
+## What changed
+
+- `docs/coordination/EVAL.md` — new. Eval corpus, current code state, the four-rung ladder,
+  five open decisions, seven ordered next actions.
+- Pointers added: `README.md` doc table, `BACKLOG.md` "Skill eval" header.
+- Commit `3f87bd8` was the prior session-log append; the eval doc lands on top of it.
+
+## Decisions
+
+- **Eval state gets its own coordination doc.** `BACKLOG.md` held the scored numbers,
+  `DECISIONS.md` held D-040/D-041, and nothing held "where are we". Split: `BACKLOG.md` keeps
+  what was measured, `EVAL.md` holds live state and direction.
+- **Nothing in `EVAL.md` §7 is decided.** Five questions, each with a recommendation and a
+  confidence level, deliberately left open for the roadmap conversation.
+
+## Learning arc
+
+- **Rebase vs merge, worked to the bottom.** Brian restated the PR 24/25 stack in his own words
+  and got the mechanism right — including that `dd4b233` survives a rebase but leaves the chain.
+  Two gaps: a PR's base is a *branch name*, not a commit (which is what makes the breakage
+  automatic — nobody edits PR 25), and a merge is not a line, it is a commit with two parents,
+  which is precisely why the shared point survives. Measured both ways: 3 files/29 insertions
+  with the merge, 4 files/80 with the rebase.
+- **Asking to be walked through it rather than acking it.** The framing he named earlier in the
+  session — "vs just ACKING decisions I 60% understand" — is what produced the restatement, and
+  the restatement is what exposed the two gaps. Cheaper than finding them in a broken PR.
+
+## Concepts touched
+
+- [concept] git-object-model — solidifying — restated the fork/stack graph unprompted and
+  correctly predicted that rebasing the base orphans `dd4b233`
+- [concept] stacked-prs — emerging — understood the base moves automatically once told the base
+  is a branch; the two-rebases maintenance cost was new
+- [concept] eval-channels — solidifying — drove the corpus/ladder analysis himself in a side
+  chat; the corrections needed were factual, not conceptual
+
+## Coaching hooks
+
+- **Verify the side chat, do not transcribe it.** Four claims in the eval side chat were wrong
+  against the store: event count (~700 vs 853), consumer count (two vs six, and two of the six
+  write), positives (193 vs 147 measured), and one open question that was already answerable.
+  Analysis written without tools needs a grounding pass before it becomes a doc.
+- **Measured tables beat asserted ones.** The rebase explanation only landed once both diffs
+  were computed on the real commits.
+
+## Next / open threads
+
+- **Star predictability test** — an hour, and it gates whether rung 4 exists at all. `take` was
+  tested four ways and every feature was dead; if `star` is the same the ladder stops at 3.
+- **Run `SKILL.md` v2 once, unmodified.** Confirmed today that v2 has never been run — it was
+  written 2026-08-20 23:40 and the newest proposals file is 23:23. Every scored number on record
+  is v1.
+- Then: use v2 for real on the next lesson (not blind), fix `score_run.py`'s `annotated` proxy,
+  add the "was a proposal in front of me" boolean, the three display fixes, rung 2 exemplars.
+- Full ordered list in `EVAL.md` §8.
+
+## Open questions / blockers
+
+- Settled today, previously open: `keep` is now effectively "has tags" — the row's work/lane
+  inputs commit through `persistSection`, so no path writes `ann.lane`/`ann.work` anymore, and
+  video 1's 14 keeps are not comparable to anything counted since PR 21.
+- Settled today: both Zoom runs having exactly 688 cues is coincidence, not a sidecar bug —
+  different text, different lengths (3870s vs 2640s).
+- Still open: everything in `EVAL.md` §7 A–E.
+
+## Chronology (the record)
+
+- Committed the worktrees/HEAD/reset side-chat record from the previous fork; pushed as `3f87bd8`.
+- Brian restated the PR 24/25 rebase situation in his own words and asked for the two gaps he had
+  marked `[something something]`.
+- Walked both ancestries on the real commits. Corrected: base is a branch, not a commit; a merge
+  keeps both parents rather than flattening to a line. Showed the two diffs side by side.
+- Noted the state had moved underneath the question — `origin/quit-csrf-guard` is at `7e4927e`,
+  "Merge pull request #25", so the decision is now history.
+- Brian handed over the eval side chat and asked for a session log plus a standalone eval state
+  doc, explicitly to set up a roadmap conversation.
+- Grounded the side chat against the store before writing: folded `labels.jsonl`, counted markers
+  and cues per run, read `score_run.py`, `grid.js`, `persist.js`, `suggest.js`, `keys.js`, and
+  compared `SKILL.md`'s mtime against the proposals files.
+- Four corrections found (see Coaching hooks). One suspicious number chased and cleared: the
+  688/688 cue coincidence.
+- Wrote `docs/coordination/EVAL.md`, added two pointers, committed to `main`.
 
