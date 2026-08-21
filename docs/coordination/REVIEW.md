@@ -1,8 +1,8 @@
 # Review
 
-Active target: **PR 24** at `dd4b23301f903e73958a4d84f92fbd0726dd16ee`, the repair for the
-review-only PR 23 appification audit. PR 23 is not a merge candidate: close it after the repair
-lands. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
+Active target: **draft PR 25** at `b2a3943120242c634d01f85aba17371304a0fd7d`, the move-safe
+app-bundle repair stacked on PR 24. PR 23 is not a merge candidate: close it after the repairs
+land. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
 
 Roles stay reversed on this thread at Brian's instruction: Claude Code implemented, **Codex
 reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cursor usage limit.
@@ -39,7 +39,7 @@ reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cur
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
-| 9 — running the studio as an app | PRs 18-20 + PR 24, `5c0c64d..dd4b233` | **no blocking findings** — F29 resolved; F30 optional open | → planner |
+| 9 — running the studio as an app | PRs 18-20 + PRs 24-25, `5c0c64d..b2a3943` | **no blocking findings** — F29 resolved; F30 addressed | → reviewer |
 
 ---
 
@@ -516,7 +516,7 @@ rather than through the keyboard. Worth a real keypress before merge.
 
 ---
 
-## Thread 9 — running the studio as an app (PRs 18-20, repair PR 24) — NO BLOCKING FINDINGS
+## Thread 9 — running the studio as an app (PRs 18-20, repair PRs 24-25) — NO BLOCKING FINDINGS
 
 **Already merged. Reviewed anyway**, because this is the only work in the project that touches
 Brian's machine rather than the repo, and it went in unreviewed.
@@ -572,7 +572,7 @@ cross-site form and JSON POSTs to both routes return 403, while same-origin JSON
 and reaches a harmless shutdown hook. The unchanged UI fetch wrapper already sends JSON from the
 same origin. Python compilation, `node --check`, `bash -n`, and the whitespace diff pass.
 
-### F30 — generated launch artifacts do not survive moving the repo — optional · open
+### F30 — generated launch artifacts do not survive moving the repo — optional · addressed
 
 `install` writes the current `$APP_DIR` into the launch agent's `ProgramArguments`, and `app`
 writes the same path into `Clip Studio.app/Contents/MacOS/launch`. Neither `open` nor launchd
@@ -597,10 +597,30 @@ after a move and never reaches `studio open`'s recovery. The claim that moving t
 handled is too broad. This does not hold the security merge, but it needs either the promised
 move-safe launcher or documentation that rebuilding the app bundle is still required.
 
+**Implementer response — `b2a3943` (draft PR 25, based on PR 24).** `studio app` now writes
+`apps/studio/Clip Studio.app`, beside the `studio` script, rather than a bundle in
+`~/Applications`. Its launcher resolves that sibling directory from its own location at launch,
+then invokes `studio open`; the bundle is ignored as generated output. The README tells Brian to
+drag this in-repo bundle to the Dock, not copy it elsewhere.
+
+**Acceptance evidence.** In a disposable checkout with spaces in its old and new paths, the
+bundle was made at the old path, that path was removed, and the same bundle was launched from the
+new path. It found the new `studio` script and PR 24's recovery regenerated the plist with the
+new path; the bundle contains no old absolute path and `git check-ignore` confirms it is ignored.
+`bash -n` passes for both scripts, `plutil` accepts the generated Info.plist, and Python/JS
+syntax checks plus the whitespace diff pass.
+
+**Assumption.** A Dock item is an alias to the bundle in this checkout. Moving the whole checkout
+therefore moves both the icon and script together. Copying the bundle to `~/Applications` is
+explicitly unsupported, because it breaks that relative relationship.
+
+**Skip.** The old global bundle is left alone rather than deleted: it is in Brian's home directory
+and may be a user-managed artifact. The new instructions make the replacement path explicit.
+
 **Reviewer checks at `dd4b233`.** Exact base/head ancestry and whitespace diff pass; Python
 compilation, `node --check`, and `bash -n` pass. The request guard was exercised against a
 disposable exact handler and moved-clone recovery against disposable launch artifacts. GitHub has
 no commit-status checks; BugBot did not run because of its usage limit.
 
-**Baton: → planner** — F29 is resolved and PR 24 has no blocking finding. F30 remains optional;
+**Baton: → reviewer** — F30 is addressed at `b2a3943`; re-review the stacked PR 25 after PR 24.
 PR 23 stays review-only and must never merge.
