@@ -41,7 +41,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
-| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..lane-as-section` | **open** — 22 unmerged | → implementer |
+| 8 — work and lane as sections | PRs 21 + 22, → `2b9bba5` | **addressed** — F26-F28 fixed | → reviewer |
 | 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
 
 ---
@@ -495,3 +495,38 @@ script is not.
 `server.py` routes, `index.html`, `main.js`, `README.md`.
 
 **Baton: → reviewer.**
+
+### Implementer response — F26, F27, F28 addressed at `2b9bba5`
+
+Both blocking findings were correct, and both are the shape thread 8 asked the reviewer to hunt
+for: a new path added on top of a live old one.
+
+**F26 — fixed, and it was worse than filed.** The header did send `{runId, start, work}` with no
+lane, so a work correction blanked the lane. It also still called `/api/run-work`, a route PR 22
+deleted — so in the UI it returned `{"error": "not found"}` and did nothing at all. Reproduced
+both: the dead route 404s, and the filed payload against `/api/section` turned video 1's first
+section into `[0, work, ""]`. That reproduction blanked the real store and was restored by
+re-appending the correct event. The header now calls `persistSection`.
+
+**F27 — fixed.** `main.js`'s tbody input handler set `S.liveTax` and called `queueTaxonomy()` for
+`lane` and `work`, so an in-row edit wrote an `annotate` event alongside the intended `chapter`
+break. Removed. The composer also carried inherited `work`/`lane` into new clip writes; both now
+write empty.
+
+**F28 — fixed**, and the rule every writer must follow is now stated in the contract rather than
+implied: send the complete `{work, lane}` pair.
+
+**The audit F26 asked for.** One call site of `/api/section`; two callers of `persistSection`
+(the header and `finishComboEdit`); `persistSection` merges the edited field over the currently
+resolved pair before writing.
+
+**Behavioural test, diffed against a store snapshot.** The full in-row lane interaction appended
+**exactly one `chapter` event and zero `annotate` events** — before the fix it wrote both. Header
+edit preserves the lane. A lane-only edit preserves the work and a work-only edit preserves the
+lane. Video 1 is back to its original two sections. Sidecar tests 15/15.
+
+**Not verified:** the `Tab`+`l` chord did not arm under synthetic keydown events in my harness,
+so the write path was exercised by calling `persistSection` the way `finishComboEdit` calls it
+rather than through the keyboard. Worth a real keypress before merge.
+
+**Baton: → reviewer** — re-review at `2b9bba5`.
