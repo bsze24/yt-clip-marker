@@ -308,7 +308,7 @@ YouTube uploads still have none — re-checked against YouTube today. See `BACKL
 
 ---
 
-## Thread 6 — matching-label export fold (`e8d206ca9c715643764e21ded55a9d248c6cda08`, PR 10) — OPEN
+## Thread 6 — matching-label export fold (`e8d206ca9c715643764e21ded55a9d248c6cda08`, PR 10) — CLOSED
 
 **Scope.** `mergeNearby` only folds entries inside the two-second window when they would print
 the same label. The intention is to enforce [[D-033]] without changing video 1's known export.
@@ -319,7 +319,7 @@ passes. The one-condition code change preserves the existing time-window and ran
 the changed condition is a no-op for video 1's known extracted-marker collisions. GitHub has no
 CI workflow or commit-status checks configured for this repository.
 
-### F24 — PR 10 creates a second, incompatible `D-035` — blocking · open
+### F24 — PR 10 creates a second, incompatible `D-035` — blocking · **resolved 2026-08-21**
 
 `main` already assigns `D-035` to local playback winning over the YouTube embed. This PR adds a
 different `D-035` for matching-label folding and changes `TD-16` to cite that new meaning. After
@@ -342,7 +342,7 @@ one `D-035` in `DECISIONS.md`, and `D-039` exists. **Resolved.**
 
 ---
 
-## Thread 7 — eval scoring scripts (`e8943cdb67964a00b30a2893c1bdf83884c8244f`, PR 11) — OPEN
+## Thread 7 — eval scoring scripts (`e8943cdb67964a00b30a2893c1bdf83884c8244f`, PR 11) — OPEN (F25 resolved; F31 filed 2026-08-21)
 
 **Scope.** Two offline CLIs: render a studio run as the transcript accepted by `yt-clipper`, and
 score a scratch proposal file without contaminating a canonical run. No product runtime code is
@@ -355,7 +355,7 @@ star recall, 65/67 region recall, and 54/64 precision. The proposal-in-`runs/` g
 CI absence were inspected; the guard's rejection path was already covered by the implementer's
 recorded check.
 
-### F25 — the intended zero-cue refusal raises `NameError` — optional · open
+### F25 — the intended zero-cue refusal raises `NameError` — optional · **resolved 2026-08-21**
 
 At `make_transcript.py:78`, the zero-cue branch interpolates `run_id`, but `main` never defines
 that name. The existing zero-cue run `Oa0wqetkNcg-20260819-0858` therefore exits 1 with a Python
@@ -363,7 +363,32 @@ traceback, not the concise `has zero cues — nothing to hand the skill` explana
 produce a bad transcript and does not affect video 2, so this is optional; using `argv[0]` or the
 resolved file name fixes it. The inline review comment is posted on PR #11.
 
-**Baton: → implementer (optional; does not hold a merge).**
+**Resolved.** `make_transcript.py` now interpolates `path.name`. Verified 2026-08-21 by running
+it against `Oa0wqetkNcg-20260819-0858`: it prints the concise `has zero cues — nothing to hand
+the skill` message and exits, no traceback.
+
+### F31 — `score_run.py` crashes instead of refusing when the ground truth has no human rows — optional · open
+
+Found 2026-08-21 while verifying F25; never previously filed, and it is a **different file and a
+different error** from F25 despite looking like the same defect.
+
+Scoring against a run with zero human rows raises `ValueError: min() iterable argument is empty`
+at `apps/studio/eval/score_run.py:84`, inside `nearest()`, because `human_all` is empty and
+`min()` has nothing to pick from. Reproduce:
+
+```bash
+python3 apps/studio/eval/score_run.py /tmp/video2-proposals.json Oa0wqetkNcg-20260819-0858
+```
+
+`make_transcript.py` guards this case and explains it; `score_run.py` does not. The same
+zero-cue uploads that motivated F25's guard reach this path. Cheap fix: refuse early when
+`human_all` is empty, with the same tone as the `make_transcript.py` message — the ground truth
+has nothing to score against, which is a corpus problem, not a skill result.
+
+Optional: it cannot produce a wrong score, only a traceback. Same neighbourhood as the
+`annotated` proxy noted in `docs/reference/EVAL.md` §4, so fix both in one pass.
+
+**Baton: → implementer (both optional; neither holds a merge).**
 
 ---
 

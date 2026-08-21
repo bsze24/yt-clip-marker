@@ -19,7 +19,9 @@ The product why is `docs/youtube-clip-marker-prd.md`.
 
 ## Repo state
 
-`main` is `5af3e13` (2026-08-18). The two-surface layout is merged: the extension lives at
+`main` is at PR 26 (2026-08-21); PRs 9-26 have landed. Do not quote a SHA from this file — run
+`git log --oneline -1` instead, because this line goes stale every merge. The two-surface layout
+is merged: the extension lives at
 `apps/extension/`, the studio at `apps/studio/`, and the clip contract at
 `docs/clip-schema.md`. The old `content/` directory in the repo root is gone.
 
@@ -81,6 +83,11 @@ filename carries the date the log was written, not the dates it covers, and a lo
 after the fact sorts newest while pointing backwards. On `track: studio-workspace` today the
 head is `2026-08-16-1507-grok-studio-fable-lock.md`, and the newer `2026-08-17-1740-…` file
 says so itself. The folded ledger shares the track but is a data artifact, not a resume point.
+
+**The live thread as of 2026-08-21 is `track: reduce-manual-tagging`**, head
+`docs/sessions/2026-08-19-2350-claude-code-opus-5-tagging-audit-and-autotag-ceiling.md`. Read its
+last two appends first — they carry the eval decisions (D-041 → D-043) and the sync direction
+(D-042). `track: review` is Codex's PR thread and is closed out.
 
 - **Learning state** — what Brian understands, drills owed, the confusions themselves — lives
   in these logs, never in the coordination docs.
