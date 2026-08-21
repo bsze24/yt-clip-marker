@@ -41,7 +41,8 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
-| 8 — lane as a section break | PR 22, `lane-as-section` | **open** — unmerged, awaiting review | → reviewer |
+| 8 — work and lane as sections | PRs 21 + 22, `355f216~1..lane-as-section` | **open** — 22 unmerged | → reviewer |
+| 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
 
 ---
 
@@ -369,12 +370,23 @@ resolved file name fixes it. The inline review comment is posted on PR #11.
 
 ---
 
-## Thread 8 — lane as a section break (PR 22, `lane-as-section`) — OPEN
+## Thread 8 — work and lane as sections (PRs 21 + 22) — OPEN
 
-**Unmerged, deliberately.** Brian's standing instruction from 2026-08-21: nothing merges without
-him saying so. This is the first PR held for that.
+**Review both commits as one design.** PR 21 is merged and PR 22 is open, but they are a single
+change split in two: sections exist (21), lane joins them (22). Reading 22 alone shows lane
+moving into a structure with no account of why the structure exists.
 
-**Scope.** `lane` joins `work` on the same `chapter` event. On video 1 the two change at exactly
+```bash
+git diff 355f216~1..lane-as-section     # both, as one diff
+```
+
+PR 22 is unmerged, deliberately — Brian's standing instruction from 2026-08-21 is that nothing
+merges without him saying so. PR 21 is not being reverted to re-review it; this repo reviews by
+SHA, and reverting merged code for a second reading is churn against no gain.
+
+**Scope.** PR 21 makes `work` a section break — an event at a timestamp on the run, resolved on
+read, never stored on a clip. Video 1 went from 67 stored copies to 2 events. PR 22 puts `lane`
+on the same break, because on video 1 the two change at exactly the same two timestamps. On video 1 the two change at exactly
 the same two timestamps, which is the tell that they are one thing — a section has a piece and a
 mode. `sections` becomes `[[start, work, lane], ...]`; neither is stored on a clip.
 
@@ -399,5 +411,36 @@ sidecar tests 15/15; the migration reused the three existing breaks rather than 
 half-change — a new run-level path added on top of the old per-clip path, both live at once.
 Brian found it by using the app, not by reading the diff. The same shape is the thing worth
 looking for here.
+
+**Baton: → reviewer.**
+
+---
+
+## Thread 9 — running the studio as an app (PRs 18-20) — OPEN
+
+**Already merged. Reviewed anyway**, because this is the only work in the project that touches
+Brian's machine rather than the repo, and it went in unreviewed.
+
+**Mechanism: a review-only PR (#23).** A throwaway branch `review-base-appification` sits at the
+commit before the range and `review-appification` at the end of it, so GitHub renders exactly
+`5c0c64d..97c0f22` and findings can be inline. Merging #23 would be a no-op into the throwaway
+base; `main` is untouched. Close it when the review lands.
+
+This is the pattern to reuse for any merged range worth a second reader — it is cheaper and
+safer than reverting merges to re-open them.
+
+**Scope.** 188 lines, 5 files. A launchd agent with `RunAtLoad` and `KeepAlive`; the
+`apps/studio/studio` script; `http://studio.localhost:8765`; a `Clip Studio.app` bundle; and a
+`quit` button backed by `POST /api/quit`.
+
+**Where to look hardest** — named in the PR body, in short: `/api/quit` has no auth beyond the
+127.0.0.1 bind and calls `os._exit(0)`, which bypasses the labels lock teardown; `KeepAlive`
+means `pkill` no longer stops the server, so a debugger may think their change did not take; and
+PR 19 exists because PR 18 was not idempotent, which raises the question of what else in the
+script is not.
+
+**Runs in parallel with thread 8.** They share no files — thread 8 is `grid.js`, `persist.js`,
+`state.js`, `export.js`, `suggest.js`, `runs.js`, `server.py`; thread 9 is `studio`,
+`server.py` routes, `index.html`, `main.js`, `README.md`.
 
 **Baton: → reviewer.**
