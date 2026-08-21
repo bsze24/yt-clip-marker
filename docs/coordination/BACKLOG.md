@@ -87,6 +87,68 @@ likewise a GMT20260707 lesson. When captions eventually land, ingesting the YouT
 second run id for a lesson that already has 75 label events keyed to the local one ([[D-008]]), and
 nothing in the store says the two are the same lesson. Decide the relationship before ingesting.
 
+## Skill eval — closed 2026-08-21
+
+Three videos scored with `apps/studio/eval/score_run.py`. Harvested from `CURRENT.md` when the
+task closed; the skill rewrite it authorised is `SKILL.md` v2 and [[D-040]].
+
+| | video 1 (anchored) | video 2 | video 3 |
+| --- | --- | --- | --- |
+| lesson | 91 min, mixed | 64 min, line-by-line polish | 44 min, harmony instruction |
+| human rows | 67 | 75 | 51 |
+| proposals | 64 (0.70/min) | 65 (1.02/min) | 31 (**0.70/min**) |
+| **star recall @45s** | 100% (n=9) | **94%** (n=36) | **81%** (n=21) |
+| star recall @60s | 100% | **100%** | 86% |
+| region recall @45s | 97% | 89% | 75% |
+| precision @45s | 84% | 94% | 81% |
+| `R-CUE-EXACT` | 64/64 | 65/65 | 31/31 |
+
+**`R-CUE-EXACT` holds on all three.** [[D-032]] does not revert; `TD-6` is closed by
+measurement — every proposal on every video lands on an exact cue start.
+
+**`R-CONCEPT` is the rule that works.** 95% on video 2 and 95% on video 3, on lessons whose
+content could hardly differ more. It carried 22 of video 3's 31 proposals.
+
+**`R-TAKE-GAP` is lesson-dependent, which is worse than being wrong.**
+
+| | fires | near a human row | near a **starred** row |
+| --- | --- | --- | --- |
+| video 2 (demo-dense) | 26 | 92% | 65% |
+| video 3 (talk-dense) | 8 | **50%** | **12%** |
+
+The 2026-08-19 prediction said the rule would fail on a Zoom transcript because Zoom writes
+down the playing instead of leaving silence. **Wrong mechanism, and the falsification test was
+badly specified** — one video could not settle it, and video 2 appeared to refute it outright.
+
+What is actually happening: gaps still exist and the rule still fires. Silence does mean
+someone is playing. But playing is only worth marking when it is *Jake demonstrating* — and on
+video 3 four of the eight gaps are the **reference track** at the top of the lesson, a Louis
+Armstrong recording, correctly detected as music and worth nothing. Tuning the threshold cannot
+separate those, because the distinction is not acoustic, it is who is playing and why.
+
+That is the same wall as `take`. See §2's settled note: no text feature predicts it.
+
+**Two named rejection classes**, both from video 3's six false positives:
+
+1. **The lesson has not started** — five of six sit before his first marker at 5:29, four of
+   them the reference track. `R-SKIP-INTERRUPT` covers scheduling chatter but not a warm-up
+   playthrough.
+2. **Under-production.** 0.70 proposals/min against a marking rate of 1.16/min. `R-COPIOUS`
+   asks for 20-30 per 90 minutes, which video 3 met — and that guidance is now the ceiling on
+   recall. Three starred moments were never proposed within 90s, all in the 33-38 minute
+   stretch on triad pairs, the densest teaching in the lesson.
+
+
+**What it authorised.** `SKILL.md` v2: `R-TAKE-GAP`, `R-TAKE-CLUSTER` and `R-TAKE-LABEL`
+retired ([[D-040]]); `R-COVERAGE`, `R-LEAD`, `R-SKIP-PREAMBLE`, `R-BIZ-BOUNDARY` added;
+`R-COPIOUS` raised from 20-30 per 90 minutes to one per minute.
+
+**Still unmeasured, and it is the only number that matters now.** Every timing figure in this
+project is Brian *authoring* markers — 1.95x realtime on video 2 with full taxonomy, 1.07x on
+video 3 with star only. None is him *reviewing* a drafted list, which is the workflow the whole
+path assumes. The ratio to bring back from the next few lessons: what fraction of markers needed
+playing versus judging from the label alone.
+
 ## Reducing manual tagging — the path (agreed 2026-08-19)
 
 Brian's goal, restated as a rate 2026-08-20: **0.27x realtime — 20 minutes to review a
