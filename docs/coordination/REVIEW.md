@@ -1,14 +1,12 @@
 # Review
 
-Active targets: **PR 10** at `e8d206ca9c715643764e21ded55a9d248c6cda08` and **PR 11** at
-`e8943cdb67964a00b30a2893c1bdf83884c8244f`. PR 10 has one blocking record conflict;
-PR 11 has one optional error-path fix. PR 9's F20-F23 are resolved at `8a47c2b`.
-Threads 1-4 are closed and collapsed to an index; durable outcomes live in `DECISIONS.md` and
+Active target: **review-only PR 23** at `97c0f22f66d6508519ad2608b1ebba6f52d5d439`, covering
+the already-merged appification range `5c0c64d..97c0f22`. It is not a merge candidate: close it
+when the review lands. Threads 1–8 are closed; durable outcomes live in `DECISIONS.md` and
 `BACKLOG.md`.
 
-Roles stay reversed on thread 5, same as thread 4 and at Brian's instruction: Claude Code
-implemented, **Codex reviews**. BugBot is not a second pair of eyes on this one — it failed
-seven times on PR #9 against the Cursor usage cap and filed nothing.
+Roles stay reversed on this thread at Brian's instruction: Claude Code implemented, **Codex
+reviews**. BugBot is not a second pair of eyes — its PR 23 attempt hit the Cursor usage limit.
 
 > ## Concurrency protocol — read before editing
 >
@@ -42,7 +40,7 @@ seven times on PR #9 against the Cursor usage cap and filed nothing.
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
-| 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — merged; review-only PR #23 | → reviewer |
+| 9 — running the studio as an app | PRs 18-20, `5c0c64d..97c0f22` | **open** — F29 blocking; review-only PR #23 | → implementer |
 
 ---
 
@@ -480,39 +478,6 @@ fold.
 states the complete-pair rule and that both values must be empty to remove a
 break.
 
-**Closed.** F26–F28 are resolved; PR 22 merged as `8d57e37`.
-
----
-
-## Thread 9 — running the studio as an app (PRs 18-20) — OPEN
-
-**Already merged. Reviewed anyway**, because this is the only work in the project that touches
-Brian's machine rather than the repo, and it went in unreviewed.
-
-**Mechanism: a review-only PR (#23).** A throwaway branch `review-base-appification` sits at the
-commit before the range and `review-appification` at the end of it, so GitHub renders exactly
-`5c0c64d..97c0f22` and findings can be inline. Merging #23 would be a no-op into the throwaway
-base; `main` is untouched. Close it when the review lands.
-
-This is the pattern to reuse for any merged range worth a second reader — it is cheaper and
-safer than reverting merges to re-open them.
-
-**Scope.** 188 lines, 5 files. A launchd agent with `RunAtLoad` and `KeepAlive`; the
-`apps/studio/studio` script; `http://studio.localhost:8765`; a `Clip Studio.app` bundle; and a
-`quit` button backed by `POST /api/quit`.
-
-**Where to look hardest** — named in the PR body, in short: `/api/quit` has no auth beyond the
-127.0.0.1 bind and calls `os._exit(0)`, which bypasses the labels lock teardown; `KeepAlive`
-means `pkill` no longer stops the server, so a debugger may think their change did not take; and
-PR 19 exists because PR 18 was not idempotent, which raises the question of what else in the
-script is not.
-
-**Runs in parallel with thread 8.** They share no files — thread 8 is `grid.js`, `persist.js`,
-`state.js`, `export.js`, `suggest.js`, `runs.js`, `server.py`; thread 9 is `studio`,
-`server.py` routes, `index.html`, `main.js`, `README.md`.
-
-**Baton: → reviewer.**
-
 ### Implementer response — F26, F27, F28 addressed at `2b9bba5`
 
 Both blocking findings were correct, and both are the shape thread 8 asked the reviewer to hunt
@@ -547,3 +512,77 @@ so the write path was exercised by calling `persistSection` the way `finishCombo
 rather than through the keyboard. Worth a real keypress before merge.
 
 **Baton: → reviewer** — re-review at `2b9bba5`.
+
+**Closed.** F26–F28 are resolved; PR 22 merged as `8d57e37`.
+
+---
+
+## Thread 9 — running the studio as an app (PRs 18-20) — OPEN
+
+**Already merged. Reviewed anyway**, because this is the only work in the project that touches
+Brian's machine rather than the repo, and it went in unreviewed.
+
+**Mechanism: a review-only PR (#23).** A throwaway branch `review-base-appification` sits at the
+commit before the range and `review-appification` at the end of it, so GitHub renders exactly
+`5c0c64d..97c0f22` and findings can be inline. Merging #23 would be a no-op into the throwaway
+base; `main` is untouched. Close it when the review lands.
+
+This is the pattern to reuse for any merged range worth a second reader — it is cheaper and
+safer than reverting merges to re-open them.
+
+**Scope.** 188 lines, 5 files. A launchd agent with `RunAtLoad` and `KeepAlive`; the
+`apps/studio/studio` script; `http://studio.localhost:8765`; a `Clip Studio.app` bundle; and a
+`quit` button backed by `POST /api/quit`.
+
+**Where to look hardest** — named in the PR body, in short: `/api/quit` has no auth beyond the
+127.0.0.1 bind and calls `os._exit(0)`, which bypasses the labels lock teardown; `KeepAlive`
+means `pkill` no longer stops the server, so a debugger may think their change did not take; and
+PR 19 exists because PR 18 was not idempotent, which raises the question of what else in the
+script is not.
+
+**Historical overlap.** Thread 8 later changed `server.py`'s taxonomy fold, but it did not alter
+the app lifecycle paths reviewed here. PR 23 remains anchored to its own historical SHA; its
+findings must be checked again against current `main` when repaired.
+
+### F29 — any website can stop the studio with a cross-site form POST — blocking · open
+
+`/api/quit` treats every POST as authorized. Binding the listener to `127.0.0.1` prevents a
+remote host from connecting directly, but it does not prevent a page in Brian's browser from
+submitting a normal HTML form to the fixed local URL. Same-origin policy hides the JSON response;
+it does not block that form's side effect.
+
+**Measured at the target SHA.** In a disposable server using the exact `97c0f22` handler, a
+form-shaped `POST /api/quit` with `Content-Type: application/x-www-form-urlencoded` and
+`Origin: https://unrelated.example` returned `200 {"ok": true, "quitting": true}` and invoked
+the shutdown function. No CORS preflight is involved.
+
+**Cost.** Visiting a hostile or compromised page can silently stop the studio and discard any
+unsaved in-progress edit. This is a live risk whenever the app is running, not a constructed
+store state.
+
+**Required repair.** Accept the quit request only from the studio page's own origin (while
+preserving the documented `studio.localhost`, `localhost`, and `127.0.0.1` entry points), and
+exercise the button in a real browser after the guard is in place.
+
+### F30 — generated launch artifacts do not survive moving the repo — optional · open
+
+`install` writes the current `$APP_DIR` into the launch agent's `ProgramArguments`, and `app`
+writes the same path into `Clip Studio.app/Contents/MacOS/launch`. Neither `open` nor launchd
+rewrites either artifact later. The PR description's claim that generating the plist from the
+script's location makes a move safe is therefore false.
+
+**Measured at the target SHA.** I installed and built the app under a disposable old path, then
+made that path disappear while the same studio tree remained at a new path. Both generated files
+still named the vanished old path. Brian's current checkout has not moved, so this is optional;
+the concrete cost is a broken app and login agent after a move until he re-runs `studio install`
+and `studio app`.
+
+**Suggested repair.** Either document those two required re-install steps after relocation, or
+change the launch design to use a stable, move-safe launcher path.
+
+**Reviewer checks at `97c0f22`.** Exact base/head ancestry and whitespace diff pass; Python
+compilation, `node --check` for the changed module, and `bash -n` for `studio` pass. The app
+bundle was built and linted in a disposable home. GitHub has no commit-status checks; BugBot did
+not run because of its usage limit.
+
+**Baton: → implementer** — F29 blocks closure. F30 is optional and may be batched with it.

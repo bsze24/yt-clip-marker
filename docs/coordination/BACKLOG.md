@@ -20,11 +20,10 @@ Merged to `main`:
 - **PR 8** (merged `71b9d82`, 2026-08-19) — local video mode: play from disk, ingest without
   network, `/media/` byte-range route, `prefetch.py`. Decisions harvested as
   [[D-034]]–[[D-038]]. Two review findings, both resolved.
-
-Open:
-
-- **PR 9** (`5eb55d2` on `zoom-export-ingest`) — Zoom export ingest and four fixes found by
-  using PR 8 on a flight. **Under review**; `CURRENT.md` is running it.
+- **PRs 9-22** (all merged by `8d57e37`, 2026-08-21) — Zoom ingest and its repairs; matching
+  export labels; scoring and provenance; eval/feedback refinements; the launchd app surface;
+  and work/lane section breaks. The detailed, live review state is `REVIEW.md`; PR #23 is only
+  the review vehicle for the already-merged appification range and must never merge.
 
 Closed unmerged:
 
@@ -35,7 +34,7 @@ The order is deliberate: the studio came out of an eval harness built to score t
 `yt-clipper` skill, and it stayed in daily use until it *was* the product. Nothing below
 assumes the extension grows back into an IDE.
 
-After PR 9 merges, in priority order (matches the PRD's "Next"):
+Further studio work, not the current implementation order:
 
 1. **End collection.** Set `end` from the grid. Required before reel-oriented export is worth
    anything ([[D-012]]).

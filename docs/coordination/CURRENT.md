@@ -10,11 +10,13 @@ contract, so it wants a look before it lands.
 
 ## 0. State as of 2026-08-21
 
-No PR open. `REVIEW.md` has no active thread. `main` is `97c0f22`.
+No product PR is open. Review-only PR #23 is open against the already-merged appification range
+`5c0c64d..97c0f22`; it must be closed, never merged, when `REVIEW.md` thread 9 lands. `main`
+contains the latest product merge, PR #22 at `8d57e37`.
 
 Closed since the last spec: the skill eval (three videos scored, results in `BACKLOG.md`
-"Skill eval"), `SKILL.md` v2 ([[D-040]]), and PRs 16-20 — the `feel` rename, the taxonomy
-schema change, and running the studio as a launchd app.
+"Skill eval"), `SKILL.md` v2 ([[D-040]]), and PRs 9-22 — Zoom ingest, export and eval repairs,
+the `feel`/taxonomy changes, the launchd app surface, and work/lane section breaks.
 
 ## 1. Why this exists
 
