@@ -85,6 +85,9 @@ export async function openRun(id) {
   S.additions = S.current.additions || [];
   S.edits = S.current.edits || {};
   S.annotations = S.current.annotations || {};
+  S.runWork = S.current.runWork || "";
+  const wf = document.getElementById("runWork");
+  if (wf) wf.value = S.runWork;
   restoreChapter(id);
   seedChapterFromRun();
   const cur = cursorFor(id);

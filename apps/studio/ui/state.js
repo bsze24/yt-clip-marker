@@ -23,6 +23,7 @@ export const S = {
   selectedKey: null,
   composer: null,
   lastChapter: { lane: "", work: "" },
+  runWork: "",
   liveTax: null,
   pendingCombo: null,
   pendingReason: null,

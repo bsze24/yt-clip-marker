@@ -135,7 +135,10 @@ export function descriptionTimestampText() {
   let lastWork = "";
   let sectionLane = "";
   for (const c of clips) {
-    const work = (c.work || "").trim();
+    // A clip's own work still wins — one lesson covering two pieces is normal,
+    // and video 1 does it. The run-level value is the default for everything
+    // that does not say otherwise, which is now every newly added clip.
+    const work = (c.work || "").trim() || (S.runWork || "").trim();
     if (work && work !== lastWork) {
       sectionLane = sectionLaneFor(clips, work);
       if (lines.length) lines.push("");
@@ -148,7 +151,7 @@ export function descriptionTimestampText() {
   // header so that header isn't swallowed as the chapter title.
   if (clips[0].start > 0) {
     const zero = `${ytStamp(0)} Start`;
-    if ((clips[0].work || "").trim()) lines.splice(1, 0, zero);
+    if (((clips[0].work || "").trim() || (S.runWork || "").trim())) lines.splice(1, 0, zero);
     else lines.unshift(zero);
   }
   return lines.join("\n");
