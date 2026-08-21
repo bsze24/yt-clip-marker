@@ -11,6 +11,15 @@ apps/studio/studio install     # once — writes and loads a launchd agent
 apps/studio/studio open        # app window, starts the server if needed
 ```
 
+`app` builds `~/Applications/Clip Studio.app` — a real double-clickable bundle
+that just runs `studio open`, so it needs no Chrome menu and survives Chrome
+changing its UI. Drag it to the Dock.
+
+The header's **quit** button stops the server for real: it boots the launch
+agent out before exiting, because `KeepAlive` would otherwise restart it a
+second later and the button would look broken. Reopen with `studio open`, which
+bootstraps a booted-out agent rather than only kickstarting a loaded one.
+
 `install` registers a launch agent that starts the studio at login and restarts
 it whenever it exits, so a crash or a stray `kill` does not take it down. `open`
 points a Chrome app window at it — dock icon, no URL bar, closest thing to a

@@ -65,6 +65,17 @@ $("runWork").addEventListener("change", async (e) => {
     setSave("saved");
   } catch (err) { saveFailed(err); }
 });
+$("quitBtn").addEventListener("click", async () => {
+  if (!confirm("Quit Clip Studio?\n\nThe server stops and stays stopped. Reopen with:\n  apps/studio/studio open")) return;
+  setSave("quitting…");
+  // The server boots itself out of launchd and exits, so this request never
+  // gets a clean reply — the failure IS the success signal.
+  try { await api("/api/quit", "POST", {}); } catch (_) {}
+  document.body.innerHTML =
+    '<div style="padding:40px;font:14px system-ui;color:#888">' +
+    'Clip Studio stopped. Reopen with <code>apps/studio/studio open</code>.</div>';
+  window.close();
+});
 $("evalMode").checked = S.evalMode;
 $("evalMode").addEventListener("change", (e) => {
   S.evalMode = e.target.checked;

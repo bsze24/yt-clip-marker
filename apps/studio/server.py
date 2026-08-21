@@ -6,6 +6,7 @@ python3 apps/studio/server.py → http://127.0.0.1:8765
 from __future__ import annotations
 
 import json
+import os
 import math
 import re
 import sys
@@ -771,6 +772,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/api/quit":
+            # Quit for real. Under launchd, KeepAlive means simply exiting gets
+            # us restarted a second later, so the agent has to be booted out
+            # first — otherwise the button would appear to do nothing.
+            self._json(200, {"ok": True, "quitting": True})
+            try:
+                self.wfile.flush()
+            except OSError:
+                pass
+            threading.Thread(target=shutdown, daemon=True).start()
+            return
         if parsed.path != "/api/ingest":
             self._json(404, {"error": "not found"})
             return
@@ -887,6 +899,22 @@ class Handler(BaseHTTPRequestHandler):
             self._json(200, {"ok": True, "runWork": work})
             return
         self._json(404, {"error": "not found"})
+
+
+def shutdown():
+    """Stop, and stay stopped. Called on a thread so the HTTP reply lands first."""
+    import subprocess
+    import time
+    time.sleep(0.2)
+    label = "com.briansze.yt-clip-studio"
+    try:
+        subprocess.run(
+            ["launchctl", "bootout", f"gui/{os.getuid()}/{label}"],
+            capture_output=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        pass  # not running under launchd, or launchctl missing — just exit
+    os._exit(0)
 
 
 def main():
