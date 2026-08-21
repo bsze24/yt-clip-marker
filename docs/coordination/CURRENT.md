@@ -1,10 +1,12 @@
 # Current task
 
-**Close the local-file loop: a run learns its YouTube id, media becomes disposable, and the
-uploads list loads itself.** Baton: **→ implementer**.
+**Close the local-file loop: a run learns its YouTube id, media becomes disposable, the
+uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
+**→ implementer**.
 
-Three phases, in order, because each needs the one before it. Phase 1 changes the clip
-contract, so it wants a look before it lands.
+Four phases, in order, because each needs the one before it. Phase 1 changes the clip
+contract, so it wants a look before it lands. Phase 4 is a join between what phases 1 and 3
+already build, not new machinery.
 
 ---
 
@@ -98,17 +100,54 @@ Brian's channel is `@briansf24` and the lessons are **unlisted**, not private.
 picker offers uploads not yet ingested. **With the network off, the studio opens at the same
 speed, shows the cached list with its age, and nothing in the console suggests a fault.**
 
-## 5. Out of scope
+## 5. Phase 4 — one rename, everywhere
+
+The lesson gets its real name on YouTube, after upload. The studio should follow, and the
+mechanism is already being built by phases 1 and 3:
+
+```
+run.youtubeId (phase 1) ──┐
+                          ├── join ──► the current title
+uploads.json  (phase 3) ──┘
+```
+
+Rename on YouTube, the background refresh lands, the picker and header show the new name. No
+new endpoint, no new event type, no new store.
+
+**The one real decision is precedence.** `runs/{id}.json` carries an immutable `title` from
+ingest ([[D-002]]). Rule: the cached YouTube title wins when the run has a `youtubeId` *and*
+the cache holds that id; otherwise the run file's `title`. Offline with a cold cache falls
+back to the run title, which is the correct behaviour rather than a degradation.
+
+**Direction is not a preference.** Pull (YouTube → studio) is the join above. Push (studio →
+YouTube) needs the YouTube Data API and OAuth, which is parked under [[D-005]]. One direction
+is nearly free; the other changes the project's dependency stance. Pull only.
+
+Local-only runs that never reach YouTube keep their filename-derived title. Nothing to sync,
+no warning.
+
+**Acceptance.** Rename the lesson on YouTube. Without restarting the studio, the run's title
+updates after the next background refresh. Kill the network and reopen: the studio shows the
+last known title, with the cache's age, and logs nothing alarming.
+
+## 6. Out of scope
 
 Deleting or merging the duplicate runs. Once phase 1 lands, `Oa0wqetkNcg` and the local
 GMT20260730 run are visibly the same lesson and the merge is obvious — but it destroys data,
 so it is its own task with its own spec. Also out: the YouTube Data API, OAuth, and any
 write-back to YouTube ([[D-005]], parking lot).
 
-## 6. Baton
+Also out, and larger than it looks: **flowing a renamed *marker label* back from the YouTube
+description.** `ingest.py` already reads description stamps into `extracted[]`, so the read
+path exists — but propagating edits back means reconciling a scraped description against the
+clip set: match by timestamp, decide the winner when both sides changed, handle a stamp
+deleted on YouTube. That is a merge problem, not a join, and it needs its own spec. Phase 4
+covers the lesson title only.
+
+## 7. Baton
 
 **→ implementer.** Phase 1 first, and it changes `docs/clip-schema.md`, so Brian should see it
-before phases 2 and 3 build on it.
+before phases 2, 3 and 4 build on it.
 
 ---
 
@@ -131,3 +170,16 @@ before phases 2 and 3 build on it.
   delete is disabled without a YouTube fallback, and the symlink-versus-target distinction is
   stated rather than assumed — deleting a symlink frees nothing, and a user who believes it did
   will delete the run next.
+
+### 2026-08-21 — planner, adding phase 4
+
+- **Why the rename is phase 4 and not its own task.** It needs `run.youtubeId` (phase 1) and
+  `uploads.json` (phase 3) and adds nothing else. Specced separately it would read as new
+  machinery; specced here it is a precedence rule over two existing fields.
+- **Why pull and not push.** Brian asked "probably YouTube?" as the source of truth. Correct,
+  but the deciding factor is that push needs the Data API and OAuth ([[D-005]]), while pull is
+  a join. The two options are not comparable in cost.
+- **The ambiguity that was flagged rather than assumed.** "Rename" could mean the lesson title
+  or a marker label edited in the YouTube description. The first is phase 4; the second is a
+  reconciliation problem and is named in §6. If Brian meant the second, phase 4 is mis-sized.
+
