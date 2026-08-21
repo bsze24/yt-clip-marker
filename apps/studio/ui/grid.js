@@ -253,28 +253,8 @@ function addFormHtml() {
     <label class="add-field"><span>Label</span>
       <input id="miss-label" name="label" value="${escapeAttr(S.composer.label || "")}" />
     </label>
-    <div class="add-field">
-      <span>Tags</span>
-      <div class="tag-box">
-        <div class="tag-chips">${chips}</div>
-        <input id="miss-tags" data-combo="tags" name="tags" autocomplete="off" placeholder="take, fingering, technique, star…" />
-        <div class="suggest" id="suggest-tags" hidden></div>
-      </div>
-    </div>
     <label class="add-field"><span>Why</span>
       <input id="miss-why" name="why" placeholder="why this is a clip" value="${escapeAttr(S.composer.why || "")}" />
-    </label>
-    <label class="add-field"><span>Work</span>
-      <div class="combo">
-        <input id="miss-work" data-combo="work" name="work" autocomplete="off" placeholder="Song | Rendition" value="${escapeAttr(S.composer.work || "")}" />
-        <div class="suggest" id="suggest-work" hidden></div>
-      </div>
-    </label>
-    <label class="add-field"><span>Lane</span>
-      <div class="combo">
-        <input id="miss-lane" data-combo="lane" name="lane" autocomplete="off" placeholder="transcription" value="${escapeAttr(S.composer.lane || "")}" />
-        <div class="suggest" id="suggest-lane" hidden></div>
-      </div>
     </label>
     <div class="add-actions">
       <button type="submit">${editing ? "Save" : "Add clip"}</button>

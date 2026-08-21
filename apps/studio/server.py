@@ -171,6 +171,50 @@ def load_edits(run_id):
     return by_idx
 
 
+def load_run_work(run_id):
+    """The lesson's work — piece and rendition — as one value for the whole run.
+
+    It lives here rather than on the run file because `runs/{id}.json` is
+    immutable ingest output ([[D-002]]), and it lives here rather than on every
+    clip because it never varied per clip: across 193 annotated rows it changed
+    5 times on one video and 0 on the other two, where the same string was
+    stored 75 times. Resolved on read, same as media ([[D-034]]).
+
+    A clip that carries its own `work` still wins — one lesson covering two
+    pieces is normal, and video 1 does exactly that.
+    """
+    work = ""
+    for ev in read_label_events():
+        if ev.get("runId") != run_id or ev.get("verdict") != "chapter":
+            continue
+        work = (ev.get("work") or "").strip()
+    return work
+
+
+def append_run_work(run_id, run, payload):
+    work = payload.get("work") if isinstance(payload.get("work"), str) else ""
+    event = {
+        "schemaVersion": 2,
+        "recordedAt": datetime.now().astimezone().isoformat(),
+        "runId": run_id,
+        "videoId": run.get("videoId"),
+        "videoUrl": run.get("url"),
+        "videoTitle": run.get("title"),
+        "markerIndex": None,
+        "source": "human-chapter",
+        "start": None,
+        "end": None,
+        "description": "",
+        "tags": [],
+        "lane": "",
+        "work": work.strip(),
+        "feedback": "",
+        "verdict": "chapter",
+    }
+    append_event(event)
+    return load_run_work(run_id)
+
+
 def load_annotations(run_id):
     """tags / lane / work on markers. Last annotate per index wins."""
     by_idx = {}
@@ -714,6 +758,7 @@ class Handler(BaseHTTPRequestHandler):
                     "id": run_id,
                     "run": run,
                     "feedback": load_feedback(run_id),
+                    "runWork": load_run_work(run_id),
                     "additions": load_additions(run_id),
                     "edits": load_edits(run_id),
                     "annotations": load_annotations(run_id),
@@ -836,6 +881,10 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(400, {"error": str(err)})
                 return
             self._json(200, {"ok": True, "annotations": annotations})
+            return
+        if parsed.path == "/api/run-work":
+            work = append_run_work(run_id, run, payload)
+            self._json(200, {"ok": True, "runWork": work})
             return
         self._json(404, {"error": "not found"})
 

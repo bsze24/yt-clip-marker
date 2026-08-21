@@ -1,7 +1,7 @@
 // Entry point: header controls, grid event delegation, ingest form, boot.
 import { $ } from "./util.js";
-import { S, EVAL_KEY, FOLLOW_KEY, FILLER_KEY } from "./state.js";
-import { api } from "./api.js";
+import { S, EVAL_KEY, FOLLOW_KEY, FILLER_KEY, setSave } from "./state.js";
+import { api, saveFailed } from "./api.js";
 import { initPlayer, togglePlay, keepKeysOnPage, scrubTo, isPlaying, getCurrentTime } from "./player.js";
 import { renderGrid, updateStats, selectRowEl, displayMarkers, followPlayhead } from "./grid.js";
 import {
@@ -55,6 +55,15 @@ $("follow").addEventListener("change", (e) => {
 $("copyTsBtn").addEventListener("click", () => {
   copyTimestamps();
   keepKeysOnPage();
+});
+$("runWork").addEventListener("change", async (e) => {
+  const work = e.target.value.trim();
+  if (!S.currentId) return;
+  try {
+    const res = await api("/api/run-work", "PUT", { runId: S.currentId, work });
+    S.runWork = res.runWork || "";
+    setSave("saved");
+  } catch (err) { saveFailed(err); }
 });
 $("evalMode").checked = S.evalMode;
 $("evalMode").addEventListener("change", (e) => {
