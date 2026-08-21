@@ -56,7 +56,14 @@ wait_up() {
 case "${1:-open}" in
   install)
     write_plist
+    # bootout is asynchronous. Bootstrapping straight after it fails with
+    # "Bootstrap failed: 5: Input/output error" because the old service is still
+    # being torn down, so wait for the label to actually disappear.
     launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
+    for _ in $(seq 1 20); do
+      launchctl print "$DOMAIN/$LABEL" >/dev/null 2>&1 || break
+      sleep 0.3
+    done
     launchctl bootstrap "$DOMAIN" "$PLIST"
     wait_up && echo "installed and running at $URL"
     ;;
