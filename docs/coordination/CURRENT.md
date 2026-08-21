@@ -182,3 +182,80 @@ before phases 2, 3 and 4 build on it.
   or a marker label edited in the YouTube description. The first is phase 4; the second is a
   reconciliation problem and is named in §6. If Brian meant the second, phase 4 is mis-sized.
 
+### 2026-08-21 — Codex, implementation-readiness review
+
+**Assessment:** the dependency order and product direction are sound, and there is enough here
+to propose a staged build plan. The task is not yet safe to implement end to end without making
+several unstated choices. Phase 1 needs one reconciliation with the code that is now on `main`;
+phase 2 needs destructive-action semantics; and phase 3 needs a real authenticated listing spike
+before the title join can depend on it.
+
+- **Phase 1 names a function that no longer exists.** §2 says `load_run_work` becomes
+  `load_run_meta`, but PRs 21–22 replaced that shape with `load_sections` and timestamped
+  `{work, lane}` breaks. `/api/section` is the one writer, and every write must preserve the
+  complete pair — the exact regression F26 caught. Recommended reconciliation: one
+  `load_run_meta` pass over `chapter` events returns `{sections, youtubeId}`. Section fields keep
+  latest-event-per-`start` semantics; `youtubeId` changes only when that key is present, so an old
+  event or an ordinary work/lane edit cannot erase it. An explicit empty string clears a link.
+- **`youtubeId` needs an effective-value rule, not only a new event field.** The four downloaded
+  runs already carry a real YouTube watch URL and 11-character `videoId`, while the two raw Zoom
+  runs carry synthetic ids and empty URLs. Recommended precedence: an explicitly recorded
+  `chapter.youtubeId` wins; otherwise parse the immutable run's YouTube URL; otherwise there is
+  no fallback. That makes the existing downloads correctly deletable and lets the Zoom run gain
+  a fallback without rewriting its run file. `/api/run` and `/api/runs` should expose this one
+  resolved value, and `player.js`, warnings, cleanup and the title join should all consume it.
+- **Phase 2's guard must live on the server.** A disabled button is presentation, not safety.
+  At deletion time the server must resolve the exact run and media entry again, refuse the action
+  without a YouTube fallback, and check every run that claims the same file. Inventory must use
+  `lstat` so regular files, live symlinks and broken symlinks remain distinguishable. The response
+  should report link size and target size separately; the total must define whether it means
+  logical bytes or allocated bytes so "matches `du`" is reproducible.
+- **Target deletion is still a product choice.** "Offer both" distinguishes unlinking
+  `media/x.mp4` from deleting the file it points to, but does not say whether target deletion is
+  permanent or recoverable, whether deleting the target also removes the link, or what confirmation
+  names the exact outside-repo path. Set those semantics before writing the endpoint.
+- **Phase 3 is the only technical go/no-go.** A public, unauthenticated
+  `yt-dlp --flat-playlist` probe against `@briansf24` returned two public uploads and none of the
+  four known lesson ids, so authenticated listing is load-bearing. The installed yt-dlp supports
+  the named flags, but flag presence does not prove that the logged-in channel listing exposes
+  unlisted owner uploads. Run one `--cookies-from-browser` spike and require it to return at least
+  `Oa0wqetkNcg` before making this the source for phase 4. The probe also returned `upload_date=NA`
+  without `youtubetab:approximate_date`; cache dates should therefore be nullable unless an
+  approximate date is explicitly accepted.
+- **The cache contract needs three small decisions.** Store `fetchedAt` alongside `items` rather
+  than deriving age implicitly; write by temp-file + atomic replace so a killed refresh cannot
+  corrupt the last good cache; and name a refresh/backoff cadence that satisfies "without
+  restarting" without retrying every four-second UI poll. Recommended default: refresh once at
+  server start and every 30 minutes, allow only one worker, and log once per failure episode while
+  retaining the cache.
+- **"Picker offers uploads" needs an interaction.** The current select assumes every option is a
+  run id and immediately calls `openRun`. Recommended low-surprise behavior: render cached uploads
+  in a separate option group; choosing an upload that has no run fills the existing Add video
+  control, where Brian explicitly starts ingest. Do not make a picker selection launch a network
+  ingest silently.
+
+**Recommended build sequence — one reviewed PR per phase:**
+
+1. **Spec repair and authenticated spike.** Record the effective-id rule, deletion semantics,
+   cache schema/cadence and picker action here; verify the authenticated listing against a known
+   unlisted lesson.
+2. **Phase 1 PR — link and playback fallback.** Implement the combined metadata fold, header
+   field, effective id in both read APIs, local-first player selection, warning suppression and
+   `docs/clip-schema.md`. Add regression cases for old events, clearing, intrinsic YouTube URLs,
+   and work/lane edits preserving the link. Stop for review before using the real file as the
+   destructive acceptance fixture.
+3. **Phase 2 PR — inventory and guarded cleanup.** Add symlink-aware inventory and totals, the
+   server-enforced delete guard, explicit link/target actions and confirmations. Cover regular,
+   symlink, broken-link and multiply-claimed-file cases with disposable files.
+4. **Phase 3 PR — cache-first uploads.** Put yt-dlp invocation and cache parsing in a small
+   testable module; serve cache synchronously and refresh it only on the background worker. Test
+   with a fake yt-dlp executable for cold fill, retained-cache failure, atomic replacement,
+   deduped refresh and offline startup; then do one browser check with real authenticated data.
+5. **Phase 4 PR — one display-title join.** Resolve the title once on the server — cached
+   YouTube title when the effective id is present, immutable run title otherwise — and use that
+   value in the picker and header. Verify rename-without-restart, last-known-title offline, and
+   cold-cache fallback.
+
+**Process note.** `REVIEW.md` still describes PR 25 as a draft with the baton at reviewer, but
+`b2a3943` is already an ancestor of `main` through the PR 24–26 repair range. Reset/harvest that
+thread before implementation so the review ledger and this baton do not disagree.
