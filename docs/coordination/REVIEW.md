@@ -1,9 +1,8 @@
 # Review
 
-Active target: **none**. Thread 9 closed 2026-08-21 after PR 24 landed at `9ae0345`, F30's
-move-safe app bundle landed through PR 26 at `02e0dfb`, both findings were resolved, and the
-review-only PR 23 was closed rather than merged. Durable outcomes live in `DECISIONS.md` and
-`BACKLOG.md`.
+Active target: **Thread 10 — Phase 1 at PR 28 / `05a325c`.** The implementer's criterion-by-
+criterion audit and live-browser receipts are in `CURRENT.md`. Thread 9 remains closed after the
+app-lifecycle work landed.
 
 > ## Concurrency protocol — read before editing
 >
@@ -38,6 +37,32 @@ review-only PR 23 was closed rather than merged. Durable outcomes live in `DECIS
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
+| 10 — effective YouTube fallback | `05a325c` (PR 28) | **AWAITING REVIEW** | → reviewer |
+
+---
+
+## Thread 10 — effective YouTube fallback (`05a325c`, PR 28) — AWAITING REVIEW
+
+**Target.** Draft PR 28 on `codex/effective-youtube-fallback`, one code commit off the Phase 1
+base. Verify the cited SHA is an ancestor of the checked-out PR branch before reviewing.
+
+**Scope.** `CURRENT.md` §3.1 rule 2 and §3.3 only: URL-derived effective YouTube identity, both
+read API surfaces, missing-media warning suppression when that fallback exists, and player
+selection that never sends a local synthetic id to YouTube. The cache, link event, cleanup and
+title join are deliberately absent.
+
+**Where to look hard.** URL host/path validation in `server.py`; a valid-shaped local `videoId`
+without URL evidence; switching from an already-loaded YouTube run to a local-only run whose
+media disappeared; and disagreement between `/api/runs`, `/api/run`, warning logic and the player.
+The last transition already produced one browser-found stale-iframe bug before `05a325c`.
+
+**Implementer verification.** Existing tests 15/15, new tests 9/9, Python compile, every Studio
+UI module parsed by Node, diff check, API reads, and live browser acceptance against the four
+zero-clip downloads plus the GMT20260730 symlink. All temporarily moved media entries were
+restored. Full evidence, assumptions and skips are in `CURRENT.md`.
+
+**Baton: → reviewer.** Record each finding as its own append-only item in this thread. No merge
+without Brian's explicit approval.
 
 ---
 
