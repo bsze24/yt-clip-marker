@@ -8,9 +8,20 @@ objects carrying `start`. Keep it OUT of apps/studio/runs/: writing proposals on
 the ground-truth run mixes them into the human record and the test can never be
 run again.
 
-The primary number is STAR RECALL, not precision. Extra markers cost a keypress;
-a starred moment with no marker near it throws Brian back into manual culling, so
-recall of the moments he cared about is the thing being bought.
+Two numbers carry the verdict, and they answer different questions:
+
+  STAR RECALL    — of the moments he cared about, how many had a proposal near?
+                   The primary number. A starred moment with no marker near it
+                   throws him back into manual culling, which is the cost being
+                   removed. Extra markers only cost a keypress.
+  STAR PRECISION — how often was a proposal good enough to keep where it stood?
+                   Measured by him starring the skill's own marker instead of
+                   building his own row beside it.
+
+These cannot share a denominator. A star sitting on a skill marker is at distance
+zero by construction, so folding those into recall guarantees a perfect score
+however bad the skill is — 500 random timestamps with 8 starred would still read
+17/17. They are excluded from recall and reported here instead.
 
 Two confounds this handles, both of which inflate the score if ignored:
 
@@ -111,10 +122,23 @@ def main(argv):
     print("human rows: %d annotated markers + %d added clips" % (len(annotated), len(added_rows)))
 
     own_stars = [r["start"] for r in starred(added_rows)]
-    marker_stars = [e["start"] for e in starred(list(annotated.values()))]
-    if marker_stars:
-        print("\n%d stars sit on skill markers — excluded as circular" % len(marker_stars))
-    recall_table(own_stars, proposals, "STAR RECALL (self-created only — the number that matters)")
+    starred_markers = starred(list(annotated.values()))
+    all_starred = len(own_stars) + len(starred_markers)
+
+    print("\nSTAR PRECISION — proposals kept exactly where the skill put them")
+    if proposals and all_starred:
+        print("   %d of %d proposals earned a star in place (%.0f%%)" % (
+            len(starred_markers), len(proposals), 100 * len(starred_markers) / len(proposals)))
+        print("   for scale, %d of %d human rows are starred (%.0f%%)" % (
+            all_starred, len(annotated) + len(added_rows),
+            100 * all_starred / (len(annotated) + len(added_rows))))
+    if starred_markers:
+        print("   the exemplars — proposals good enough to bookmark unchanged:")
+        for e in sorted(starred_markers, key=lambda x: x["start"]):
+            print("      %s  %s" % (hms(e["start"]), (e.get("description") or "")[:56]))
+        print("   ^ few-shot material for a skill revision. Excluded from recall below,")
+        print("     because their distance to a proposal is zero by construction.")
+    recall_table(own_stars, proposals, "STAR RECALL — moments he built himself, so the skill did NOT place them well")
     recall_table(human_all, proposals, "REGION RECALL (every human row)")
 
     print("\nPRECISION — proposals with no human row nearby")
