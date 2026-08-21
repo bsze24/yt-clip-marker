@@ -75,7 +75,11 @@ def main(argv):
     run = json.loads(path.read_text(encoding="utf-8"))
     cues = run.get("cues") or []
     if not cues:
-        sys.exit(f"{run_id} has zero cues — nothing to hand the skill")
+        sys.exit(
+            f"{path.name} has zero cues — nothing to hand the skill.\n"
+            "Four YouTube uploads are in this state: their captions never arrived "
+            "(BACKLOG.md, \"The corpus, and the one blocker\")."
+        )
     lines = render(cues, threshold)
     gaps = sum(1 for line in lines if line.startswith(">>> GAP"))
     print("\n".join(lines))
