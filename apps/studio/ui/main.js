@@ -12,7 +12,7 @@ import {
   queueTaxonomy, persistSection,
 } from "./persist.js";
 import { submitComposer, openEditor } from "./composer.js";
-import { refreshRuns, openRun, renderRunSelect } from "./runs.js";
+import { refreshRuns, openRun, renderRunSelect, chooseRunOrUpload } from "./runs.js";
 import { initKeys } from "./keys.js";
 import { initTimeline, updateTimelineHead } from "./timeline.js";
 import { initFiller, syncDensity } from "./filler.js";
@@ -27,7 +27,7 @@ $("playerCatcher").addEventListener("click", () => {
   togglePlay();
   $("gridWrap").focus();
 });
-$("runSelect").addEventListener("change", (e) => openRun(e.target.value));
+$("runSelect").addEventListener("change", (e) => chooseRunOrUpload(e.target.value));
 $("allCues").addEventListener("change", (e) => {
   S.showAllCues = e.target.checked;
   renderGrid();

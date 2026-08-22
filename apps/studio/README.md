@@ -57,6 +57,7 @@ apps/studio/
   studio                                start/stop/open as an app (launchd agent)
   server.py                             HTTP server + label-event store
   ingest.py                             URL → captions, gaps, description, extracted → run file
+  uploads.py                            background yt-dlp refresh → uploads.json cache
   local.py                              file on disk + sidecars → run file (no network)
   index.html                            markup only; loads /ui/ assets
   ui/                                   ES modules + stylesheet, served via the
@@ -76,6 +77,7 @@ apps/studio/
   runs/{videoId}-{YYYYMMDD-HHMM}.json   ingest/model output + caption cues (immutable)
   tests/test_sidecars.py                stdlib unittest: sidecar matching, F18 + F20 regressions
   labels.jsonl                          append-only human judgments
+  uploads.json                          derived YouTube upload listing (gitignored)
   media/                                video/audio files for offline playback (gitignored)
   attach_cues.py                        CLI: merge a fetch_transcript.py dump into a run
   attach_extracted.py                   CLI: attach or migrate YT description timestamps
@@ -91,6 +93,14 @@ Runs come from two doors:
 
 1. **In-app ingest** — paste a URL in the header (`POST /api/ingest`). Writes a run with an empty `markers` array: transcript skeleton, no markers yet.
 2. **The yt-clipper skill** (`~/.claude/skills/yt-clipper/`) — proposes candidate markers and writes a run with `markers` filled, using the attach CLIs above.
+
+The run picker also lists cached YouTube uploads that do not have a run yet. Picking one fills
+the Add video field; it never starts ingest on its own. The listing comes from the channel's
+uploads playlist through Chrome's YouTube login and is refreshed in one background thread at
+startup and every 30 minutes. HTTP requests only read `uploads.json`, so a slow connection,
+expired login, or fully offline start cannot delay the Studio. A failed refresh keeps the last
+good cache and its visible age. `GET /api/uploads` returns an empty successful response when no
+valid cache exists because the listing is optional, while the runs remain the workspace.
 
 ## Label event (`labels.jsonl`)
 

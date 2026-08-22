@@ -13,6 +13,8 @@ export const CHAPTER_KEY = "yt-clipper-studio-chapter";
 
 export const S = {
   runs: [],
+  uploads: [],
+  uploadsAgeSeconds: null,
   currentId: null,
   current: null,
   additions: [],

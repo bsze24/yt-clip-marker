@@ -6,6 +6,17 @@ import { renderGrid, updateStats } from "./grid.js";
 import { loadVideo } from "./player.js";
 
 let offline = false;
+const UPLOAD_PREFIX = "upload:";
+
+function uploadsAgeLabel() {
+  const seconds = Number(S.uploadsAgeSeconds);
+  if (!Number.isFinite(seconds) || seconds < 60) return "YouTube uploads · cached just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `YouTube uploads · cached ${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 48) return `YouTube uploads · cached ${hours}h ago`;
+  return `YouTube uploads · cached ${Math.floor(hours / 24)}d ago`;
+}
 
 function showRunWarnings(payload, id) {
   const warnings = Array.isArray(payload.warnings) ? payload.warnings : [];
@@ -28,27 +39,50 @@ function showRunWarnings(payload, id) {
 export function renderRunSelect() {
   const select = $("runSelect");
   const prev = select.value;
-  select.innerHTML = S.runs.map((r) => {
+  const runOptions = S.runs.map((r) => {
     const offlineMark = r.hasMedia ? "⏏ " : "";
     const label = S.evalMode
       ? `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.checkCount} check`
       : `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.missCount} added`;
     return `<option value="${escapeAttr(r.id)}">${escapeHtml(label)}</option>`;
   }).join("");
+  const runIds = new Set(S.runs.map((r) => r.youtubeId).filter(Boolean));
+  const uploadOptions = S.uploads
+    .filter((upload) => upload && !runIds.has(upload.id))
+    .map((upload) => {
+      const value = UPLOAD_PREFIX + escapeAttr(upload.id);
+      return `<option value="${value}">${escapeHtml(upload.title || upload.id)}</option>`;
+    })
+    .join("");
+  select.innerHTML =
+    (runOptions ? `<optgroup label="Runs">${runOptions}</optgroup>` : "") +
+    (uploadOptions ? `<optgroup label="${escapeAttr(uploadsAgeLabel())}">${uploadOptions}</optgroup>` : "");
   if (S.currentId && S.runs.some((r) => r.id === S.currentId)) select.value = S.currentId;
   else if (prev && S.runs.some((r) => r.id === prev)) select.value = prev;
+  else if (S.runs.length) select.value = S.runs[0].id;
+  else select.selectedIndex = -1;
 }
 
 export async function refreshRuns() {
-  try {
-    S.runs = await api("/api/runs", "GET");
-  } catch (err) {
+  // Both calls only read local files. Keep them independent: the optional
+  // uploads cache must never prevent runs from rendering or erase its last
+  // good in-memory value when that endpoint fails.
+  const [runsResult, uploadsResult] = await Promise.allSettled([
+    api("/api/runs", "GET"),
+    api("/api/uploads", "GET"),
+  ]);
+  if (uploadsResult.status === "fulfilled" && Array.isArray(uploadsResult.value.items)) {
+    S.uploads = uploadsResult.value.items;
+    S.uploadsAgeSeconds = uploadsResult.value.ageSeconds;
+  }
+  if (runsResult.status === "rejected") {
     if (!offline) {
       offline = true;
       setSave("server unreachable");
     }
     return;
   }
+  S.runs = runsResult.value;
   if (offline) {
     offline = false;
     setSave("saved");
@@ -61,6 +95,18 @@ export async function refreshRuns() {
     const id = (last && S.runs.some((r) => r.id === last)) ? last : $("runSelect").value;
     await openRun(id);
   }
+}
+
+export function chooseRunOrUpload(value) {
+  if (!value.startsWith(UPLOAD_PREFIX)) {
+    return openRun(value);
+  }
+  const videoId = value.slice(UPLOAD_PREFIX.length);
+  if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return Promise.resolve();
+  $("ingestUrl").value = `https://www.youtube.com/watch?v=${videoId}`;
+  $("ingestUrl").focus();
+  renderRunSelect();
+  return Promise.resolve();
 }
 
 export async function openRun(id) {
