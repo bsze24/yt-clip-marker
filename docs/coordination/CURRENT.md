@@ -2,7 +2,8 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer — PR A is Phase 3 + Phase 5. Sequence recut 2026-08-22, see §4 and §6.**
+**→ reviewer — PR A (draft PR 31) is Phase 3 + Phase 5 at `8eab5e7`. See §4, §6 and the final
+handoff note.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -214,7 +215,10 @@ exists for that reason and a synchronous network call on load would undo it.
    recoverable, against silent loss. **Prune only on a refresh carrying a canary:** an id already
    in the cache and known to be unlisted, today `Oa0wqetkNcg`. A cold cache with no canary stores
    what it got and records `authenticated: false`, so §3.9 never mistakes a two-item public list
-   for the whole channel.
+   for the whole channel. A canary-bearing refresh may prune only when it returns at least half
+   as many rows as the previous cache. Below half is treated as a partial authenticated listing:
+   merge and log once for the failure episode. The canary proves authentication, not completeness
+   (`TD-18`).
 5b. **The refresh subprocess gets a finite timeout, and it is the one that already exists** —
    `ingest.SUBPROCESS_TIMEOUT`, 300s. One worker plus no timeout is not a slow refresh; it is
    permanent suppression of every later refresh, presenting as a cache that quietly stops ageing.
@@ -352,8 +356,8 @@ reason findings are never renumbered. The **PR** column is the order to build in
 | --- | --- | --- | --- | --- |
 | 1 | Warning suppression + effective id | §3.1 rule 2, §3.3 | PR 28 | **merged** `62278d6` |
 | 2 | Uploads cache | §3.4, §3.5, §3.6 | PR 30 | **merged** |
-| 3 | The link event | §3.1 rule 1, §3.2, §3.9 | **A** | next |
-| 5 | Title join | §3.8 | **A** | rides with Phase 3 |
+| 3 | The link event | §3.1 rule 1, §3.2, §3.9 | **A / PR 31** | **in review** `8eab5e7` |
+| 5 | Title join | §3.8 | **A / PR 31** | **in review** `8eab5e7` |
 | 6 | The lesson inbox | §3.10a | **B** | after A |
 | 4 | Inventory and guarded delete | §3.7 | **C** | last |
 | — | Open-findings sweep | — | **E** | independent, any time |
@@ -443,7 +447,7 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer, for PR A — Phase 3 + Phase 5.** The sequence and PR cut were recut on
+**→ reviewer, for draft PR 31 at `8eab5e7` — PR A, Phase 3 + Phase 5.** The sequence and PR cut were recut on
 2026-08-22 (§4) and agreed by Brian: **A = Phase 3 + Phase 5, then B = Phase 6, then C = Phase 4**,
 with **E** the findings sweep, landable any time. Phase numbers stayed put; the build order is the
 PR column.
@@ -961,3 +965,61 @@ poll interaction; isolated cached/offline startup and clean browser diagnostics;
 --check`. Total automated tests: 35/35.
 
 Committed as `e13e3e6` and opened as draft PR 30. No merge performed.
+
+### 2026-08-22 — Codex, PR A implementation (`8eab5e7`, draft PR 31)
+
+**Acceptance criteria, one at a time.** The link is a dedicated schema-v2 event written by
+`append_link` (`apps/studio/server.py:370`) and folded ahead of the immutable URL by
+`effective_youtube_id` (`:302`); an explicit empty value clears it. `run_warnings` now resolves
+the id internally (`:339`, F32), and both `/api/runs` and `/api/run` consume the same event list
+and resolver (`:659`, `:710`). The two mandatory collision regressions are
+`test_writing_link_leaves_sections_byte_identical` and
+`test_writing_section_leaves_effective_id_unchanged`
+(`apps/studio/tests/test_youtube_fallback.py:160`, `:171`). A disposable copy of the current GMT
+run plus the full label log preserved **75/75 live added clips**, its exact section
+`Can't Take That Away From Me | Louis and Ella / Solo`, and all 688 cues after linking; with its
+media absent it resolved `Oa0wqetkNcg`, joined the cached title and returned no warning. That is
+the current store count — §4's older “179 clips” acceptance figure is stale.
+
+The header link control accepts an id, a supported YouTube URL or an explicit blank, and ranks all
+cached uploads by absolute distance from the run's last cue (`apps/studio/ui/runs.js:61`, `:194`).
+Null durations sort after ranked candidates and are never compared as zero. In the isolated
+browser, the real GMT run shape ranked `Oa0wqetkNcg` first at **13 seconds**, linking hid the
+missing-media warning and loaded the YouTube embed, clearing restored the warning and empty
+player, and a work/lane section survived a later link write. No canonical event was written.
+
+The server joins cached YouTube titles at read time (`apps/studio/server.py:646-654`) while the
+immutable run title stays untouched. The picker already polls; it now copies that server-resolved
+title into the open payload and repaints the header (`apps/studio/ui/runs.js:159-165`). Editing
+the isolated cache title changed both picker and header on the next four-second poll without a
+restart. The same isolated server had a deliberately missing yt-dlp, so the title came from the
+retained cache; the cold-cache fallback is pinned by
+`test_title_falls_back_to_immutable_run_when_cache_is_missing` (`test_youtube_fallback.py:208`).
+
+F34 is addressed: `list_runs` reads `labels.jsonl` once and passes the parsed events to all
+folds, pinned by `test_run_list_reads_label_log_once` (`test_youtube_fallback.py:220`). TD-17 and
+TD-18 are implemented in `uploads.py`: refresh has a tolerant valid-row recovery reader (`:163`),
+and an authenticated result below half the previous row count merges and logs rather than pruning
+(`:222`). Their regressions are `test_refresh_recovers_valid_rows_from_malformed_cache` and
+`test_drastic_authenticated_shrink_merges_and_logs` (`test_uploads.py:126`, `:149`).
+
+**Assumptions.** “Drastic shrink” is half the prior cache: equality may prune, anything below it
+may not. That is the concrete threshold the review suggested (“say, half”) and §3.5 now records
+it. Duration ranking lives in the browser because `/api/uploads` already supplies the full cache;
+the highest-confidence candidates come first and unknown durations remain selectable at the end.
+The link control is present for every run rather than only `source: local`, because an explicit
+link event is also the supported override/clear for an immutable URL. `/api/run` exposes the
+display title beside `run`, never inside it.
+
+**Skips and divergences.** The live `labels.jsonl`, run files, media links and YouTube account were
+not mutated; acceptance used disposable copies and a cache-title edit rather than renaming the
+real upload. Canary rot remains noted rather than expanded: the cache contains no durable
+visibility metadata from which to infer additional known-unlisted ids, while TD-18's assigned
+completeness guard is implemented. Phase 6, Phase 4 and PR E are untouched. No merge was
+performed.
+
+**Verification.** `python3 -m unittest discover -s apps/studio/tests -p 'test_*.py' -v` — 45/45;
+`py_compile` for `server.py` and `uploads.py`; `node --check` for `ui/runs.js` and `ui/main.js`;
+isolated HTTP/browser acceptance on `:8799`; disposable full-store fold; visual pass at the app's
+normal 1280px window; and `git diff --check`. Draft PR 31 is open. **Baton: → reviewer at
+`8eab5e7`.**
