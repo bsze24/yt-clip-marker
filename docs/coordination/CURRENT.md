@@ -2,8 +2,8 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ reviewer — PR A (draft PR 31) is Phase 3 + Phase 5 at `8eab5e7`. See §4, §6 and the final
-handoff note.**
+**→ implementer — PR A (draft PR 31, `8eab5e7`) reviewed clean 2026-08-22. No blocking
+findings; F40 and four small ones to fold in. See §6, `REVIEW.md` thread 14.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -57,9 +57,16 @@ Measured 2026-08-21:
 | `nWCc3xBSz-0` | real file | 271 MB | 0 | 0 | yes, in the run file |
 | `Oa0wqetkNcg` | real file | 102 MB | 0 | 0 | yes, in the run file |
 | `glhvfs6OOOE` | real file | 101 MB | 0 | 0 | yes, in the run file |
-| `GMT20260730…` | symlink | 0 MB here, 193 MB at target | 179 | 688 | **no** |
-| `GMT20260712…` | symlink | 0 MB here, 175 MB at target | 87 | 688 | **no** |
+| `GMT20260730…` | symlink | 0 MB here, 193 MB at target | 75 | 688 | **no** |
+| `GMT20260712…` | symlink | 0 MB here, 175 MB at target | 51 | 688 | **no** |
 | `YYW4Q1Nivg8` | none | 0 | 72 | 1464 | yes, in the run file |
+
+**Clip counts corrected 2026-08-22 (reviewer, `F41`).** The four figures above previously read
+179, 87, 266 and 179. Those were `miss` events minus `unmiss` events, not clips: `load_additions`
+folds latest-event-per-start ([[D-008]]), so re-saving one clip's label writes a second `miss` at
+the same start and the old method counted it twice. Measured on today's `labels.jsonl` — 184 miss
+/ 5 unmiss / **75** live clips for GMT20260730, 89 / 2 / **51** for GMT20260712. `/api/run` and
+the picker both report the folded number, so 75 and 51 are what acceptance sees on screen.
 
 **Two problems wearing one coat, and the table is what separates them.**
 
@@ -70,7 +77,7 @@ gone. The only obstacle is `run_warnings` (`apps/studio/server.py:290`) shouting
 file that has a working fallback. That is one condition, not a feature. **No new event field
 frees a byte of it.**
 
-**The 368 MB is the actual missing link.** The two GMT runs hold 266 clips between them and do
+**The 368 MB is the actual missing link.** The two GMT runs hold 126 clips between them and do
 not know their lessons exist on YouTube:
 
 ```
@@ -79,7 +86,7 @@ GMT20260730 local run:   videoId 'GMT20260730-155336_Recording_640x360-1'
                          source  'local'
 ```
 
-Delete that 193 MB target and its 179 clips are unplayable forever. Their `media/` entries are
+Delete that 193 MB target and its 75 clips are unplayable forever. Their `media/` entries are
 symlinks, so this is also the case where deleting `media/x.mp4` frees nothing.
 
 **And two lessons are stored locally twice.** `Oa0wqetkNcg` (102 MB) is the same lesson as the
@@ -343,7 +350,7 @@ The argument behind this section is the handoff note of 2026-08-21 17:05.
 
 ### 3.10 Fixtures
 
-Do every destructive acceptance on the four zero-clip runs first. The two GMT runs hold 266 clips
+Do every destructive acceptance on the four zero-clip runs first. The two GMT runs hold 126 clips
 between them and are not fixtures.
 
 ## 4. Sequence and PR cut — recut 2026-08-22
@@ -412,7 +419,7 @@ the picker offers the uploads with no run yet. **With the network off, the studi
 same speed, shows the cached list with its age, and nothing in the console suggests a fault.**
 
 **Phase 3 acceptance.** Link the GMT20260730 run to `Oa0wqetkNcg` from the candidate list. Repoint
-its symlink at nothing and the run still plays — from YouTube — with all 179 clips intact and no
+its symlink at nothing and the run still plays — from YouTube — with all 75 clips intact and no
 warning. Set the lesson's work label, write the link, and confirm the work label survives. Restore
 the symlink and it plays locally again.
 
@@ -447,7 +454,18 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ reviewer, for draft PR 31 at `8eab5e7` — PR A, Phase 3 + Phase 5.** The sequence and PR cut were recut on
+**→ implementer, for draft PR 31 at `8eab5e7` — PR A, Phase 3 + Phase 5.**
+
+**Reviewed 2026-08-22, no blocking findings** (`REVIEW.md` thread 14). The contracts §3.1 rule 1,
+§3.2, §3.8, §3.9 and the assigned debt are all implemented, and the two mandatory regressions were
+reproduced by the reviewer against a disposable copy of the real 853-event store: 75 clips, 688
+cues and the lesson's section survive a link, and a section write leaves the effective id alone.
+Seven findings, none blocking. **F40 is the one that would bite** — joining the YouTube title
+makes the Zoom run and its `Oa0wqetkNcg` twin read identically in the picker, and Phase 4 turns
+that into a delete dialog. Fold F40, F42, F43, F44 and F45 into this PR; F41 is already applied to
+§1 and §4 above; F46 belongs to PR E.
+
+The sequence and PR cut were recut on
 2026-08-22 (§4) and agreed by Brian: **A = Phase 3 + Phase 5, then B = Phase 6, then C = Phase 4**,
 with **E** the findings sweep, landable any time. Phase numbers stayed put; the build order is the
 PR column.
@@ -1023,3 +1041,27 @@ performed.
 isolated HTTP/browser acceptance on `:8799`; disposable full-store fold; visual pass at the app's
 normal 1280px window; and `git diff --check`. Draft PR 31 is open. **Baton: → reviewer at
 `8eab5e7`.**
+
+### 2026-08-22 — Claude Code, reviewing PR A (`8eab5e7`, draft PR 31)
+
+**Verdict: no blocking findings.** Full round in `REVIEW.md` thread 14; only what does not belong
+in the ledger is here.
+
+**What the review actually tested, and why that shape.** The append-only store is the thing this
+PR can permanently damage, so the round was built on a disposable copy of the real
+`labels.jsonl` — 853 events, both GMT runs, the real sections — served by an isolated studio on
+`:8799` rather than on constructed fixtures. A green suite proves the code does what its author
+expected; the real store is the only thing that proves the fold survives data nobody designed.
+Both mandatory §3.2 regressions were reproduced that way as well as read in the test file.
+
+**The finding worth carrying past this PR.** F40 is not a bug in any line of the diff. Every piece
+behaves as specced: the join is correct, the duplicate runs are deliberate ([[D-005]] scope, §5),
+and the picker label was already ambiguous-ish. The defect only exists where two correct
+decisions meet — which is the failure mode that component-by-component review never catches, and
+the reason the round ended by asking "what does the *user* now see", not "does each function
+return the right value".
+
+**F41 is a lesson about the ledger, not the code.** §1's clip counts were `miss` minus `unmiss`,
+which double-counts every clip whose label was edited — 179 against 75 real clips. The numbers
+that justify a task get quoted for weeks without anyone re-deriving them; this one had been
+quoted in three places. Any count taken off an append-only log has to be folded first ([[D-008]]).
