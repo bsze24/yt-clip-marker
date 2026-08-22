@@ -1,7 +1,7 @@
 ---
 date: 2026-08-17
 time: "19:14"
-revised: 2026-08-19 05:37
+revised: 2026-08-22 07:10 UTC
 surface: grok
 project: yt-clip-marker
 track: two-surface-land
@@ -92,51 +92,53 @@ with a reference note and a `docs/reference/` home for folds and explainers.
 - Use discarded json3 word offsets? Probably not, if captions are the right grain.
 
 ## Chronology (the record)
-- **19:14** — README filler: learning-state bullet does not follow from cold start. Cut it.
-- **19:16** — `DECISIONS.md` note was incident-specific (`e158710`, D-001…D-022). Asked to
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-17 11:14 UTC** — README filler: learning-state bullet does not follow from cold start. Cut it.
+- **2026-08-17 11:16 UTC** — `DECISIONS.md` note was incident-specific (`e158710`, D-001…D-022). Asked to
   generalize in README only.
-- **19:20** — `git log --all -- path` lists commits; it does not print the file. Tether
+- **2026-08-17 11:20 UTC** — `git log --all -- path` lists commits; it does not print the file. Tether
   decisions to the work SHA, not “newest anywhere.”
-- **19:30** — Line 40 “gold” looked wrong. You were describing `g`. Gold is the description
+- **2026-08-17 11:30 UTC** — Line 40 “gold” looked wrong. You were describing `g`. Gold is the description
   lane. Proposed skill / extracted / added as types with a grade on skill only.
-- **19:37** — Understood the collision. Asked if the three are different schema parts, and what
+- **2026-08-17 11:37 UTC** — Understood the collision. Asked if the three are different schema parts, and what
   `unmiss` is. Yes: three records. Delete button writes `unmiss` (eval slang: undo a `miss`).
   README should lead with the grid, then a store footnote.
-- **19:39–19:41** — Rename gold globally to extracted or derived. Then align names:
+- **≈2026-08-17 11:39–11:41 UTC** — Rename gold globally to extracted or derived. Then align names:
   skill_marker / added_marker / extracted_marker.
-- **19:41–19:51** — Picked extracted. Prose names, not underscores. Docs on this branch; studio
+- **≈2026-08-17 11:41–11:51 UTC** — Picked extracted. Prose names, not underscores. Docs on this branch; studio
   JSON still `gold` on PR 3. CSS `--gold` left as paint. `attach_gold.py` left as filename.
   Star listed as a fifth eval verdict — wrong shelf.
-- **19:51** — Append the rename to PR 3; deprecate gold.
-- **19:51–20:00** — PR 3 `6ebc21a`: write `extracted[]`, silent read of `gold[]`. Pushed.
-- **11:00 (08-18)** — Silent fallback hides stragglers. Best practice here: migrate data, one
+- **2026-08-17 11:51 UTC** — Append the rename to PR 3; deprecate gold.
+- **≈2026-08-17 11:51–12:00 UTC** — PR 3 `6ebc21a`: write `extracted[]`, silent read of `gold[]`. Pushed.
+- **2026-08-18 03:00 UTC** — Silent fallback hides stragglers. Best practice here: migrate data, one
   loud shim, then delete the shim. CSS gold is the color.
-- **11:00** — Why not rename `attach_gold.py` to something like `extract_ytdescription.py`?
+- **2026-08-18 03:00 UTC** — Why not rename `attach_gold.py` to something like `extract_ytdescription.py`?
   Stopped to talk, no edits.
-- **11:01** — `attach_extracted.py` is the name (pairs with `attach_cues.py`). Asked for a
+- **2026-08-18 03:01 UTC** — `attach_extracted.py` is the name (pairs with `attach_cues.py`). Asked for a
   Codex prompt covering the whole hard deprecation. Wrote it. Did not run it.
-- **11:59** — Is the star eval bullet necessary? No. It is a tag. Four channels: `g`, `x`,
+- **2026-08-18 03:59 UTC** — Is the star eval bullet necessary? No. It is a tag. Four channels: `g`, `x`,
   taxonomy-without-`g`, blank.
-- **12:01** — Is blank even possible? Yes: default unread skill marker. Video 1 ended `blank 0`.
-- **12:03–12:06** — Standing trap. First pass too dense. Second: grid is subtitles; clip is a
+- **2026-08-18 04:01 UTC** — Is blank even possible? Yes: default unread skill marker. Video 1 ended `blank 0`.
+- **≈2026-08-18 04:03–04:06 UTC** — Standing trap. First pass too dense. Second: grid is subtitles; clip is a
   sticky note on the nearest subtitle.
-- **12:06** — Why aren’t markers always caption timestamps? Skill would mark 0:22 if cues are
+- **2026-08-18 04:06 UTC** — Why aren’t markers always caption timestamps? Skill would mark 0:22 if cues are
   0:18 and 0:24?
-- **12:09** — Quoted the caption-span paragraph. Exclude takes. Is that word granularity, with
+- **2026-08-18 04:09 UTC** — Quoted the caption-span paragraph. Exclude takes. Is that word granularity, with
   the skill guessing when the word occurs?
-- **12:09** — Checked `fetch_transcript.py`. No. One start per caption block. Retracted.
-- **12:12** — Exclude takes and extracted. Then why would stored ever drift? Guessing a word
+- **2026-08-18 04:09 UTC** — Checked `fetch_transcript.py`. No. One start per caption block. Retracted.
+- **2026-08-18 04:12 UTC** — Exclude takes and extracted. Then why would stored ever drift? Guessing a word
   inside a short, listed caption feels like a bad design.
-- **12:13** — For concepts, drift is not required. The skill emits approximate `M:SS` under
+- **2026-08-18 04:13 UTC** — For concepts, drift is not required. The skill emits approximate `M:SS` under
   `R-NEIGHBORHOOD` instead of copying `cue.start`. README 1:18:50 example is a demo.
-- **12:13** — Print `R-NEIGHBORHOOD`. Entire rule: “Approximate timestamps; clip-marker nailing
+- **2026-08-18 04:13 UTC** — Print `R-NEIGHBORHOOD`. Entire rule: “Approximate timestamps; clip-marker nailing
   is downstream.”
-- **12:17** — Cut a markdown file of this stretch, summary and open questions at top. Landed
+- **2026-08-18 04:17 UTC** — Cut a markdown file of this stretch, summary and open questions at top. Landed
   first under `docs/sessions/`, then moved to `docs/reference/`.
-- **16:00** — Any consequence of `docs/reference/` for the ledger and the clocks note? No
+- **2026-08-18 08:00 UTC** — Any consequence of `docs/reference/` for the ledger and the clocks note? No
   runtime. Stale pointers in CURRENT/REVIEW/README/AGENTS. Session-log skill ignoring
   `docs/reference/` is the point.
-- **05:36 (08-19)** — `/session-log`, same track and filename pattern as the Claude 05:28 log.
+- **2026-08-18 21:36 UTC** — `/session-log`, same track and filename pattern as the Claude 05:28 log.
 
 ## Banked artifacts
 
