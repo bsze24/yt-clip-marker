@@ -1,5 +1,6 @@
 ---
 date: 2026-08-21
+revised: 2026-08-22 07:10 UTC
 time: "09:35"
 surface: codex-gpt-5
 project: yt-clip-marker
@@ -62,15 +63,17 @@ skill evaluation to a staged local-file / YouTube-fallback task.
 - None in the review track. The phase-1 acceptance test is the next implementation gate.
 
 ## Chronology (the record)
-- **2026-08-19** — re-reviewed PR 9 at `8a47c2b`. Exact sidecars won over normalized bases, and
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **≈2026-08-20 00:28–05:03 UTC** — re-reviewed PR 9 at `8a47c2b`. Exact sidecars won over normalized bases, and
   the real video-2 layout retained a usable grid at a compact viewport. F20-F23 resolved.
-- **2026-08-20** — reviewed PR 10. The matching-label fold was narrow and sound, but its duplicate
+- **≈2026-08-21 04:24–04:45 UTC** — reviewed PR 10. The matching-label fold was narrow and sound, but its duplicate
   D-035 would have made coordination citations ambiguous; filed it as a blocking record conflict.
-- **2026-08-20** — reviewed PR 11. Video 2 reproduced 714 transcript lines and 26 GAP flags;
+- **≈2026-08-21 04:24–04:45 UTC** — reviewed PR 11. Video 2 reproduced 714 transcript lines and 26 GAP flags;
   video 1 reproduced the claimed score. A zero-cue run raised `NameError` instead of the intended
   explanation, filed as optional.
-- **2026-08-21** — checked Claude's merged history: PR 10 recorded D-039 directly on main, PR 11
+- **≈2026-08-21 04:45–16:33 UTC** — checked Claude's merged history: PR 10 recorded D-039 directly on main, PR 11
   fixed the zero-cue refusal, and both merged. Claude later merged PRs 17-20 and committed
   `45856bb`, which replaces the finished eval task with the local-file-loop implementation plan.
-- **2026-08-21** — user asked to check Claude and run this session log, noting plans to move skills
+- **2026-08-21 16:33 UTC** — user asked to check Claude and run this session log, noting plans to move skills
   into a shared repository.
