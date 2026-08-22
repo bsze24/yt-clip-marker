@@ -1,5 +1,6 @@
 ---
 date: 2026-08-19
+revised: 2026-08-22 07:10 UTC
 time: "16:56"
 surface: claude-code-opus-5
 project: yt-clip-marker
@@ -128,84 +129,86 @@ pointer, and `k` sticking where two cues share a second.
   automated check covers it.
 
 ## Chronology (the record)
-- **06:27** — Opens with the goal: local video mode, flight, no YouTube player. Asks for a
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-18 22:27 UTC** — Opens with the goal: local video mode, flight, no YouTube player. Asks for a
   one-shot build, interrupts himself, and asks for a question list to sharpen the spec instead.
-- **06:28** — I read `player.js`, `ingest.py`, `server.py`, `runs.js` and `clip-schema.md` first,
+- **2026-08-18 22:28 UTC** — I read `player.js`, `ingest.py`, `server.py`, `runs.js` and `clip-schema.md` first,
   then return 16 questions grouped by area, each with the default I would take.
-- **06:30** — "much shorter list, I have limited time. only the breaking questions." Cut to three:
+- **2026-08-18 22:30 UTC** — "much shorter list, I have limited time. only the breaking questions." Cut to three:
   do the Zoom recordings have transcripts, which case is real on this flight, and are the files
   already downloaded.
-- **06:31** — Answers: not sure about transcripts, prefers YouTube if downloadable, "do your own
+- **2026-08-18 22:31 UTC** — Answers: not sure about transcripts, prefers YouTube if downloadable, "do your own
   research." Airport wifi for a couple more hours.
-- **06:32** — Web research settles it: Zoom audio transcripts are cloud-recording-only, paid plan,
+- **2026-08-18 22:32 UTC** — Web research settles it: Zoom audio transcripts are cloud-recording-only, paid plan,
   opt-in. Local recordings have none unless live-caption saving was on. So zero-cue has to be a
   first-class path.
-- **06:33–06:50** — Build. `local.py` (sidecar-aware run builder, VTT/SRT/json3 parsers with a
+- **≈2026-08-18 22:33–22:50 UTC** — Build. `local.py` (sidecar-aware run builder, VTT/SRT/json3 parsers with a
   rolling-window dedupe), byte-range `/media/` route with a name allowlist that deliberately does
   not `resolve()` symlinks, `resolve_run_media` computed per read, `player.js` split into two
   backends behind one interface, `n` to mark at the playhead, a synthetic composer row so a
   transcript-less run has somewhere to put the form.
-- **06:52** — Verified against a disposable copy of the store so the real `labels.jsonl` was never
+- **2026-08-18 22:52 UTC** — Verified against a disposable copy of the store so the real `labels.jsonl` was never
   written: range/416/traversal probes, byte-for-byte `dd` comparison, transport keys, `n` at 0:27
   round-tripping to a `miss` event, run switching, auto-attach by video id and its removal.
-- **06:55** — Regression on the real store surfaced a bug I had introduced: deferring the IFrame
+- **2026-08-18 22:55 UTC** — Regression on the real store surfaced a bug I had introduced: deferring the IFrame
   API widened the window where the 250ms poll calls `getDuration()` on a null player. Guarded it
   and its siblings.
-- **07:07** — "assume I'll extract with yt-dlp." Wrote `prefetch.py`. Running it immediately found
+- **2026-08-18 23:07 UTC** — "assume I'll extract with yt-dlp." Wrote `prefetch.py`. Running it immediately found
   two real yt-dlp problems: `--sub-langs "en.*,en"` pulls auto-translated tracks and a 429 on the
   third killed the whole download; and the default player client `android_vr` lists every format
   then answers 403 for the stream. Narrowed the langs, made success artifact-based rather than
   exit-code-based, pinned `web_embedded,mweb`.
-- **07:20** — Chased the 403 down a wrong path first: installed `curl_cffi`, found yt-dlp silently
+- **≈2026-08-18 23:20 UTC** — Chased the 403 down a wrong path first: installed `curl_cffi`, found yt-dlp silently
   ignores an unsupported version, installed a supported one, and the 403 persisted anyway. The
   player client was the real cause.
-- **07:30** — Same turn asked for the coordination-docs review cycle with roles reversed. Wrote
+- **≈2026-08-18 23:30 UTC** — Same turn asked for the coordination-docs review cycle with roles reversed. Wrote
   `CURRENT.md` as the PR 7 spec with the three-part audit, `REVIEW.md` thread 4, `TD-11`/`TD-12`.
   Baton to the reviewer at `c4de36d`.
-- **07:58** — Codex filed F18 (sidecar prefix match adopts `Lesson 10.vtt`) and F19 (non-media
+- **2026-08-18 23:58 UTC** — Codex filed F18 (sidecar prefix match adopts `Lesson 10.vtt`) and F19 (non-media
   `HEAD` writes a body, desynchronising an HTTP/1.1 keep-alive connection). Both non-blocking.
   Fixed both; F19 deliberately wider than asked, routing HEAD through the same dispatch as GET so
   every route is correct rather than the one branch reported.
-- **08:04** — "commit/push/pr to a new branch." Found two stale facts in `CURRENT.md` I had
+- **2026-08-19 00:04 UTC** — "commit/push/pr to a new branch." Found two stale facts in `CURRENT.md` I had
   written myself — PR 4 already merged, wrong `main` SHA — and corrected them before pushing.
   Opened #8.
-- **08:07** — Flagged the PR-number mismatch as a footnote; he pushed back that substance should
+- **2026-08-19 00:07 UTC** — Flagged the PR-number mismatch as a footnote; he pushed back that substance should
   own the number. Renamed the spec and every reference, leaving the one "PR 7" that really does
   mean the Codex session-log PR, and the published commit titles.
-- **08:39** — PR 8 merged. Asks how to use the player, and whether ingesting after processing is
+- **2026-08-19 00:39 UTC** — PR 8 merged. Asks how to use the player, and whether ingesting after processing is
   all that's left.
-- **08:50** — Four YouTube URLs. Checked captions first: none of the four had any. Three of four
+- **2026-08-19 00:50 UTC** — Four YouTube URLs. Checked captions first: none of the four had any. Three of four
   were also still processing video, offering only 360p. Downloaded anyway (~820MB) since that is
   the slow half, and fixed `prefetch.py` so a rerun can pick up captions independently of the
   download — the old code short-circuited on the media file and my earlier recovery advice was
   therefore wrong.
-- **09:01** — "check out the files I dropped in docs/references/sample_video... I see a possible
+- **2026-08-19 01:01 UTC** — "check out the files I dropped in docs/references/sample_video... I see a possible
   transcript." A full Zoom cloud export: video, audio, and a real 690-cue speaker-attributed
   transcript. Strictly better than the YouTube copy, and available immediately.
-- **09:03** — It did not work. Zoom names the video `..._Recording_640x360.mp4` and the transcript
+- **2026-08-19 01:03 UTC** — It did not work. Zoom names the video `..._Recording_640x360.mp4` and the transcript
   `..._Recording.transcript.vtt`; the stems do not match, so the flagship case for the whole
   feature silently produced an empty grid. Added `stem_variants` — strip a trailing `_{W}x{H}`
   and a browser `" (1)"` marker — keeping F18's `.` boundary on every variant. 688 cues, 26 gap
   rows.
-- **09:07** — Asks how to see it in the tool. Sent him to the dropdown, warning that two entries
+- **2026-08-19 01:07 UTC** — Asks how to see it in the tool. Sent him to the dropdown, warning that two entries
   looked nearly identical.
-- **09:08** — Screenshot: no dropdown visible, and video 1 loaded instead. Not user error. The
+- **2026-08-19 01:08 UTC** — Screenshot: no dropdown visible, and video 1 loaded instead. Not user error. The
   layout height was `calc(100% - 49px)`, a hardcoded one-row header; the header wraps at any zoom,
   the document became scrollable, and the grid's `scrollIntoView` carried the header off the top.
   Made the body a flex column and clipped `html`; capped the player column at 62vh after
   `minmax(0, auto)` turned out not to help, because an `auto` max still resolves to max-content.
-- **12:53–12:55** — Server had died between turns; restarted.
-- **13:00** — Second Zoom export dropped at `docs/reference/GMT20260712`. Ingested: 688 cues,
+- **≈2026-08-19 04:53–04:55 UTC** — Server had died between turns; restarted.
+- **2026-08-19 05:00 UTC** — Second Zoom export dropped at `docs/reference/GMT20260712`. Ingested: 688 cues,
   8 gap rows. Both runs landing on exactly 688 was suspicious enough to check — coincidence, both
   raw VTTs have 690 and the dedupe drops 2. Generalised the gitignore to
   `docs/reference/**/*.mp4`, since the per-folder rule had already stopped covering the next drop.
-- **13:24** — "cleaned up file names... do you have to update any references/pointers?" Yes: the
+- **2026-08-19 05:24 UTC** — "cleaned up file names... do you have to update any references/pointers?" Yes: the
   `media/` entry is a symlink and the rename left it dangling, so the run with 52 markers had gone
   to a black player. Repointed the symlink rather than re-ingesting, which would have minted a new
   run id and orphaned the markers. Then made the studio say so — `run_warnings` now reports a run
   that names media it cannot find, with the repoint command, and leads with "markers are intact"
   because that is the first question.
-- **13:36** — Reports `k` sticking at 33:38, guessing duplicate timestamps. Correct: two cues share
+- **2026-08-19 05:36 UTC** — Reports `k` sticking at 33:38, guessing duplicate timestamps. Correct: two cues share
   start 2018, and this is systemic — 25 such pairs in one lesson, 64 in the other. Read the code,
   formed the theory, then drove the poll→keypress loop directly rather than trusting it: five
   presses, no movement. The cause is an interaction of three fine-alone behaviours — the playhead
@@ -213,7 +216,7 @@ pointer, and `k` sticking where two cues share a second.
   they seek the video to whatever they select. Fixed by preferring the selection when both sit on
   the same second. A second bug fell out: `j` had been silently skipping the first row of every
   duplicate pair.
-- **16:56** — Session log, written after landing. Machine clock has moved from UTC+8 to UTC−7.
+- **2026-08-19 23:56 UTC** — Session log, written after landing. Machine clock has moved from UTC+8 to UTC−7.
 
 ## Banked artifacts
 
