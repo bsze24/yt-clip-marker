@@ -414,3 +414,85 @@ in all of them.
 | Broadcast logging (E1) | Revenue | $50–500k | Medium | Yes | Medium+FMs | ●○ |
 | Creator clipping (E2) | Passion | $15–30/mo | None | No | Severe | ●● |
 | Music / masterclass (F) | Passion | small | High | Yes | Greenfield | ●● |
+
+## 7. The autotag premium — ranking the table by it
+
+*Added 2026-08-22, same session. The question: rank the entries by the incremental value of
+the heavy, human-corrected, compounding approach over a naive LLM wrapper that autotags 100%
+on day one — where that increment must be immediately obvious to the buyer.*
+
+### Four amendments to the premise first
+
+1. **The question bundles two different axes: delta size and delta legibility.** The wrapper
+   demos *better* than the loop almost everywhere — 100% coverage on day one is a wow, and
+   the loop's proof lives in week six, when the correction rate has visibly fallen and the
+   tags have stopped drifting. So the ranking below scores both, and the strategic
+   consequence is: either pick markets where the buyer is themselves the expert (they see
+   generic tags being wrong *in their own language* within one session — instant
+   legibility), or plan to manufacture legibility in the sales motion (see the VoC entry).
+
+2. **The field splits into wrapper-immune and wrapper-threatened markets, and the premium
+   means different things in each.** Where there is no transcript to wrap — sports film,
+   surgical quality, flight debrief, CCTV safety — the naive wrapper cannot enter at all.
+   The premium there is not a differentiator you pitch; it is the entry ticket you must also
+   buy. The "why not a thin wrapper" objection only exists in transcript markets, and that
+   is where the ranking below is really about differentiation.
+
+3. **The real competitor is not the naive wrapper — it is the wrapper with a feedback
+   button.** Every wrapper will bolt on thumbs-down and "custom instructions." What doesn't
+   compound about that: corrections not captured as data against a stable row identity, no
+   controlled vocabulary to correct *into*, no eval harness to prove the corrections took.
+   The moat is not "a human is involved"; it is corrections-as-data + taxonomy governance +
+   a correction UX cheap enough that experts actually produce corrections. That is, item
+   for item, `labels.jsonl`, the vocab discipline, and the keyboard grid — the D-008
+   row-identity decision is precisely what a feedback button lacks.
+
+4. **The delta is a depreciating asset wherever the tag is inferable from public
+   knowledge.** Model improvement closes the gap on "customer mentioned pricing." It does
+   not close it where the ground truth is *private* (this program's play language, this
+   fund's thesis codes), *perceptual* (surgical technique quality, voicing), or
+   *accountability-bound* (scores that touch pay, flags a regulator audits, evaluations a
+   union contests). Rank durability by which of those three the row rests on.
+
+### The ranking
+
+Premium = incremental, buyer-visible value of the compounding human-corrected loop over a
+competent zero-shot wrapper. Class I = wrapper-immune (premium is the entry ticket),
+II = wrapper-threatened (premium is the defense), III = premium too small to matter.
+
+| # | Use case | Class | Premium | Why the buyer sees it — or doesn't |
+|---|---|---|---|---|
+| 1 | Sports film (C2) | I | 10 | No transcript to wrap; the taxonomy is the program's own play language; the buyer is the expert and sees "it doesn't know our calls" in one film session |
+| 2 | Surgical review (C1) | I | 9.5 | Foundation models get phase detection (the commodity part); competence judgment needs expert-calibrated ground truth, and credentialing demands the calibration record |
+| 3 | Comms surveillance (B2) | II | 9 | Precision on rare classes *is* the product; the FP rate is a number the buyer tracks daily; the correction log is the artifact the regulator audits. Caveat: biggest delta ≠ best business — this market is closed to newcomers |
+| 4 | Flight debrief (C5) | I | 9 | Naive has nothing to grip — the data is telemetry + video and the standard is the syllabus; premium is the entry ticket, not the pitch |
+| 5 | Investor libraries (A3) | II | 8.5 | The tag is the analyst's *conclusion*, not an observable; naive can only tag what was said, never what it means to the thesis — generic tags read as noise to the expert instantly |
+| 6 | Contact-center QA (B1) | II | 8 | Scores touch agent pay; uncalibrated AI scoring dies in its first agent dispute; the buyer already measures inter-rater agreement, so the delta arrives with a number attached |
+| 7 | Therapy fidelity (C4) | II | 7.5 | The vocabulary is public (which shrinks the gap) but validated agreement with expert raters is the market's currency — psychometrics, not vibes |
+| 8 | Safety video (B3) | I | 7 | Site-specific rules (this machine's exclusion zone) learned from corrections; but the fight is with CV incumbents, not wrappers |
+| 9 | Teacher coaching (C3) | II | 7 | Human-calibrated review is politically mandated — union contracts, employment stakes; wrappers are disqualified rather than out-competed. Slow money, though |
+| 10 | Broadcast logging (E1) | II | 7 | Editorial taste plus decades-long retrieval consistency; archivists already run controlled vocabularies and spot drift immediately |
+| 11 | Sales coaching (A1) | II | 6 | Team-specific scorecard trust is real, but the rubric is largely transcript-inferable, so naive demos credibly — and the incumbents are already half-closing the loop |
+| 12 | VoC product signal (A2) | II | 5.5 | The truth is a 7; the demo is a 4. Topics are inferable on day one; the premium lives in month-three trend integrity — see below |
+| 13 | UX repository (D1) | II | 5 | Taxonomy drifts by design, which undercuts the compounding claim; the delta is real but diffuse, and researchers want to do the interpreting themselves |
+| 14 | Depositions (D2) | III | 4 | Human judgment is essential but the loop resets per case — nothing compounds outside recurring litigation lines (insurance defense) |
+| 15 | Qual research (D3) | III | 3.5 | Per-study taxonomies; highlight reels are recall-dominant and naive-friendly |
+| 16 | Music / masterclass (F) | lab | — | The delta is large in kind — perceptual, personal — and zero in dollars. It is the lab, not a market |
+| 17 | Creator clipping (E2) | III | 1 | No taxonomy, cheap errors, recall-dominant: naive wins outright |
+
+### What this does to the §5 shortlist
+
+This lens is hardest on the fast-wedge pick. **VoC product-signal (A2) has the weakest
+wrapper-differentiation of the three picks**: a naive autotagger looks convincing on day
+one because product topics are transcript-inferable. The wedge survives on buyer grounds
+(the CRO-owned incumbents ignore PMs), not on autotag-delta grounds — and the sales motion
+must manufacture the legibility the demo lacks. Two demos that do it: run the wrapper on
+the same call three times and show three different tag sets, then ask it "how many
+customers requested SSO this quarter" twice and get two numbers — versus the loop's stable
+counts; and show the correction-rate curve falling week over week on the buyer's own calls.
+The claim being sold is not "better tags," it is "counts you can put in a roadmap review."
+
+Conversely, this lens is what makes **sports film the clear #1** — the only entry scoring
+maximum on delta, legibility, *and* durability — and it confirms the expert-skill cluster
+(surgical, flight, therapy) as the long game: those premiums rest on perceptual expertise
+and accountability, the two foundations model improvement doesn't erode.
