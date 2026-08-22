@@ -1,8 +1,8 @@
 # Review
 
-Active target: **Thread 10 — Phase 1 at PR 28 / `05a325c`.** The implementer's criterion-by-
-criterion audit and live-browser receipts are in `CURRENT.md`. Thread 9 remains closed after the
-app-lifecycle work landed.
+Active target: **none.** Thread 10 closed 2026-08-21 — Phase 1 reviewed clean and merged at
+`62278d6`; the one finding, F32, is deferred into Phase 3 by Brian's call. Threads 1-9 remain
+closed. Durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
 
 > ## Concurrency protocol — read before editing
 >
@@ -37,32 +37,65 @@ app-lifecycle work landed.
 | 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
-| 10 — effective YouTube fallback | `05a325c` (PR 28) | **AWAITING REVIEW** | → reviewer |
+| 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
 
 ---
 
-## Thread 10 — effective YouTube fallback (`05a325c`, PR 28) — AWAITING REVIEW
+## Thread 10 — effective YouTube fallback (`05a325c` → `758460c`, PR 28) — CLOSED 2026-08-21
 
-**Target.** Draft PR 28 on `codex/effective-youtube-fallback`, one code commit off the Phase 1
-base. Verify the cited SHA is an ancestor of the checked-out PR branch before reviewing.
+**Verdict: no blocking findings. Merged at `62278d6`** on Brian's explicit approval, after a
+rebase onto `origin/main` (the branch was one code commit behind, PR 27; `git merge-tree` showed
+no conflict and the files did not overlap).
 
-**Scope.** `CURRENT.md` §3.1 rule 2 and §3.3 only: URL-derived effective YouTube identity, both
-read API surfaces, missing-media warning suppression when that fallback exists, and player
-selection that never sends a local synthetic id to YouTube. The cache, link event, cleanup and
-title join are deliberately absent.
+**Scope reviewed.** `CURRENT.md` §3.1 rule 2 and §3.3 only: URL-derived effective YouTube
+identity, both read API surfaces, missing-media warning suppression when a fallback exists, and
+player selection that never sends a local synthetic id to YouTube.
 
-**Where to look hard.** URL host/path validation in `server.py`; a valid-shaped local `videoId`
-without URL evidence; switching from an already-loaded YouTube run to a local-only run whose
-media disappeared; and disagreement between `/api/runs`, `/api/run`, warning logic and the player.
-The last transition already produced one browser-found stale-iframe bug before `05a325c`.
+**Reviewer verification — re-run, not taken on the audit's word.** Tests 24/24 (`test_sidecars`
+15/15, `test_youtube_fallback` 9/9), before and after the rebase. Server half exercised headlessly
+against all seven real run files with `MEDIA_DIR` patched to an empty directory: the four
+zero-clip downloads resolve an id and fall silent, the two GMT locals resolve nothing and keep
+`missing-media`. Browser half on a second instance at `:8799` with two media entries removed —
+deleted download cues the embed and reports `getDuration() === 3883`, matching the uploads-list
+duration for `Oa0wqetkNcg`; the dead local run computes `display: none` on `#player`, shows its
+warning, reports `isPlayerReady() === false`, and keeps all 688 grid rows. Five run transitions
+leave no stale lesson on screen. Cold boot on a dead run never fetches the IFrame API, and the
+deferred load on a later switch cues correctly. Console clean apart from the intended warning.
+All 24 `player.` dereferences are guarded; `D-034` and `D-035` citations resolve; `git diff
+--check` clean.
 
-**Implementer verification.** Existing tests 15/15, new tests 9/9, Python compile, every Studio
-UI module parsed by Node, diff check, API reads, and live browser acceptance against the four
-zero-clip downloads plus the GMT20260730 symlink. All temporarily moved media entries were
-restored. Full evidence, assumptions and skips are in `CURRENT.md`.
+**Why the `ready()` change is load-bearing, not cosmetic.** `playerReady` means "a player object
+exists", not "a video is cued". Those were the same thing until this PR introduced a third state —
+a live player with nothing in it. On a warm switch from a YouTube run to a dead local run the old
+predicate stayed `true`, so `togglePlay` would drive a cleared player and `getDuration` /
+`getCurrentTime` would report the *previous* lesson's clock. Hiding the iframe alone would not have
+caught that. General principle, worth carrying: when a two-state system gains a third state, every
+predicate written as "not the other one" becomes wrong, and the ones reading a cached flag rather
+than the live condition fail silently.
 
-**Baton: → reviewer.** Record each finding as its own append-only item in this thread. No merge
-without Brian's explicit approval.
+### F32 — `run_warnings` takes the resolved id as a parameter — DEFERRED to Phase 3
+
+`run_warnings(run_id, run, youtube_id)` (`server.py:311`) depends on its caller passing the right
+id. The one caller, `run_payload`, is correct; a future one can suppress a real warning by passing
+a stale value. Calling `effective_youtube_id(run)` inside the function costs one `urlparse` and
+removes the way to be wrong.
+
+**Disposition, 2026-08-21:** deferred, not fixed on its own. Phase 3 changes the resolver's
+signature anyway (F33), so the parameter question resolves there in code that is already being
+touched. Not worth a PR for three lines.
+
+### F33 — the resolver signature changes in Phase 3 — NOTE, no action
+
+`effective_youtube_id(run)` takes no `run_id`, so the link event forces `effective_youtube_id(run_id,
+run)` and a rewrite of the nine tests that call it positionally. Expected and cheap. Recorded so the
+Phase 3 reviewer does not read the churn as scope creep.
+
+### F34 — `/api/runs` re-parses `labels.jsonl` per run — NOTE for Phase 3 sizing
+
+`load_annotations` and `load_additions` each call `read_label_events()` inside the per-run loop, so
+`/api/runs` parses all 853 lines roughly fourteen times per poll. A per-run link lookup makes it
+twenty-one. Measured 42 ms against a 4-second poll, so this is not urgent — but Phase 3 is where
+caching the parse becomes worth one line.
 
 ---
 

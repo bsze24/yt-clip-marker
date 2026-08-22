@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ reviewer, Phase 1 / PR 28.**
+**→ implementer, Phase 2.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -14,7 +14,12 @@ does not repeat it.
 
 ## 0. State as of 2026-08-21
 
-**Draft PR 28 is open at `05a325c` for Phase 1.** Review-only PR #23 was closed rather than
+**Phase 1 is merged.** PR 28 landed at `62278d6` on 2026-08-21 — reviewed clean, one deferred
+finding (F32, folded into Phase 3). Tests are now 24/24: `test_sidecars.py` 15/15 and
+`test_youtube_fallback.py` 9/9.
+
+**A running studio does not pick this up until it restarts.** The launchd agent on `:8765` serves
+whatever code it started with, so `/api/run` keeps omitting `youtubeId` until then. Review-only PR #23 was closed rather than
 merged, which was its correct disposition. PRs 24, 25 and 26 have since landed — the app-lifecycle
 repair, the move-safe app bundle, and the same-origin guard. Working tree clean, tests 15/15
 (`python3 apps/studio/tests/test_sidecars.py`).
@@ -306,7 +311,13 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ reviewer.** Review Phase 1 at PR 28 / `05a325c`. Merging requires Brian's explicit approval.
+**→ implementer, Phase 2 (uploads cache, §3.4-§3.6).** Build it as its own reviewed PR. Stop with
+the PR open; merging requires Brian's explicit approval, per PR.
+
+Phase 1 is done and merged at `62278d6`. Its review is `REVIEW.md` thread 10, closed. Two notes
+ride into **Phase 3**, not Phase 2: F32 (fold the resolved id back inside `run_warnings` while the
+signature is changing anyway) and F34 (cache the `labels.jsonl` parse when the per-run link lookup
+lands — `/api/runs` already parses it fourteen times per poll).
 
 ---
 
@@ -543,3 +554,27 @@ board.
 - **`.gitignore` misses the Zoom chat files.** `GMT20260404-201119_RecordingnewChat (1).txt` and
   its `GMT20260602` twin are untracked, so two export folders show as `??`. That is F22 exactly —
   the reason the `.vtt` rule was added. One line: `docs/reference/**/*newChat*.txt`.
+
+### 2026-08-21 — Claude Code, reviewing and merging Phase 1
+
+**Verdict: no blocking findings.** Merged at `62278d6` on Brian's explicit approval, after
+rebasing the branch onto `origin/main` — it was one code commit behind (PR 27), with no conflict
+and no file overlap. Full receipts are in `REVIEW.md` thread 10; the short version is that the
+acceptance in §4 was re-run rather than accepted on the audit's word, and it holds: with media
+removed, the four zero-clip downloads play from YouTube with no warning, and the two GMT locals
+keep `missing-media` and render no player at all.
+
+**Three findings, none blocking, all deferred rather than fixed.** F32 (`run_warnings` trusts a
+caller-supplied id), F33 (the resolver signature changes in Phase 3), F34 (`/api/runs` re-parses
+`labels.jsonl` fourteen times per poll). F32 and F34 are folded into Phase 3 because that PR is
+already editing both call sites; a separate PR for three lines is ceremony, not review.
+
+**One thing worth carrying beyond this PR.** `playerReady` meant "a player object exists", not
+"a video is cued". Phase 1 introduced a third state — a live player with nothing in it — and the
+predicate written as "not local" silently kept reporting the previous lesson's clock on a warm
+switch. When a two-state system gains a third state, every predicate written as *not the other
+one* becomes wrong, and the ones reading a cached flag rather than the live condition fail
+without an error.
+
+**Not re-filed, because the 17:05 Phase 6 note already has it:** the `.gitignore` gap on Zoom's
+`*newChat*.txt` sidecars, and §1's disk figure being stale.
