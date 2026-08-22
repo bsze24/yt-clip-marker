@@ -1,7 +1,7 @@
 ---
 date: 2026-08-21
 time: "16:33"
-revised: 2026-08-21 23:15
+revised: 2026-08-22 06:15
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -117,9 +117,7 @@ in the transcript predicts `star`, so rung 4 of the ML ladder loses its target. 
 
 ---
 
-# Append — 2026-08-21 23:20 — the inbox spec, and two review rounds
-
-*(Heading corrected 23:15 — it was first written as `2026-08-22 06:20`, which is UTC. This file, its filename and every commit in the repo are local `-0700`, so the whole session is one local day: 2026-08-21 16:16 → 23:12. See the note in Next about the same drift in `REVIEW.md`.)*
+# Append — 2026-08-22 06:20 — the inbox spec, and two review rounds
 
 The 16:33 log ends with the eval work. Everything after it is coordination and review: Phase 6
 specced, Codex's Phase 2 readiness review resolved, and PRs 29 and 30 reviewed. Project state is
@@ -219,14 +217,17 @@ the part that has no home in those.
 
 ---
 
-# Append — 2026-08-21 23:15 — closing the thread; the build gets its own
+# Append — 2026-08-22 06:15 — closing the thread; the build gets its own
 
 Written to close this thread. The next session should start a **new log on a build track**, and
 the reason is in Decisions below.
 
 ## What changed
 
-Times are local `-0700`, from the transcript.
+Times are **UTC**, from the transcript. Brian set that convention on 2026-08-22 — it is
+what `REVIEW.md` and `CURRENT.md` already used, and what makes the review dates there correct
+rather than a day ahead. The filename's `1633` is local-at-creation and stays as it is: it is this
+file's identity, and `AGENTS.md` points at it by name.
 
 - `0558373` — the inbox migration recorded. `~/lesson-inbox/` now holds 2.3 GB;
   `docs/reference/` is back to 64 KB; both `media/` symlinks re-pointed and verified resolving.
@@ -286,9 +287,10 @@ Times are local `-0700`, from the transcript.
 1. **PR A — Phase 3 + Phase 5**, carrying F32, F34, TD-17, TD-18. `CURRENT.md` §4 and §6.
 2. **PR B — Phase 6**, then **PR C — Phase 4**. **PR E** — F31, F36, F37, the `annotated` proxy —
    any time.
-3. **Timezone drift to sweep.** `REVIEW.md` and `CURRENT.md` label the PR 29/30 reviews
-   `2026-08-22`; those are UTC. Every commit in the repo is local `-0700` and locally it was still
-   2026-08-21. About eight labels. Cosmetic, but it makes commit dates and ledger dates disagree.
+3. **Times are UTC from here.** Set 2026-08-22. `REVIEW.md` and `CURRENT.md` were already
+   written that way, so their `2026-08-22` review dates are correct and need no sweep. Git's own
+   author dates stay local `-0700`, so a commit reading `Aug 21 22:24` and a ledger entry reading
+   `2026-08-22` are the same moment — expect that, do not "fix" it.
 4. **Use v2 for real on the next lesson** ([[D-043]]) — the only open eval item, waiting on a
    lesson existing. **This is what `track: reduce-manual-tagging` resumes on**, and it is the one
    thing the new build track should not absorb.
@@ -299,34 +301,36 @@ Times are local `-0700`, from the transcript.
 
 ## Chronology (the record)
 
-Local `-0700`, anchored to the transcript.
+UTC, anchored to the transcript. The session crosses UTC midnight, which is why the reviews
+carry `2026-08-22` dates.
 
-- **16:16** — session opens with three eval next steps and "check the latest session logs for state".
-- **16:18** — `yt-clipper` invoked for real; v2 smoke test on video 3. 99 proposals, 2.25/min,
+- **08-21 23:16** — session opens with three eval next steps and "check the latest session logs for state".
+- **23:18** — `yt-clipper` invoked for real; v2 smoke test on video 3. 99 proposals, 2.25/min,
   99/99 on exact cue starts, no gap over 60s. Score deliberately not recorded ([[D-043]]).
-- **~16:25** — star predictability test. Ten features dead; the ceiling test — a model reading
+- **~23:25** — star predictability test. Ten features dead; the ceiling test — a model reading
   Brian's own labels — lands at 0.513. D-044 written; PR 27 opened.
-- **16:33** — first session log.
-- **16:56** — five Zoom exports found in `docs/reference/`; staging-folder question. Phase 6
+- **23:33** — first session log.
+- **23:56** — five Zoom exports found in `docs/reference/`; staging-folder question. Phase 6
   specced and appended, since Codex held the file. Staging goes outside the repo.
-- **21:55** — Codex's five Phase 2 contracts resolved inline. Finding 1 verified rather than
+- **08-22 04:55** — Codex's five Phase 2 contracts resolved inline. Finding 1 verified rather than
   accepted, and it was bigger than reported: in-app ingest already broken. F35 filed.
-- **22:00** — "all this inline at current.md?" Measured: 187 lines of review inside a 114-line
+- **05:00** — "all this inline at current.md?" Measured: 187 lines of review inside a 114-line
   contracts section. Agreed it did not belong.
-- **22:01** — collapse executed. Decisions into contracts, argument into handoff notes, F35 into
+- **05:01** — collapse executed. Decisions into contracts, argument into handoff notes, F35 into
   `REVIEW.md`. Reversed my own proposal on re-reading rule 1: a spec review has no target SHA.
-- **22:24** — PR 29 reviewed. Tested the missing-binary branch the audit could only inspect.
+- **05:24** — PR 29 reviewed. Tested the missing-binary branch the audit could only inspect.
   F36, F37 filed.
-- **22:33** — "make sure your notes are in review.md". Ledger audit found four stale things,
+- **05:33** — "make sure your notes are in review.md". Ledger audit found four stale things,
   including thread 7 reading CLOSED over an open F31.
-- **22:46** — PR 30 reviewed. 35 tests run, three edge behaviours probed. F38, F39 filed; F39 is a
+- **05:46** — PR 30 reviewed. 35 tests run, three edge behaviours probed. F38, F39 filed; F39 is a
   hole in my own §3.5 5a.
-- **22:54** — "are you consistently posting these?" Grepped rather than asserted: reviews yes,
+- **05:54** — "are you consistently posting these?" Grepped rather than asserted: reviews yes,
   session log no. Append written.
-- **22:57** — state-of-the-app assessment, measured from disk and the live API rather than the
+- **05:57** — state-of-the-app assessment, measured from disk and the live API rather than the
   plan. Headline: nothing about marking clips changed and no disk has been freed.
-- **23:04** — "are 3-6 polish?" No: two of them destroy data when wrong. PR cut proposed.
-- **23:08** — Brian agreed the ordering. §4 recut, §3.10a promoted, findings assigned homes.
-- **23:11** — `/session-log`, asking whether the thread can close.
-- **23:12** — asked for timestamps on the chronology, which is what exposed the UTC/local drift
-  in the previous append's heading.
+- **06:04** — "are 3-6 polish?" No: two of them destroy data when wrong. PR cut proposed.
+- **06:08** — Brian agreed the ordering. §4 recut, §3.10a promoted, findings assigned homes.
+- **06:11** — `/session-log`, asking whether the thread can close.
+- **06:12** — asked for timestamps on the chronology. Converting them exposed that this file mixed
+  UTC and local; Brian set **UTC** as the convention, so the previous append's `06:20` heading was
+  right the first time and the "local" correction was the error.
