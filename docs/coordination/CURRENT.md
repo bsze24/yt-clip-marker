@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer — the `PATH` fix (F35), then one measurement, then Phase 2. See §6.**
+**→ reviewer — F35 at draft PR 29 / `735ff6a`. Phase 2 remains gated; see §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -348,13 +348,11 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer, but not on Phase 2 yet.** Codex's readiness review is resolved (planner,
-2026-08-21): all five contracts it asked for are now written into §3.4, §3.5, §3.6 and §3.9, and
-the argument behind them is the handoff note of the same date. Order:
+**→ reviewer, F35 at draft PR 29 / `735ff6a`.** Codex's readiness review is resolved (planner,
+2026-08-21), but Phase 2 remains gated. Order:
 
-1. **The `PATH` fix, as its own small PR.** In-app YouTube ingest is broken today on the launchd
-   agent — a live bug in merged code, not a Phase 2 prerequisite. Filed as **F35**,
-   `REVIEW.md` thread 11.
+1. **Review draft PR 29 / `735ff6a`, the `PATH` fix.** It remains unmerged and F35 is addressed,
+   awaiting reviewer verification in `REVIEW.md` thread 11.
 2. **Run the one measurement F35 names:** a refresh executed by the reinstalled agent, which must
    return `Oa0wqetkNcg`. This gates Phase 2 and costs one command. `--cookies-from-browser` is
    the second member of F35's class and is the only unmeasured thing Phase 2 rests on.
@@ -781,3 +779,30 @@ order on 2026-08-21 and the reason stands if the measurement in (a) passes.
 
 Confidence: **high** that the cookie path is the real risk and that (a) must run before Phase 2;
 **low** on resequencing, downgraded from moderate once §3.9's existing paste door was re-read.
+
+### 2026-08-21 — Codex, implementing F35
+
+Draft PR 29 is open at `735ff6a`. No merge was performed.
+
+**Acceptance audit.** `apps/studio/studio` now resolves yt-dlp when the agent is installed and
+writes its directory into the plist's explicit `EnvironmentVariables/PATH`. A terminal install
+and an install invoked with exactly launchd's old minimal PATH both generated
+`/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin`; the restarted agent process reported that same
+value. A live `POST /api/ingest` for the deliberately invalid id `00000000000` returned yt-dlp's
+`Video unavailable`, proving the running agent executed the binary rather than raising the prior
+`yt-dlp not found` error. No run was written.
+
+**Assumptions.** Process dependency discovery belongs to the launcher, not to each Python caller.
+The installer first honors `command -v`, then checks the standard Apple Silicon and Intel
+Homebrew paths so the existing GUI-triggered move-healing reinstall works even when its own PATH
+is minimal. If none exists, the plist keeps the system PATH and the server still boots; the
+existing ingest error remains the user-facing failure.
+
+**Skips and divergences.** Phase 2, the authenticated-cookie measurement, and the Zoom chat
+`.gitignore` rule are deliberately absent: F35 was required to ship as its own PR, the measurement
+follows review and explicit merge, and the ignore rule is a separate change. The missing-binary
+case was inspected rather than tested by uninstalling the user's working yt-dlp. No merge.
+
+**Verification.** `bash -n apps/studio/studio`; existing Python suites 24/24; `plutil -lint` on
+the generated plist; normal and minimal-PATH live installs; live agent environment inspection;
+live invalid-video ingest through the agent; and `git diff --check`.

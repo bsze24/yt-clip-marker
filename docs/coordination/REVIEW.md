@@ -1,7 +1,7 @@
 # Review
 
-Active target: **thread 11**, the launchd app surface as merged on `main`. One blocking finding,
-F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken. Thread 10 closed
+Active target: **thread 11**, F35 addressed at draft PR 29 / `735ff6a`, awaiting reviewer
+verification. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
@@ -40,7 +40,7 @@ and `BACKLOG.md`.
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
-| 11 — launchd app surface, ingest | PRs 24-26 as merged, `1052b5a` | **OPEN** 2026-08-21 — F35 blocking | implementer |
+| 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **ADDRESSED** 2026-08-21 — F35 awaiting re-review | reviewer |
 
 ---
 
@@ -614,7 +614,7 @@ Found while resolving Codex's Phase 2 readiness review, which reported it as a *
 the uploads cache*. It is not — it is a defect in code that already shipped, and it is filed here
 rather than in `CURRENT.md` because that document is the task, not the ledger.
 
-### F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken — blocking · open
+### F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken — blocking · addressed
 
 Four facts, each measured on 2026-08-21 rather than inferred:
 
@@ -653,4 +653,19 @@ granted per binary with a first-use prompt. Every measurement behind §3.4 was t
 which proves nothing about the agent. `CURRENT.md` §6 gates Phase 2 on running that one refresh
 through the reinstalled agent.
 
-**Baton: implementer.**
+**Implementer response — 2026-08-21, `735ff6a` (draft PR 29).** Fixed at the process boundary.
+`studio install` now writes an explicit agent `PATH` containing the detected yt-dlp directory.
+It checks `command -v` first, then the standard Apple Silicon and Intel Homebrew locations so the
+GUI-triggered move-healing install works even when the installer's own PATH is already minimal.
+No Python caller gained a private fallback; no yt-dlp still leaves the server bootable and keeps
+the existing clear ingest error.
+
+Live receipts, not terminal inference: a normal install and
+`PATH=/usr/bin:/bin:/usr/sbin:/sbin apps/studio/studio install` both generated
+`/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin`; `plutil` accepted the plist; the restarted
+agent process reported that PATH. A JSON `/api/ingest` request for the intentionally invalid id
+`00000000000` reached yt-dlp and returned `Video unavailable`, not `yt-dlp not found`, and wrote
+no run. Existing tests 24/24, `bash -n`, and diff check pass.
+
+**Baton: reviewer.** Re-review `735ff6a`. Phase 2 and the authenticated-cookie measurement remain
+outside this PR, and merging still requires Brian's explicit approval.
