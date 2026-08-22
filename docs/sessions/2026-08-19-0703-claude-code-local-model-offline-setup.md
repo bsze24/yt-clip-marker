@@ -1,5 +1,6 @@
 ---
 date: 2026-08-19
+revised: 2026-08-22 07:10 UTC
 time: "07:03"
 surface: claude-code-opus-5
 project: yt-clip-marker
@@ -86,42 +87,44 @@ task: docs/coordination/CURRENT.md
 - Unknown whether transcripts 2–5 have caption tracks at all; ingest fails without them.
 
 ## Chronology (the record)
-- Brian opens with the flight and asks how to get a local model running, guessing a coder
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-18 21:32 UTC** — Brian opens with the flight and asks how to get a local model running, guessing a coder
   model is right.
-- Machine audit: M4 Pro, 48 GB, 1.1 TB free. `llama.cpp` and `yt-dlp` already present via
+- **≈2026-08-18 21:32–21:48 UTC** — Machine audit: M4 Pro, 48 GB, 1.1 TB free. `llama.cpp` and `yt-dlp` already present via
   brew; no ollama, no LM Studio, no models.
-- Repo audit turns up the real problem: `apps/studio/runs/` does not exist on `main`, and
+- **≈2026-08-18 21:32–21:48 UTC** — Repo audit turns up the real problem: `apps/studio/runs/` does not exist on `main`, and
   `player.js:56` loads the YouTube iframe API. Two network dependencies, neither about
   the model.
-- Brian: 45 minutes, pick a model and download it. Then interrupts to ask for a range of
+- **≈2026-08-18 21:48–21:54 UTC** — Brian: 45 minutes, pick a model and download it. Then interrupts to ask for a range of
   options and a web search first.
-- Searches surface Qwen3-Coder-Next as the 48 GB pick, GLM-4.7-Flash as a strong 30B-class
+- **≈2026-08-18 21:48–21:54 UTC** — Searches surface Qwen3-Coder-Next as the 48 GB pick, GLM-4.7-Flash as a strong 30B-class
   alternative, Qwen3-Coder 30B-A3B as the safe consensus.
-- I start the 19 GB `qwen3-coder:30b` pull as insurance while writing up the options —
+- **≈2026-08-18 21:48–21:54 UTC** — I start the 19 GB `qwen3-coder:30b` pull as insurance while writing up the options —
   without labelling it as insurance.
-- Brian: "wait why are you installing Qwen3-Coder 30B-A3B when you recommended Next?"
+- **2026-08-18 21:54 UTC** — Brian: "wait why are you installing Qwen3-Coder 30B-A3B when you recommended Next?"
   Fair. I answer the inconsistency directly.
-- Throughput measured at "71 MB/s" — wrong, it was reading ollama's preallocated sparse
+- **≈2026-08-18 21:54–21:59 UTC** — Throughput measured at "71 MB/s" — wrong, it was reading ollama's preallocated sparse
   files. Real rate later measured at 48 MB/s.
-- The Next download 404s on a bad quant tag. Fetching the actual HF file listing shows
+- **≈2026-08-18 21:54–21:59 UTC** — The Next download 404s on a bad quant tag. Fetching the actual HF file listing shows
   Q4_K_M is 48.5 GB, not the 28 GB the search snippet claimed. That kills the
   recommendation: on 48 GB, Next only fits at 3-bit.
-- Brian: "getting mixed signals — can my machine handle next or is coder the better fit?"
+- **≈2026-08-18 21:54–21:59 UTC** — Brian: "getting mixed signals — can my machine handle next or is coder the better fit?"
   Straight answer given: take the 30B.
-- Brian: "do i need next if we're going with coder?" No. Skipped.
-- Brian spots that a `llama-server` process is still alive. It is — a zombie from the 404,
+- **2026-08-18 21:59 UTC** — Brian: "do i need next if we're going with coder?" No. Skipped.
+- **≈2026-08-18 21:59–22:00 UTC** — Brian spots that a `llama-server` process is still alive. It is — a zombie from the 404,
   downloading nothing. Killed it. He follows with "oh i see nm".
-- `brew install uv && uv tool install aider-chat` fails building scipy from source for want
+- **≈2026-08-18 22:00–22:05 UTC** — `brew install uv && uv tool install aider-chat` fails building scipy from source for want
   of `g95`. Fixed with `--python 3.12`.
-- Both models complete. Smoke test: `qwen3-coder:30b` returns a correct clamp one-liner in
+- **≈2026-08-18 22:05–23:01 UTC** — Both models complete. Smoke test: `qwen3-coder:30b` returns a correct clamp one-liner in
   ~11 s including load.
-- Wrote `~/flight-local-llm.md`.
-- Restarted `ollama serve` with `OLLAMA_CONTEXT_LENGTH=65536`, flash attention on, KV cache
+- **≈2026-08-18 22:05–23:01 UTC** — Wrote `~/flight-local-llm.md`.
+- **≈2026-08-18 23:01–23:03 UTC** — Restarted `ollama serve` with `OLLAMA_CONTEXT_LENGTH=65536`, flash attention on, KV cache
   at q8_0. Verified: 65536 context, 100% GPU, 21 GB resident, `/v1` endpoint answering.
-- Brian: "so we are actually at pencils down on the local model" — yes. I flag the two
+- **≈2026-08-18 23:02–23:03 UTC** — Brian: "so we are actually at pencils down on the local model" — yes. I flag the two
   remaining network-dependent items; he does not paste the URLs.
-- Meanwhile, a parallel session commits PR 8 (`4b344d5`) — local video mode — at 07:03.
-- Brian invokes `/session-log`.
+- **2026-08-18 23:03 UTC** — Meanwhile, a parallel session commits PR 8 (`4b344d5`) — local video mode — at 07:03.
+- **2026-08-18 23:03 UTC** — Brian invokes `/session-log`.
 
 ## Banked artifacts
 
