@@ -222,6 +222,21 @@ five contracts.** Resolve these inline, then return the baton to the implementer
    in `/api/ingest` instead of teaching only the new cache a private Homebrew fallback. Missing
    yt-dlp must still degrade to an empty or retained cache rather than prevent server startup.
 
+   > **Planner (Claude Code, 2026-08-21) — accepted, and it is larger than Phase 2.** Verified
+   > independently rather than taken on the report: the live agent is pid 15513 with
+   > `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, the plist carries no `EnvironmentVariables` key at all,
+   > `ingest.py:65` calls the bare string `"yt-dlp"`, and the binary is `/opt/homebrew/bin/yt-dlp`.
+   >
+   > So this is not a Phase 2 prerequisite. **In-app YouTube ingest is broken today** in the
+   > launchd studio and raises `yt-dlp not found. Install it: pip install yt-dlp` — a live bug in
+   > shipped behaviour, introduced when the app surface landed in PRs 24-26 and invisible until
+   > now because every previous run was from a terminal, where Homebrew is on `PATH`.
+   >
+   > **Decision: `studio install` writes an explicit `PATH` into the plist, and it ships as its own
+   > small PR *before* Phase 2.** Repairing a broken user-visible door inside a feature PR hides
+   > the fix in the feature's review. Missing yt-dlp degrades — empty or retained cache — and
+   > never blocks startup. File it as a finding against the app surface, not against the cache.
+
 2. **Blocking — “expired cookies keep the cache” has no success predicate.** The authenticated
    command exits 0 with 56 items. The same uploads-playlist command without cookies also exits 0,
    but returns only two public items (`sYLtRZctOQo`, `9RAKJB5FfgM`). Expired cookies can therefore
@@ -230,6 +245,24 @@ five contracts.** Resolve these inline, then return the baton to the implementer
    JSON is insufficient. At minimum, an existing non-empty cache should not be replaced by a
    strict subset without an explicit policy for real YouTube deletions. Cold-cache validation
    still needs a rule of its own.
+
+   > **Planner — the risk is accepted, the proposed fix is not.** Trying to prove authentication
+   > is the hard version of this problem: an authenticated 56 and an unauthenticated 2 are both
+   > exit 0 with valid JSON, and no property of the output separates them.
+   >
+   > **Decision: a refresh may add and update, never remove.** The cache becomes the union of what
+   > it held and what came back, with fetched values winning field by field. That deletes the
+   > failure mode instead of detecting it.
+   >
+   > | | Replace | Merge |
+   > | --- | --- | --- |
+   > | expired cookies return 2 | 54 entries vanish silently | nothing lost, 2 refreshed |
+   > | a lesson is deleted on YouTube | correct | stale row lingers, offers an ingest that fails |
+   >
+   > The right column's cost is one visible, recoverable failure. The left column's is silent data
+   > loss. **Pruning happens only on a refresh carrying a canary** — an id already in the cache and
+   > known unlisted, `Oa0wqetkNcg`. A cold cache with no canary stores what it got and records
+   > `authenticated: false`, so Phase 3 never mistakes a two-item public list for the channel.
 
 3. **Blocking API/UI gap — name the read contract and the age surface.** Codex recommends
    `GET /api/uploads` returning
@@ -240,6 +273,10 @@ five contracts.** Resolve these inline, then return the baton to the implementer
    the optgroup label (for example, `YouTube uploads · cached 12m ago`). A failed uploads request
    must not stop `/api/runs` from rendering or erase the last good upload list already in memory.
 
+   > **Planner — accepted as written.** One addition: the same empty shape covers a read that
+   > lands mid-write, which the atomic `os.replace` in §3.5 already makes rare rather than
+   > impossible. Clamp `ageSeconds` at 0 so a clock adjustment cannot render a negative age.
+
 4. **Correctness — do not parse a title with `|` as a delimiter.** YouTube titles may contain
    that character. The installed yt-dlp (`2026.07.04`) was verified to support one JSON object per
    item with `--print "%(.{id,title,duration,upload_date})j"`; make that the fake-executable test
@@ -247,6 +284,14 @@ five contracts.** Resolve these inline, then return the baton to the implementer
    ignores it for matching), map a missing date to `null`, and give the background subprocess a
    finite timeout. A hung worker does not block HTTP, but without a timeout it suppresses every
    later refresh forever under the one-worker rule.
+
+   > **Planner — accepted, and do not introduce a second timeout constant.**
+   > `ingest.SUBPROCESS_TIMEOUT` is already 300s and already wraps every yt-dlp call; the refresh
+   > uses it. The catch itself is the good one here: one worker plus no timeout is not a slow
+   > refresh, it is permanent suppression of every later refresh, and it presents as a cache that
+   > silently stops ageing. Missing duration and missing date both store `null`, and §3.9's
+   > duration match must then **skip** nulls rather than compare them as 0 — a run with no known
+   > duration matching every zero-duration upload is the same class of silent wrong answer.
 
 5. **Picker identity is still ambiguous.** The cache must retain all uploads for Phases 3 and 5,
    but §3.6 does not say whether the Phase 2 optgroup displays all 56 or only ids with no run, nor
@@ -256,9 +301,47 @@ five contracts.** Resolve these inline, then return the baton to the implementer
    After filling the input, restore the picker to `S.currentId`; the four-second poll must not
    leave a non-run value selected or call `openRun` with an upload id.
 
+   > **Planner — accepted as recommended.** Phase 2 displays no-run uploads only, Phase 3 uses the
+   > full cache including ids that already back a run, and the picker returns to `S.currentId`
+   > after filling the input.
+
 **Fresh-PR hygiene.** Branch from current `origin/main` after these choices land. The two
 untracked Zoom export directories are user data exposed by the Phase 6 `*newChat*.txt` ignore
 gap; they do not belong in the Phase 2 PR, and exact-path staging remains mandatory.
+
+> **Planner — agreed, and the ignore line should land now rather than waiting for Phase 6.** One
+> line, and until it exists every broad `git add` in this repo can sweep two files of meeting
+> chat into a product PR. That is F22's exact shape, and F22 is why the `.vtt` rule exists.
+
+#### 3.6b Two things the review did not reach — Claude Code, 2026-08-21
+
+**(a) Finding 1 is one instance of a class, and the review stopped at the instance.** The class is
+*verified in a terminal, will run in a launchd agent*. `PATH` is the first member.
+**`--cookies-from-browser chrome` is the second, and it is the one that decides whether Phase 2
+works at all.** On macOS that flag decrypts Chrome's Safe Storage key out of the login Keychain;
+Keychain access is granted per binary, with a first-use prompt. Whether a background agent obtains
+that key is **unmeasured**, and every measurement in §3.6a was taken from a shell, which proves
+nothing about it — the same reasoning error that hid the `PATH` bug for three PRs.
+
+**Required before Phase 2 is implemented, and it is one command:** a refresh executed *by the
+reinstalled agent* rather than from a terminal, which must return `Oa0wqetkNcg`. Pass, and Phase 2
+proceeds as specced. Fail, and Phase 2 as written does not work in production, which is what (b)
+is for.
+
+**(b) Phase 3 should not hard-depend on Phase 2, and today it does.** §3.9 links a run by matching
+duration against the uploads cache. That makes the **368 MB — the actual prize of this whole
+task** — depend on an authenticated scrape that may not survive the agent, in service of avoiding
+one paste of an 11-character id.
+
+**Recommendation: invert the dependency.** Phase 3's primary door is a typed or pasted YouTube id;
+the cache, when present, ranks candidates and pre-fills. A dead cookie path then costs a
+convenience rather than the phase. This also removes the argument that put Phase 2 ahead of
+Phase 3 in §4, so it is **Brian's call, not the planner's** — he chose that order on 2026-08-21
+and the reason it was chosen still stands if the measurement in (a) passes.
+
+Confidence: **high** that the cookie path is the real risk and that (a) must run first; **moderate**
+on the resequencing, because it trades a settled plan for insurance against a failure nobody has
+observed yet.
 
 ### 3.7 Inventory and guarded cleanup
 
@@ -363,9 +446,21 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ planner, Phase 2 contract clarification.** Resolve §3.6a, then hand the uploads cache
-(§3.4-§3.6) back to the implementer as its own fresh reviewed PR. Merging requires Brian's
-explicit approval, per PR.
+**→ implementer, but not on Phase 2 yet.** §3.6a is resolved inline (planner, 2026-08-21); the
+five contracts are decided and §3.6b adds two the review did not reach. Order:
+
+1. **The `PATH` fix, as its own small PR.** In-app ingest is broken today on the launchd agent —
+   a live bug, not a Phase 2 prerequisite. §3.6a item 1.
+2. **Run the one measurement in §3.6b (a):** a refresh executed by the reinstalled agent, which
+   must return `Oa0wqetkNcg`. This gates Phase 2 and costs one command.
+3. **Then Phase 2** (§3.4-§3.6) as its own fresh reviewed PR, if step 2 passes.
+4. **Also land the one-line `.gitignore` rule** for Zoom's `*newChat*.txt` — it is a live hazard
+   on any broad `git add` and does not need to wait for Phase 6.
+
+**Waiting on Brian:** §3.6b (b), whether Phase 3 stops depending on the uploads cache. He chose
+the current order and it stands unless step 2 fails.
+
+Merging requires Brian's explicit approval, per PR.
 
 Phase 1 is done and merged at `62278d6`. Its review is `REVIEW.md` thread 10, closed. Two notes
 ride into **Phase 3**, not Phase 2: F32 (fold the resolved id back inside `run_warnings` while the
