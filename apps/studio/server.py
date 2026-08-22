@@ -19,13 +19,16 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import ingest
 import local
+import uploads
 
 APP_DIR = Path(__file__).resolve().parent
 RUNS_DIR = APP_DIR / "runs"
 UI_DIR = APP_DIR / "ui"
 LABELS_PATH = APP_DIR / "labels.jsonl"
 MEDIA_DIR = APP_DIR / "media"
+UPLOADS_PATH = APP_DIR / "uploads.json"
 PORT = 8765
+UPLOADS_CACHE = uploads.UploadCache(UPLOADS_PATH)
 
 # /media/ serves only bare filenames from MEDIA_DIR. No slashes and no "..",
 # so a symlinked gigabyte file inside the directory is reachable while nothing
@@ -829,6 +832,11 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/runs":
             self._json(200, list_runs())
             return
+        if path == "/api/uploads":
+            # Optional derived data: a missing or invalid cache is a successful
+            # empty response, and this read never invokes yt-dlp.
+            self._json(200, UPLOADS_CACHE.read_api())
+            return
         if path == "/api/run":
             run_id = (parse_qs(parsed.query).get("id") or [""])[0]
             run = load_run(run_id)
@@ -1022,6 +1030,7 @@ def main():
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     # Don't let a slow in-flight ingest thread block Ctrl-C shutdown.
     server.daemon_threads = True
+    UPLOADS_CACHE.start()
     print(f"clip studio → http://127.0.0.1:{PORT}")
     print(f"runs:    {RUNS_DIR}")
     print(f"labels:  {LABELS_PATH}")
