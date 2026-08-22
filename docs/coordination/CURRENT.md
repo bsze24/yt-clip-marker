@@ -420,3 +420,126 @@ Studio Python entry modules, `node --check` over every `apps/studio/ui/*.js`, an
 `git diff --check`. Browser half: real Studio run switching, four fallback runs, broken local-only
 symlink, restored local playback, and a clean normal-path console; the deliberate broken-media
 case logged its existing visible warning as expected.
+
+### 2026-08-21 17:05 — Claude Code, scoping Phase 6: the lesson inbox
+
+**Appended, not edited.** Codex holds this file for Phases 1-5 and PR 28 is open, so nothing
+above this line was touched. **This section is a phase spec sitting in the handoff notes because
+the safe place to write while someone else is mid-flight is the end of the file.** Fold it into
+§4 as Phase 6 when the baton is quiet.
+
+**What prompted it.** Brian dropped five new Zoom exports into `docs/reference/` on 2026-08-21 —
+`GMT20260404`, `GMT20260409`, `GMT20260415`, `GMT20260518`, `GMT20260602` — and none of them is
+visible to the studio. He asked for a staging folder the tool detects on its own, with this loop:
+
+```
+1. download Zoom lessons to a staging folder
+2. process them in the studio
+3. upload to YouTube with the clipper markings
+4. delete the lesson from staging
+```
+
+**Three of those four steps already exist.** Only step 1→2 is missing, and the missing part is
+discovery, not ingest.
+
+| Step | Where it already lives |
+| --- | --- |
+| 2 — process | `/api/ingest` already accepts a local path, not only a URL (`server.py:868` → `local.create_local_run`) |
+| 3 — upload with markings | `export.js` produces the `M:SS — label` block; markers are one-way app → YouTube ([[D-042]]) |
+| 4 — delete from staging | **Phase 4 of this task.** The guard is identical: refuse the delete unless the run has an effective YouTube id (§3.1, §3.7) |
+
+Step 4 must **not** be built twice. A staging-folder delete with its own guard is the same
+destructive endpoint with a second, unreviewed copy of the rule that protects 179 clips.
+
+#### 6.1 Where staging lives — outside the repo
+
+**Brian's call, 2026-08-21: outside the repo.** Default `~/lesson-inbox/`, overridable with
+`CLIP_STUDIO_INBOX`.
+
+The deciding argument is not tidiness. `docs/reference/**/*.mp4` is gitignored, and `git clean
+-xdf` deletes ignored files. There are now **2.4 GB** of Zoom exports under `docs/reference/`
+that exist nowhere else until the lesson is on YouTube — one routine clean and they are gone.
+Moving them out of the checkout removes that class of loss entirely. `media/` entries are
+symlinks with absolute targets, so nothing else in the codebase cares where the file sits.
+
+Migration is one `mv` per folder plus re-pointing the two existing symlinks; `resolve_run_media`
+recomputes on every read ([[D-034]]), so no run file changes.
+
+#### 6.2 The one new primitive
+
+A media file is **already ingested** when its realpath is the target of a `media/` entry named by
+some run's `media` field. Compare realpaths, never filenames — the existing pair already differ,
+because `stage_media` deduplicated the name:
+
+```
+media/GMT20260730-155336_Recording_640x360-1.mp4
+   -> docs/reference/GMT20260730/GMT20260730-155336_Recording_640x360.mp4
+                                                                 ^ no -1 at the target
+```
+
+`apps/studio/inbox.py`, stdlib, no server import:
+
+- `ingested_realpaths(runs_dir, media_dir)` → the set. Resolves each `media/` entry and each run's
+  `media` name. This is the same primitive Phase 4's inventory needs; **Phase 4 should consume it
+  rather than grow a second copy.**
+- `scan(inbox_dir, ingested)` → one candidate per lesson folder: `{path, title, size, hasTranscript}`.
+  Bounded depth, no network, no writes.
+
+**One candidate per folder, not three.** A Zoom export is `.mp4` + `.m4a` + `.transcript.vtt`.
+Offer the video; if a folder holds more than one, the largest. Offering the `.m4a` produces a
+second run for the same lesson, which is the duplicate-run problem §5 already calls out as
+destructive to untangle.
+
+**Sidecar matching already handles the new drops — verified, do not "fix" it.** The new files
+carry both a browser dedup suffix and a resolution suffix:
+
+```
+GMT20260404-201119_Recording_1920x1384 (1).mp4
+GMT20260404-201119_Recording.transcript (1).vtt
+```
+
+`stem_variants` (`local.py`) strips ` (1)` then `_1920x1384`, leaving
+`GMT20260404-201119_Recording`, which the transcript matches at a `.` boundary. These pair
+correctly and will ingest with cues.
+
+#### 6.3 Server and picker
+
+- `GET /api/inbox` returns `{items, root, scannedAt}`. **Synchronous is correct here**, and the
+  contrast with §3.5 is the point: the uploads cache must never touch the request path because it
+  shells out to yt-dlp over the network. A bounded directory scan is microseconds and has no
+  failure mode worth a cache. A missing or unreadable inbox returns an empty list, not an error.
+- The picker renders inbox candidates in their own option group, and **selecting one fills the
+  Add video control rather than starting an ingest** — the same low-surprise rule §3.6 already
+  sets for uploads. One interaction, not two.
+- No filesystem watcher. The runs list already polls; the scan rides that poll.
+
+#### 6.4 Acceptance
+
+1. Five folders in `~/lesson-inbox/`, zero runs. The picker offers exactly five candidates — the
+   `.mp4` of each, never the `.m4a`.
+2. Ingest one. It disappears from the candidate list on the next poll, with no restart, and its
+   run carries cues from the `.transcript (1).vtt`.
+3. Point `CLIP_STUDIO_INBOX` at a directory that does not exist. The studio opens at the same
+   speed, the group is absent, and the console is clean.
+4. A file already ingested through a *renamed* `media/` symlink is still recognised as ingested —
+   the realpath test, not the filename test.
+
+#### 6.5 Out of scope, and the dependency
+
+Deletion is Phase 4 and is not restated here. No auto-ingest — a scan proposes, Brian starts it.
+No transcode, no Zoom API, no watcher.
+
+**The loop only closes after Phases 3 and 4.** A freshly ingested Zoom lesson has no YouTube id,
+so nothing may be deleted from staging until it is linked (Phase 3, §3.9 matches by duration) and
+the guarded delete exists (Phase 4). Phase 6 delivers steps 1-2; steps 3-4 are already on the
+board.
+
+#### 6.6 Two things flagged rather than changed
+
+- **§1's numbers are stale.** It justifies the task with 1.1 GB. Measured 2026-08-21 17:00:
+  2.4 GB under `docs/reference/` plus 783 MB in `media/`, and the five new lessons have no runs,
+  so they appear in none of the Phase 4 inventory §3.7 describes. The design holds; the table
+  does not. Left alone because Codex is mid-flight on this file.
+- **`.gitignore` misses the Zoom chat files.** `GMT20260404-201119_RecordingnewChat (1).txt` and
+  its `GMT20260602` twin are untracked, so two export folders show as `??`. That is F22 exactly —
+  the reason the `.vtt` rule was added. One line: `docs/reference/**/*newChat*.txt`.
