@@ -1,9 +1,10 @@
 # Current task
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
-uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer — PR A (draft PR 31, `8eab5e7`) reviewed clean 2026-08-22. No blocking
-findings; F40 and four small ones to fold in. See §6, `REVIEW.md` thread 14.**
+uploads list loads itself, and the lesson is renamed in exactly one place.** Build baton:
+**→ planner — PR A merged at `754aa48` on 2026-08-22 after Brian's explicit approval. Phase 4 is
+next. `REVIEW.md` thread 14's optional follow-up is addressed at `5f99530`; its bookkeeping
+baton is with the reviewer.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -23,6 +24,11 @@ finding (F32, folded into Phase 3). Tests are now 24/24: `test_sidecars.py` 15/1
 restarted Studio reads all 56 cached uploads including the private canary; its uploads suite is
 11/11. Review findings F38 and F39 are deferred as TD-17 and TD-18 because they can only shrink
 derived, refetchable cache data temporarily; neither touches runs, labels, clips or media.
+
+**Phase 3 is merged.** PR 31 landed at `754aa48` on 2026-08-22 after Claude's review found no
+blocking issue and Brian explicitly approved the follow-up and merge. F40 and F42-F45 are
+addressed at `5f99530`; F41 corrected this document's counts, and F46 remains assigned to PR E.
+The suite is 45/45.
 
 **A running studio does not pick this up until it restarts.** The launchd agent on `:8765` serves
 whatever code it started with, so `/api/run` keeps omitting `youtubeId` until then. Review-only PR #23 was closed rather than
@@ -1065,3 +1071,35 @@ return the right value".
 which double-counts every clip whose label was edited — 179 against 75 real clips. The numbers
 that justify a task get quoted for weeks without anyone re-deriving them; this one had been
 quoted in three places. Any count taken off an append-only log has to be folded first ([[D-008]]).
+
+### 2026-08-22 — Codex, PR A review follow-up (`5f99530`) and merge (`754aa48`)
+
+**Acceptance criteria, one at a time.** F40 is addressed by exposing the immutable `runTitle`
+beside the joined display title and disambiguating rows that resolve to the same YouTube id
+(`apps/studio/server.py:list_runs`, `apps/studio/ui/runs.js:renderRunSelect`). On a disposable
+copy of the full store, linking the 75-clip GMT run produced two distinct adjacent picker labels.
+F42 prefixes `https://` for a scheme-less input while retaining the YouTube host allowlist;
+F43 writes the canonical id back after a successful save; the isolated browser accepted
+`youtube.com/watch?v=Oa0wqetkNcg` and showed `Oa0wqetkNcg` afterwards. F44 guards both candidate
+rebuilds and metadata repaints on actual data changes; all 56 candidates remained available and
+focused typing survived the four-second poll. F45 passes the loaded run into `append_link` and
+stamps `videoId`, `videoUrl`, and `videoTitle`, pinned by the event-shape regression.
+
+**Assumptions.** Duplicate rows prefer the immutable run title as Claude recommended; when it is
+identical to the joined title, the run id is the disambiguator so two rows can never collapse
+back to the same label. Upload-list equality is the normalized API rows' JSON equality: the list
+is small (56 today), and a title, duration, id or order change all correctly trigger a rebuild.
+F41's correction is accepted: the earlier implementation note's word “stale” was wrong; the old
+figure was computed from events without folding latest-per-start.
+
+**Skips and divergences.** F46 is untouched and remains assigned to PR E because it is PR 30's
+read-side contract. No live run, label log, media file, uploads cache or YouTube account was
+mutated; link acceptance used a temporary full-store copy. No second reviewer round was awaited:
+Claude's verdict had zero blocking findings, optional items do not hold the merge baton, and
+Brian explicitly said to knock out the follow-up and merge.
+
+**Verification.** Full stdlib suite 45/45; `py_compile` for `server.py` and `uploads.py`;
+`node --check` for `ui/runs.js`; `git diff --check`; isolated browser acceptance on `:8801` for
+F40/F42-F44; the appended disposable `link` line carried all three identity fields. Cursor
+Bugbot completed with `skipping` before merge. PR 31 merged at `754aa48`. **Build baton: → planner
+for Phase 4. Review bookkeeping baton: → reviewer for thread 14's addressed optional findings.**

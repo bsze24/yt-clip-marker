@@ -1,6 +1,8 @@
 # Review
 
-Active target: **thread 14** (PR 31, `8eab5e7`) — reviewed 2026-08-22, no blocking findings, baton with the implementer. **Thread 11** stays open for F36/F37. Thread 13 closed after PR 30 merged at `9622365`; its non-blocking
+Active target: **thread 14** (PR 31, `8eab5e7` → `5f99530`) — reviewed with no blocking
+findings, follow-up addressed, and merged at `754aa48` on Brian's explicit approval; baton with
+the reviewer for disposition. **Thread 11** stays open for F36/F37. Thread 13 closed after PR 30 merged at `9622365`; its non-blocking
 F38 and F39 are deferred as TD-17 and TD-18. Thread 11's F35 is **resolved** — PR 29 merged at
 `255739f` on 2026-08-22 — while the two non-blocking findings it recommended folding in,
 **F36 and F37, remain open against `main`**. Thread 10 closed
@@ -63,16 +65,19 @@ day behind a thread heading that read CLOSED.
 | 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **OPEN** — reviewed clean, merged `255739f`; F35 resolved, **F36/F37 open against `main`** | implementer |
 | 12 — eval star predictability | `d8b21f1` (PR 27) | **UNREVIEWED** — merged `2026-08-21` with no thread. Author was the only reader. | — |
 | 13 — background uploads cache | `e13e3e6` (PR 30) | **CLOSED** 2026-08-22 — merged `9622365`; F38/F39 deferred → TD-17/TD-18 | — |
-| 14 — link event + title join | `8eab5e7` (PR 31) | **OPEN** 2026-08-22 — no blocking findings; F40-F46 filed, F41 applied | implementer |
+| 14 — link event + title join | `8eab5e7` → `5f99530` (PR 31) | **OPEN** — no blockers; merged `754aa48`; F40/F42-F45 addressed, F41 applied, F46 deferred to PR E | reviewer |
 
 ---
 
-## Thread 14 — the link event and the title join (`8eab5e7`, PR 31) — OPEN (no blocking findings)
+## Thread 14 — the link event and the title join (`8eab5e7` → `5f99530`, PR 31) — OPEN (no blocking findings; merged `754aa48`)
 
 **Target.** One code commit, `8eab5e7`, draft PR 31 on `codex/pr-a-link-title`; verify with
 `git merge-base --is-ancestor 8eab5e7 origin/codex/pr-a-link-title`. Scope is `CURRENT.md` §3.1
 rule 1, §3.2, §3.8 and §3.9, plus the assigned debt `TD-17` / `TD-18` and the deferred `F32` /
 `F34`. Inventory, guarded delete and the lesson inbox are out of scope and untouched.
+
+**Follow-up target.** The implementer response is `5f99530`, verified on the PR branch before
+merge; GitHub merged it as `754aa48`.
 
 **Verdict: no blocking findings.** Seven findings follow. **One would bite Brian the first time
 he performs §4's Phase 3 acceptance** (F40); one corrects the numbers that acceptance is checked
@@ -112,7 +117,7 @@ treated as partial the cache merges forever, so if Brian ever really does delete
 uploads, the stale rows stay in the picker until `uploads.json` is deleted by hand. The stderr
 line is the only signal, and it does not say that.
 
-### F40 — the title join makes the two duplicate runs byte-identical in the picker — non-blocking · **would bite you** · open
+### F40 — the title join makes the two duplicate runs byte-identical in the picker — non-blocking · **would bite you** · addressed `5f99530`
 
 Measured on the real store, not constructed. Today the picker distinguishes the Zoom run from its
 YouTube twin by their titles:
@@ -138,6 +143,13 @@ that differs — the run's own immutable title, its `source`, or its ingest date
 preference is the immutable title in parentheses, because that is the string Brian has been
 reading for a week.
 
+**Implementer response — addressed at `5f99530`.** `/api/runs` now exposes the immutable
+`runTitle`; `renderRunSelect` counts rows by resolved `youtubeId` and appends that title when a
+duplicate exists, falling back to the run id only when the joined and immutable titles are the
+same. On a disposable copy of the full store after linking the GMT run, the adjacent labels were
+distinct: the download carried `(Oa0wqetkNcg-20260819-0858)` and the Zoom run kept
+`(GMT20260730-155336_Recording_640x360 (1))`.
+
 ### F41 — §1's clip counts were event counts, not clips — non-blocking · **applied** 2026-08-22
 
 `CURRENT.md` §1 said the two GMT runs hold 179 and 87 clips, "266 between them", and §4's Phase 3
@@ -155,7 +167,7 @@ matters because the same method would misreport any future count. Corrected in `
 and §4 with the measurement recorded inline. No code implication — the API and the app have
 always shown the folded number.
 
-### F42 — a scheme-less YouTube URL is refused — non-blocking · open
+### F42 — a scheme-less YouTube URL is refused — non-blocking · addressed `5f99530`
 
 `youtubeIdFromInput` (`runs.js:75`) hands the raw string to `new URL`, which throws without a
 scheme, so `youtube.com/watch?v=Oa0wqetkNcg` returns "invalid YouTube id or URL". Reproduced in
@@ -164,7 +176,11 @@ pasted by hand, so this is the input most likely to arrive without `https://`. F
 `new URL(value, "https://")`, or prefixing when there is no `://`; the host allowlist still
 rejects everything else, so nothing new is admitted.
 
-### F43 — a saved link keeps the raw URL in the field — non-blocking · open
+**Implementer response — addressed at `5f99530`.** `youtubeIdFromInput` prefixes `https://`
+only when the value has no scheme, then applies the existing YouTube-host allowlist. Browser
+acceptance saved `youtube.com/watch?v=Oa0wqetkNcg` successfully against the isolated store.
+
+### F43 — a saved link keeps the raw URL in the field — non-blocking · addressed `5f99530`
 
 `syncLinkControl` refuses to overwrite the input while it has focus, which is right for the poll
 and wrong for the save that just succeeded: paste a watch URL, press Save, and the field still
@@ -172,7 +188,11 @@ reads `https://www.youtube.com/watch?v=…` while the stored value is the 11-cha
 Reproduced in the browser. `saveYoutubeLink` should set the field to the canonical id it just
 wrote, focus or not.
 
-### F44 — the candidate list is rebuilt on every four-second poll — non-blocking · open
+**Implementer response — addressed at `5f99530`.** After `/api/link` succeeds,
+`saveYoutubeLink` writes the canonical id directly to the control before reopening the run.
+The same browser pass observed `Oa0wqetkNcg` in the field after the scheme-less URL save.
+
+### F44 — the candidate list is rebuilt on every four-second poll — non-blocking · addressed `5f99530`
 
 `refreshRuns` calls `renderLinkCandidates()` unconditionally, so all 56 `<option>` nodes are
 replaced every poll whether or not the cache changed — measured at 5 rebuilds in 13 seconds with
@@ -180,7 +200,11 @@ the field focused. Nothing breaks: the typed text and the focus both survive, ve
 on the uploads list actually having changed, the same way the title repaint should be guarded
 (`refreshRuns` also repaints `#meta` every poll for an unchanged title).
 
-### F45 — a `link` event carries no video identity — non-blocking · open
+**Implementer response — addressed at `5f99530`.** `refreshRuns` now rebuilds candidates only
+when the upload rows change and repaints metadata only when the resolved title changes. With all
+56 candidates loaded, typed text and focus remained intact across a poll interval.
+
+### F45 — a `link` event carries no video identity — non-blocking · addressed `5f99530`
 
 Every other writer stamps `videoId` / `videoUrl` / `videoTitle` from the run; `append_link` does
 not, because it is the one appender that never receives `run`. `README.md` claims each line is a
@@ -188,7 +212,12 @@ standalone example, and a `link` line is the one line where knowing *which lesso
 what* is the entire content. The handler already has `run` loaded two lines up. Costs nothing
 today — no reader needs it — and costs a forensic pass later if the log is ever audited by hand.
 
-### F46 — `authenticated` is written but never read — non-blocking · open · **not this PR's code**
+**Implementer response — addressed at `5f99530`.** `append_link` now receives the loaded run and
+stamps `videoId`, `videoUrl`, and `videoTitle`; the event-shape regression asserts all three.
+The isolated full-store write produced one self-contained event while leaving the live ledger
+untouched.
+
+### F46 — `authenticated` is written but never read — non-blocking · deferred to PR E · **not this PR's code**
 
 §3.5 justifies the flag with "so §3.9 never mistakes a two-item public list for the whole
 channel", but nothing reads it: `api_payload` omits it from `/api/uploads`, no UI module mentions
@@ -197,7 +226,15 @@ protection the contract describes does not exist on the read side. Landed in PR 
 because PR A is the PR that opens `uploads.py`. Either expose it and let the picker say the list
 is public-only, or drop the clause from §3.5 — but the two should not disagree.
 
-**Baton: implementer.** No merge without Brian's explicit approval.
+**Implementer response — deferred.** No PR A change: the finding is against PR 30's read-side
+contract and the routing table above assigns it to PR E.
+
+**Merge record.** Brian explicitly approved the follow-up and merge on 2026-08-22. Automated
+checks were 45/45 plus syntax/compile checks; isolated browser acceptance covered F40/F42-F44,
+and the disposable event covered F45. PR 31 merged at `754aa48`.
+
+**Baton: reviewer.** Re-review the addressed optional findings at `5f99530` and close the thread;
+no blocking finding held the merge.
 
 ---
 
