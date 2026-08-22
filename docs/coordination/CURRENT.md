@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer — run the one measurement that gates Phase 2. See §6.**
+**→ implementer — Phase 2 is built and verified; record its SHA and open the fresh PR. See §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -348,23 +348,21 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer, for the measurement in step 1.** Codex's readiness review is resolved (planner,
-2026-08-21) and the `PATH` fix is merged, but Phase 2 is still gated.
+**→ implementer, to record Phase 2's SHA and open its fresh PR.** Codex's readiness review is
+resolved (planner, 2026-08-21), the `PATH` fix is merged, and the production cookie gate passed.
 
 **Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
 merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
 optional and belong in whichever PR next opens `apps/studio/studio`.
 
-1. **Run the one measurement F35 names:** a refresh executed by the reinstalled agent, which must
-   return `Oa0wqetkNcg`. This gates Phase 2 and costs one command. `--cookies-from-browser` is
-   the second member of F35's class and is the only unmeasured thing Phase 2 rests on.
-2. **Then Phase 2** (§3.4-§3.6) as its own fresh reviewed PR, if step 1 passes.
-3. **Also land the one-line `.gitignore` rule** for Zoom's `*newChat*.txt` — it is a live hazard
-   on any broad `git add` and does not need to wait for Phase 6.
+1. **Done — production cookie measurement.** A one-shot launchd job using the reinstalled
+   agent's PATH returned 56 unique uploads, no stderr, and the private canary `Oa0wqetkNcg`.
+2. **Built and verified — Phase 2** (§3.4-§3.6), awaiting its SHA and fresh reviewed PR.
+3. **Built with it — the one-line `.gitignore` rule** for Zoom's `*newChat*.txt`, the live
+   broad-`git add` hazard carried from the readiness review.
 
-**Waiting on Brian:** whether Phases 2 and 3 swap order. Low confidence that it is needed — §3.9
-already carries a typed-id door — so the current order stands unless step 2 fails. The argument is
-in the handoff note, 2026-08-21, "Codex readiness review of Phase 2".
+The Phase 2 gate passed, so the current Phase 2 → Phase 3 order stands. The typed-id door in §3.9
+still keeps Phase 3 usable when the optional cache is absent.
 
 Merging requires Brian's explicit approval, per PR.
 
@@ -808,3 +806,44 @@ case was inspected rather than tested by uninstalling the user's working yt-dlp.
 **Verification.** `bash -n apps/studio/studio`; existing Python suites 24/24; `plutil -lint` on
 the generated plist; normal and minimal-PATH live installs; live agent environment inspection;
 live invalid-video ingest through the agent; and `git diff --check`.
+
+### 2026-08-21 — Codex, Phase 2 pre-SHA audit
+
+The gate passed before implementation: a one-shot launchd-managed refresh ran with the merged
+agent PATH and Chrome cookies, returned 56 unique uploads with no stderr, and included the private
+canary `Oa0wqetkNcg`. This is the background-process measurement the shell-only spike did not
+provide.
+
+**Acceptance criteria, one at a time.** With a cold cache, the live launchd Studio restarted in
+0.35s, `/api/runs` answered in 0.05s, and `/api/uploads` immediately returned the specified empty
+HTTP-200 shape; the background worker then wrote 56 items, `authenticated: true`, through
+`uploads.py`'s temp-file + `os.replace` path. In Chrome, the picker held 7 runs in `Runs` and 51
+uploads without a resolved run in `YouTube uploads · cached just now`. Choosing `scGgrMLqax4`
+filled the Add video field with its watch URL, focused that field, restored the picker to the
+current GMT run, left the run count at 7, and stayed unchanged after the four-second poll — no
+automatic ingest. For the offline half, an isolated Studio on `:8799` used the real cache and a
+deliberately nonexistent yt-dlp: the refresh failed once in the background, both read endpoints
+still answered in 0.05s or less, the picker showed the same 7/51 groups with `cached 1m ago`, save
+state stayed `saved`, and browser diagnostics were empty. The test tabs and temporary server were
+closed, and the live form was cleared afterwards.
+
+**Assumptions.** `authenticated` is persisted in the cache for Phase 3 but omitted from the Phase
+2 API because the accepted read shape exposes only channel, items, timestamp and age. A refresh
+carrying the private canary is authoritative and may prune; any other valid refresh updates and
+adds by id but retains absent cached rows. Upload selection fills a canonical watch URL, not the
+bare id, because the existing field is explicitly the Add video door. An upload "has a run" when
+`/api/runs` exposes the same resolved `youtubeId`; synthetic local ids are deliberately not
+treated as YouTube identity.
+
+**Skips and divergences.** No YouTube Data API, OAuth, write-back, link event, duration matching,
+inventory/delete, or title join — those remain later phases. The Zoom `*newChat*.txt` ignore rule
+rides here because §6 explicitly says to land it now; no raw lesson files are staged. F36/F37 do
+not ride here because this phase does not open `apps/studio/studio`, which their review names as
+the trigger. No network interface was disabled system-wide; the offline acceptance instead made
+the refresh executable unavailable to an isolated server, exercising the exact failure boundary
+without disrupting the user's machine.
+
+**Verification.** New uploads suite 11/11; sidecars 15/15; YouTube fallback 9/9; `py_compile` for
+`uploads.py` and `server.py`; real launchd cold fill with 56 items and canary; browser picker and
+poll interaction; isolated cached/offline startup and clean browser diagnostics; `git diff
+--check`. Total automated tests: 35/35.
