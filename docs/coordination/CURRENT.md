@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ reviewer — Phase 2 is draft PR 30 at `e13e3e6`. See §6 and `REVIEW.md` thread 13.**
+**→ Brian — PR 30 reviewed, no blocking findings. The merge call is yours. See §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -348,8 +348,10 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ reviewer, for Phase 2 draft PR 30 at `e13e3e6`.** Codex's readiness review is resolved
-(planner, 2026-08-21), the `PATH` fix is merged, and the production cookie gate passed.
+**→ Brian, for the merge call on PR 30.** Codex's readiness review is resolved (planner,
+2026-08-21), the `PATH` fix is merged, the production cookie gate passed, and Phase 2 is
+**reviewed clean** (2026-08-22) with two non-blocking findings — **F38** and **F39**, `REVIEW.md`
+thread 13. F39 is a hole in the planner's own §3.5 5a, not in the implementation.
 
 **Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
 merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
@@ -357,7 +359,7 @@ optional and belong in whichever PR next opens `apps/studio/studio`.
 
 1. **Done — production cookie measurement.** A one-shot launchd job using the reinstalled
    agent's PATH returned 56 unique uploads, no stderr, and the private canary `Oa0wqetkNcg`.
-2. **Built and verified — Phase 2** (§3.4-§3.6), draft PR 30 at `e13e3e6`; no merge.
+2. **Built, verified and reviewed — Phase 2** (§3.4-§3.6), draft PR 30 at `e13e3e6`; no merge.
 3. **Built with it — the one-line `.gitignore` rule** for Zoom's `*newChat*.txt`, the live
    broad-`git add` hazard carried from the readiness review.
 

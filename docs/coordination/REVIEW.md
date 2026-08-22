@@ -1,6 +1,8 @@
 # Review
 
-Active target: **thread 13**, Phase 2 draft PR 30 at `e13e3e6`. Thread 11's F35 is **resolved** —
+Active target: **thread 13**, Phase 2 draft PR 30 at `e13e3e6` — **reviewed 2026-08-22, no
+blocking findings**; two non-blocking, F38 and F39, and F39 is a hole in the planner's own
+§3.5 5a rather than in the implementation. Thread 11's F35 is **resolved** —
 PR 29 merged at `255739f` on 2026-08-22 — while the two non-blocking findings it recommended
 folding in, **F36 and F37, remain open against `main`**. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
@@ -43,7 +45,7 @@ and `BACKLOG.md`.
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
 | 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **OPEN** — reviewed clean, merged `255739f`; F35 resolved, **F36/F37 open against `main`** | implementer |
 | 12 — eval star predictability | `d8b21f1` (PR 27) | **UNREVIEWED** — merged `2026-08-21` with no thread. Author was the only reader. | — |
-| 13 — background uploads cache | `e13e3e6` (draft PR 30) | **UNREVIEWED** — implementation audit complete | reviewer |
+| 13 — background uploads cache | `e13e3e6` (draft PR 30) | **REVIEWED** 2026-08-22 — no blocking findings; F38, F39 non-blocking | Brian, merge call |
 
 ---
 
@@ -792,7 +794,7 @@ and F34 into Phase 3 rather than giving three lines their own PR.
 
 ---
 
-## Thread 13 — background uploads cache (`e13e3e6`, draft PR 30) — UNREVIEWED
+## Thread 13 — background uploads cache (`e13e3e6`, draft PR 30) — REVIEWED 2026-08-22
 
 **Target.** One code commit on current `main`; verify with
 `git merge-base --is-ancestor e13e3e6 HEAD`. Scope is `CURRENT.md` §3.4-§3.6 and the explicitly
@@ -833,3 +835,108 @@ behaviour in the studio — and a wrong number there is checkable by re-running 
 **What would justify opening it:** if [[D-044]] is ever load-bearing for a decision bigger than
 "do not build rung 4" — for instance if it is cited to justify deleting collected labels — the
 arithmetic deserves a second reader first. Flagged, not scheduled.
+
+---
+
+## Reviewer round — 2026-08-22 (Claude Code), thread 13 / PR 30 / `e13e3e6`
+
+**Verdict: no blocking findings.** Every contract §3.4-§3.6 asks for is implemented as written,
+including the four the planner added on 2026-08-21. The gate that blocked this phase was
+satisfied with the right kind of measurement — a one-shot launchd job carrying the merged agent
+PATH, returning 56 uploads and the canary — rather than another shell spike. That was the entire
+point of the gate and it was honoured instead of worked around.
+
+**What I verified myself, and what I took from the audit.** Verified here: 35/35 tests pass on
+the branch (`test_sidecars` 15, `test_youtube_fallback` 9, `test_uploads` 11); the request path
+contains no subprocess call; `/api/runs` exposes `youtubeId`, which is what the picker's run
+matching depends on; upload titles reach the DOM through `escapeHtml`, so a YouTube title
+containing markup cannot inject; and three edge behaviours the tests do not cover, probed
+directly. Taken from the audit rather than re-run: the in-browser picker pass and the live cookie
+gate — both described concretely enough to trust, and re-running them would mean driving Brian's
+live Studio.
+
+### Contract conformance
+
+| Contract | Status |
+| --- | --- |
+| §3.4 one JSON object per line, no pipe delimiter | done, and a test pins a title containing a pipe |
+| §3.5 5a merge, never remove; prune only on the canary | `merge_items`, exactly as specced |
+| §3.5 5b reuse `ingest.SUBPROCESS_TIMEOUT` | done, asserted by a test rather than assumed |
+| §3.5 8 read contract, HTTP 200 empty shape, clamped age | done; the skew clamp returns 0 on a future `fetchedAt` |
+| §3.6 no-run uploads only, restore to `S.currentId` | done, via `chooseRunOrUpload` |
+| §3.10 fake-executable fixtures | `test_uploads.py`, 11 cases |
+
+Two things beyond the contract, both welcome: the `.gitignore` rule for Zoom's `*newChat*.txt`
+pending since the readiness review, and a README section that explains *why* the endpoint answers
+200 with nothing rather than just stating that it does.
+
+### F38 — one malformed row discards the whole cache, and the next refresh then deletes the good rows — non-blocking · open
+
+`_validated_cache` is all-or-nothing: it re-normalizes every item and returns `None` if any single
+one fails. That is right for the API. But `refresh` decides what to merge against using the same
+reader:
+
+```python
+previous = read_cache(self.path)
+items, authenticated = merge_items(previous["items"] if previous else [], fetched)
+```
+
+So one bad row turns "keep the cache" into "lose the cache". Probed on the branch rather than
+argued:
+
+```
+cache: 5 valid rows + 1 row with an invalid video id
+  read_cache()                      -> None (whole cache discarded)
+  /api/uploads items                -> 0
+  then one unauthenticated refresh  -> 1 item; the 5 good rows are GONE
+```
+
+That is the outcome §3.5 5a exists to prevent, reached through validation instead of through
+merging. The realistic trigger is not disk corruption — only `write_cache_atomic` writes this
+file — it is a **schema change**: `_validated_cache` requires `authenticated` to be a bool, so a
+cache written by a future Studio that renames or drops that key is discarded whole.
+
+**Severity is genuinely low**, worth saying plainly rather than inflating: the cache is derived
+and refetchable, so the cost is one 30-minute window with a short list, and the next authenticated
+refresh heals it completely. **Fix, two lines:** drop invalid rows and keep valid ones; discard
+wholesale only when the envelope — channel, `fetchedAt` — is unusable.
+
+### F39 — an authenticated but truncated refresh still prunes silently — non-blocking · open
+
+`merge_items` returns `list(fetched)` whenever the canary is present. The canary proves the
+*login* worked. It does not prove the *listing was complete*. Probed:
+
+```
+previous 10 rows (canary among them) → fetched 1 row (the canary) → kept 1, authenticated=True
+```
+
+Nine rows deleted, no signal. **PR 30 behaves exactly as §3.5 5a specifies**, so this is a finding
+against the contract the planner wrote on 2026-08-21, not against this implementation. The canary
+rule was built to stop an *unauthenticated* shrink and does that well; it says nothing about a
+truncated authenticated one.
+
+**Fix, in the same function:** prune only when the fetch is not a drastic shrink — merge and log
+instead when `len(fetched)` falls below, say, half of `len(previous)`. A real deletion moves the
+count by one or two; a truncated page moves it by an order of magnitude, and the two are easy to
+separate.
+
+**Noted rather than filed: canary rot.** `CANARY_ID` is the hardcoded `Oa0wqetkNcg`. Delete that
+video or flip it to private and every future refresh is classified unauthenticated, pruning
+switches off permanently, and nothing says so — the cache simply stops shrinking. Cheap insurance
+if F39 is addressed anyway: treat any id already in the cache and known unlisted as a canary,
+rather than one constant.
+
+### Not findings, recorded so nobody re-raises them
+
+- `/api/uploads` re-reads and re-validates 56 items on every four-second poll. Same family as
+  F34's fourteen `labels.jsonl` parses per poll, and at this size not worth a line of code.
+- `fetch_uploads`'s dedup loop is convoluted — append, then index, with a `continue` in the
+  middle — but correct: last occurrence wins, original order preserved.
+- The refresh decrypts Chrome cookies every 30 minutes from a login-time daemon, forever. That is
+  what was asked for and the README says so. If the Keychain ACL is ever reset the worker blocks
+  on an invisible prompt until `SUBPROCESS_TIMEOUT`, then retains the cache and logs once — which
+  is the correct failure.
+
+**Baton: Brian, for the merge call.** F38 and F39 are both small and both live in a file this PR
+already touches, so folding them in costs a handful of lines. Merging as-is is also defensible:
+neither can lose anything a refresh will not rebuild.
