@@ -1,7 +1,7 @@
 ---
 date: 2026-08-16
 time: "15:07"
-revised: 2026-08-17 17:45
+revised: 2026-08-22 07:10 UTC
 surface: grok
 project: yt-clip-marker
 track: studio-workspace
@@ -75,49 +75,51 @@ Started as a first `/yt-clipper` run on a real lesson; the eval harness built to
 - None blocking annotation; eval leftover list is empty. Ledger: 64 skill markers (`g` 23 · `x` 24 · keep 14 · note 3 · blank 0), 21 live added markers, 24 extracted. (First log’s “14 blanks” were taxonomy-without-`g` keeps.)
 
 ## Chronology (the record)
-- Fri 12:09–12:30 (door into the run, same sitting): captions have start not end; `yt-dlp` PATH vs Homebrew vs `python3 -m` — the fetch the skill needs.
-- Fri 12:35: first `/yt-clipper` on `https://www.youtube.com/watch?v=YYW4Q1Nivg8`. Run stamp `YYW4Q1Nivg8-20260814-1248` (~12:48): 64 markers, 1464 cues, 27 gaps.
-- Fri 12:42: 1:20 and 2:37 look arbitrary mid-playing. “Sniffing like an eval surface might help.” 12:44: where is the actual runbook?
-- Fri 12:48: spin up a **quick eval web dashboard**; rationale field as close as possible to the runbook rule; goal 5 videos in a few hours. Flow: run skill → table (start, description, rationale, feedback) → `check` = good marker.
-- Fri 12:51: store eval feedback durably “in case we want to turn this eval into a real part of the product.” → `eval/labels.jsonl`.
-- Fri 13:03–13:05: `>>> GAP` is the fetch script, not a caption. **Add caption segments + timestamps in the dashboard** so captions + playbook rules + markers are inline (the 0:22 / GAP@1:20 “Heat. Heat.” sketch).
-- Fri 13:09–13:11: formatting; keep YouTube native keys (←/→ seek).
-- Fri 13:12–13:24: how to mark a *missed* clip from the transcript? Enter on caption → add-clip; refresh the marker panel.
-- Fri 13:30: “Honestly could see this replacing large swaths of the actual tool.” Editable description; **keep the skill’s original label** for another eval loop.
-- Fri 13:36: extracted-marker / description column as eval against manual tagging; **3-way time-aligned grid** (captions / skill markers / description stamps).
-- Fri 13:48–14:08: video on top; `j`/`k`/Enter; extracted-row visual; layout toggle (`f` then); apply-clip key; delete for adds; extracted-inserted rows highlighted only when they add a row (overlap with a caption = no extra treatment).
-- Fri 14:10–14:20: checkbox that spawned a second add-clip on an already-clipped caption → kill the checkbox; freeform feedback; positive feedback on generated markers too.
-- Fri 14:20: click timestamp steals keys; iframe focus (`keepKeysOnPage` later).
-- Fri 14:29–14:53: TAKE/CONCEPT independent of the clip. Taxonomy: tags (take, fingering, technique, star) + work (song|rendition) + lane (transcription, …). Chapter ≠ concept. Autocomplete; Tab+t/w/l; field order Work, Lane, Tags; Enter on existing → edit label. `kind` becomes legacy.
-- Fri 14:58: `j` stuck on 3:19 — two rows share a start; selection must be **row identity**, not start time.
-- Fri 15:43: “easiest path for Fable to audit/refactor.” Grok: the eval dashboard *is* the app; promote it; don’t wrap in Next or fold into the extension.
-- Fri 16:40: **product breakthrough in your words** — “this might actually end up being the better surface for what I imagined yt-clipper to be (chrome extension in yt)… viewing surface (youtube) and annotating surface (this dashboard) might be 2 separate things.”
-- Fri 16:44: media-scraper is a **separate repo**, downstream JSON export only. Skill vs in-app scrape still open. Ask for a split to-do.
-- Fri 16:50: wrap chronology + findings as a **suggested path** for Claude → `docs/two-surface-handoff.md`.
-- Fri 16:54 **this thread (Fable):** execute handoff Steps A–D (PRD, tree, freeze extension, promote `eval/` → `apps/studio/`).
-- Fri 17:16: port from Grok to Fable for production — audit / red-team / harden, not a from-scratch rebuild. `eval/` is a husk.
-- Fri 17:32–17:39: Fable extra-high overbaked for UX nits? Yes for chrome; no for keyboard/focus/state. **Yes: split the 1500-line inline script** → `ui/keys.js` one dispatcher, `ui/state.js` `S`, modules.
-- Sat 15:48: Shift+j/k between populated marker rows; “skill” → feel “marker” is better (terminology lands Sunday).
-- Sat 16:48–17:08: Esc out of tag field; `x` on tag chip; tab work→lane in composer.
-- Sun 11:18 (Grok again, same composer): follow; inherit work/lane; Enter expands marker fields and submits.
-- Sun 11:23–11:38: how to say “perfect skill marker”? Talk through tags vs fields. `g` = write `check` under the hood (few-shot), **not** a tag and **not** `star` (personal bookmark). `c`/chapter deprecated. Grid `s` / `g` / `x`. Visual eval chip.
-- Sun 11:40–11:54: selected row centered; timeline ticks; star migration + visual; qualitative why on remove (“Heat heat” hallucinated caption); 0:00 as chapter not clip; YouTube chapters as a maybe; rogue tags on Tab; restore selection on refresh.
-- Sun 11:59: Tab+w → why on existing markers.
-- Sun 12:27–12:31: follow vs pin — follow on while watching fights editing (row runs away). Toggle; layout hotkey moves off `f`.
-- Sun 12:39 then 12:58: pause-on-j reversed — browse keeps playing; **edit mode pauses**.
-- Sun 12:43–12:54: filler captions (yeah/okay/right) are noise, not an AssemblyAI problem. Hide/skip backchannels; editable skip-word list; `h` toggle + mode chrome.
-- Sun 13:15–13:41: `x` not delete as the reject/delete key; tags column between marker and work; `<`/`>` playback rate; follow-on `j`/`k` origin = playhead row then pin.
-- Sun 14:04: first full marker-eval + clipping pass done. Ask: (1) do the annotations make a comprehensible eval stream? (2) copy timestamps back to YouTube description — never drop manuals; label matches manual where present.
-- Sun 14:10–14:21: copy-timestamps metadata; over 5000 chars → work as section header; first section needs “Pennies from Heaven | Stan Getz”; `0:00 Start` under first header; `***` for star.
-- Sun 14:22–14:24: taxonomy-without-`g` is an unlabeled **keep**, not a skip. Is `g` worth it vs just taxonomy? Yes: `g` is a note to future-you (few-shot exemplar); `star` is for you.
-- Sun 14:28–14:36: cross-ref notes; sloppy ones rewritten; 29:09 not a grid row (caption-only) — note lives on 29:23.
-- Sun 14:40–14:54: 1:18:50/52/54 confusion. Store: no clip at 50; marker[53] at 52 `g`; add at 54. Time column had snapped. Terminology: “skill marker” → “marker.” Align fix: `takeExact` then `takeNear`. Leftover adds: **delete** (`unmiss`), not `x`-as-verdict; `x` key on ADDED CLIP already deletes.
-- Sun 14:58–15:04: 35:53/`x` (still hunting) + 36:39 keep; 0:22 unmiss; 38:55 `x` (chapter change). Aside: do not train only on `x` — `g` is few-shot. 20:46/`g` ballpark + 21:18 perfect; sequential-numbers = fingering, last-mention stripped; 29:23/`g` names 29:09, no add created.
-- Sun 15:06–15:15: session-log skill import (symlink); first `/session-log` write (this file, then mis-leveled). Folded ledger asked so Claude can reverse-engineer skill + extracted + added without the live grid.
-- Sun 15:13–15:15: Fable refactor was **this** composer, not a missing Claude-app chat. Model flip is the picker (re-bills prefix).
-- Sun 16:10: video 2 ingest is **studio** Add video (empty markers), not required skill run.
-- Sun 16:14–16:16: land repo soon; model-switch cost; first log introspected as too app-specific / wrong starting point.
-- Sun 16:27–16:34: remembered 6-beat arc interrogated against transcripts **before** rewriting. Starting point = first skill run. Skip pre-Friday product history. Curate this file.
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **≈2026-08-14 04:09–04:30 UTC** — captions have start not end; `yt-dlp` PATH vs Homebrew vs `python3 -m` — the fetch the skill needs.
+- **2026-08-14 04:35 UTC** — first `/yt-clipper` on `https://www.youtube.com/watch?v=YYW4Q1Nivg8`. Run stamp `YYW4Q1Nivg8-20260814-1248` (~12:48): 64 markers, 1464 cues, 27 gaps.
+- **≈2026-08-14 04:42–04:44 UTC** — 1:20 and 2:37 look arbitrary mid-playing. “Sniffing like an eval surface might help.” 12:44: where is the actual runbook?
+- **2026-08-14 04:48 UTC** — spin up a **quick eval web dashboard**; rationale field as close as possible to the runbook rule; goal 5 videos in a few hours. Flow: run skill → table (start, description, rationale, feedback) → `check` = good marker.
+- **2026-08-14 04:51 UTC** — store eval feedback durably “in case we want to turn this eval into a real part of the product.” → `eval/labels.jsonl`.
+- **≈2026-08-14 05:03–05:05 UTC** — `>>> GAP` is the fetch script, not a caption. **Add caption segments + timestamps in the dashboard** so captions + playbook rules + markers are inline (the 0:22 / GAP@1:20 “Heat. Heat.” sketch).
+- **≈2026-08-14 05:09–05:11 UTC** — formatting; keep YouTube native keys (←/→ seek).
+- **≈2026-08-14 05:12–05:24 UTC** — how to mark a *missed* clip from the transcript? Enter on caption → add-clip; refresh the marker panel.
+- **2026-08-14 05:30 UTC** — “Honestly could see this replacing large swaths of the actual tool.” Editable description; **keep the skill’s original label** for another eval loop.
+- **2026-08-14 05:36 UTC** — extracted-marker / description column as eval against manual tagging; **3-way time-aligned grid** (captions / skill markers / description stamps).
+- **≈2026-08-14 05:48–06:08 UTC** — video on top; `j`/`k`/Enter; extracted-row visual; layout toggle (`f` then); apply-clip key; delete for adds; extracted-inserted rows highlighted only when they add a row (overlap with a caption = no extra treatment).
+- **≈2026-08-14 06:10–06:20 UTC** — checkbox that spawned a second add-clip on an already-clipped caption → kill the checkbox; freeform feedback; positive feedback on generated markers too.
+- **2026-08-14 06:20 UTC** — click timestamp steals keys; iframe focus (`keepKeysOnPage` later).
+- **≈2026-08-14 06:29–06:53 UTC** — TAKE/CONCEPT independent of the clip. Taxonomy: tags (take, fingering, technique, star) + work (song|rendition) + lane (transcription, …). Chapter ≠ concept. Autocomplete; Tab+t/w/l; field order Work, Lane, Tags; Enter on existing → edit label. `kind` becomes legacy.
+- **2026-08-14 06:58 UTC** — `j` stuck on 3:19 — two rows share a start; selection must be **row identity**, not start time.
+- **2026-08-14 07:43 UTC** — “easiest path for Fable to audit/refactor.” Grok: the eval dashboard *is* the app; promote it; don’t wrap in Next or fold into the extension.
+- **2026-08-14 08:40 UTC** — **product breakthrough in your words** — “this might actually end up being the better surface for what I imagined yt-clipper to be (chrome extension in yt)… viewing surface (youtube) and annotating surface (this dashboard) might be 2 separate things.”
+- **2026-08-14 08:44 UTC** — media-scraper is a **separate repo**, downstream JSON export only. Skill vs in-app scrape still open. Ask for a split to-do.
+- **2026-08-14 08:50 UTC** — wrap chronology + findings as a **suggested path** for Claude → `docs/two-surface-handoff.md`.
+- **2026-08-14 08:54 UTC — reconstructed** — **this thread (Fable):** execute handoff Steps A–D (PRD, tree, freeze extension, promote `eval/` → `apps/studio/`).
+- **2026-08-14 09:16 UTC — reconstructed** — port from Grok to Fable for production — audit / red-team / harden, not a from-scratch rebuild. `eval/` is a husk.
+- **2026-08-14 09:32–09:39 UTC — reconstructed** — Fable extra-high overbaked for UX nits? Yes for chrome; no for keyboard/focus/state. **Yes: split the 1500-line inline script** → `ui/keys.js` one dispatcher, `ui/state.js` `S`, modules.
+- **2026-08-15 07:48 UTC — reconstructed** — Shift+j/k between populated marker rows; “skill” → feel “marker” is better (terminology lands Sunday).
+- **2026-08-15 08:48–09:08 UTC — reconstructed** — Esc out of tag field; `x` on tag chip; tab work→lane in composer.
+- **≈2026-08-16 03:18 UTC** — follow; inherit work/lane; Enter expands marker fields and submits.
+- **≈2026-08-16 03:23–03:38 UTC** — how to say “perfect skill marker”? Talk through tags vs fields. `g` = write `check` under the hood (few-shot), **not** a tag and **not** `star` (personal bookmark). `c`/chapter deprecated. Grid `s` / `g` / `x`. Visual eval chip.
+- **≈2026-08-16 03:40–03:54 UTC** — selected row centered; timeline ticks; star migration + visual; qualitative why on remove (“Heat heat” hallucinated caption); 0:00 as chapter not clip; YouTube chapters as a maybe; rogue tags on Tab; restore selection on refresh.
+- **2026-08-16 03:59 UTC** — Tab+w → why on existing markers.
+- **≈2026-08-16 04:27–04:31 UTC** — follow vs pin — follow on while watching fights editing (row runs away). Toggle; layout hotkey moves off `f`.
+- **2026-08-16 04:39 UTC** — then 12:58: pause-on-j reversed — browse keeps playing; **edit mode pauses**.
+- **≈2026-08-16 04:43–04:54 UTC** — filler captions (yeah/okay/right) are noise, not an AssemblyAI problem. Hide/skip backchannels; editable skip-word list; `h` toggle + mode chrome.
+- **≈2026-08-16 05:15–05:41 UTC** — `x` not delete as the reject/delete key; tags column between marker and work; `<`/`>` playback rate; follow-on `j`/`k` origin = playhead row then pin.
+- **2026-08-16 06:04 UTC** — first full marker-eval + clipping pass done. Ask: (1) do the annotations make a comprehensible eval stream? (2) copy timestamps back to YouTube description — never drop manuals; label matches manual where present.
+- **≈2026-08-16 06:10–06:21 UTC** — copy-timestamps metadata; over 5000 chars → work as section header; first section needs “Pennies from Heaven | Stan Getz”; `0:00 Start` under first header; `***` for star.
+- **≈2026-08-16 06:22–06:24 UTC** — taxonomy-without-`g` is an unlabeled **keep**, not a skip. Is `g` worth it vs just taxonomy? Yes: `g` is a note to future-you (few-shot exemplar); `star` is for you.
+- **≈2026-08-16 06:28–06:36 UTC** — cross-ref notes; sloppy ones rewritten; 29:09 not a grid row (caption-only) — note lives on 29:23.
+- **≈2026-08-16 06:40–06:54 UTC** — 1:18:50/52/54 confusion. Store: no clip at 50; marker[53] at 52 `g`; add at 54. Time column had snapped. Terminology: “skill marker” → “marker.” Align fix: `takeExact` then `takeNear`. Leftover adds: **delete** (`unmiss`), not `x`-as-verdict; `x` key on ADDED CLIP already deletes.
+- **≈2026-08-16 06:58–07:04 UTC** — 35:53/`x` (still hunting) + 36:39 keep; 0:22 unmiss; 38:55 `x` (chapter change). Aside: do not train only on `x` — `g` is few-shot. 20:46/`g` ballpark + 21:18 perfect; sequential-numbers = fingering, last-mention stripped; 29:23/`g` names 29:09, no add created.
+- **≈2026-08-16 07:06–07:15 UTC** — session-log skill import (symlink); first `/session-log` write (this file, then mis-leveled). Folded ledger asked so Claude can reverse-engineer skill + extracted + added without the live grid.
+- **≈2026-08-16 07:13–07:15 UTC** — Fable refactor was **this** composer, not a missing Claude-app chat. Model flip is the picker (re-bills prefix).
+- **2026-08-16 08:10 UTC** — video 2 ingest is **studio** Add video (empty markers), not required skill run.
+- **≈2026-08-16 08:14–08:16 UTC** — land repo soon; model-switch cost; first log introspected as too app-specific / wrong starting point.
+- **≈2026-08-16 08:27–08:34 UTC** — remembered 6-beat arc interrogated against transcripts **before** rewriting. Starting point = first skill run. Skip pre-Friday product history. Curate this file.
 
 ## Worked corrections
 - Claim: I stood up an eval, then later realized it was the product. → Correction: 13:30 was 42 minutes after the 12:48 harness ask, in the same Grok sitting, while still asking to preserve skill labels for another eval loop. → Principle: the instinct often arrives *inside* the “disposable” tool, not after a finished prototype.
