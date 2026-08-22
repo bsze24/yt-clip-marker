@@ -100,7 +100,15 @@ uploads playlist through Chrome's YouTube login and is refreshed in one backgrou
 startup and every 30 minutes. HTTP requests only read `uploads.json`, so a slow connection,
 expired login, or fully offline start cannot delay the Studio. A failed refresh keeps the last
 good cache and its visible age. `GET /api/uploads` returns an empty successful response when no
-valid cache exists because the listing is optional, while the runs remain the workspace.
+valid cache exists because the listing is optional, while the runs remain the workspace. Refresh
+repairs a malformed row without forgetting its valid neighbours, and an authenticated result
+smaller than half the prior cache is treated as partial: it merges and logs instead of pruning.
+
+For a local run, the **YouTube link** control writes an append-only `link` event. Enter an
+11-character id, paste a watch URL, or choose from the duration-ranked cached candidates; saving
+an empty field explicitly clears the fallback. Local media still plays first. The cached YouTube
+title is joined on read into the picker and lesson header, so the lesson is renamed on YouTube in
+one place and the immutable run file is never edited.
 
 ## Label event (`labels.jsonl`)
 
@@ -110,7 +118,7 @@ One JSON object per line. Every save appends; the latest event for a row identit
 
 | Field | Point |
 |---|---|
-| `schemaVersion` | `1` |
+| `schemaVersion` | `1` on legacy events; `2` on current writes |
 | `recordedAt` | ISO-8601 with offset |
 | `runId` | filename stem of the run |
 | `videoId` / `videoUrl` / `videoTitle` | YouTube identity |
@@ -124,13 +132,17 @@ One JSON object per line. Every save appends; the latest event for a row identit
 | `rationale` | rule citation from the skill (eval) |
 | `ruleIds` | parsed `R-*` ids from rationale (eval) |
 | `feedback` | raw text: `check` or `check: why` = good; `wrong` or `wrong: reason` = reject; anything else = eval note |
-| `verdict` | `check` \| `wrong` \| `note` \| `blank` \| `miss` \| `unmiss` \| `relabel` \| `annotate` |
+| `verdict` | `check` \| `wrong` \| `note` \| `blank` \| `miss` \| `unmiss` \| `relabel` \| `annotate` \| `chapter` \| `link` |
 
 `relabel` events store `originalDescription` (suggester output, never mutated on the run file) and `description` (your edit). Latest relabel for `(runId, markerIndex)` is the current label; the grid shows `original: …` under the field when they differ.
 
 `miss` is a human-added clip (the verdict name is legacy eval vocabulary; the UI says "added clip"). `unmiss` is a tombstone for that `(runId, start)` — last event wins, so delete does not rewrite history.
 
 `annotate` stamps `tags` / `lane` / `work` on a marker (`markerIndex`). Latest wins. Added clips store those fields on the `miss` event.
+
+`link` carries `youtubeId` and `source: "human-link"`, keyed by `runId`. Latest wins; an empty
+`youtubeId` is a deliberate clear. It never shares the `chapter` fold, because clearing a link
+must not erase the lesson-level work/lane section at zero.
 
 Each line is a standalone example. You do not need the run file to score it.
 

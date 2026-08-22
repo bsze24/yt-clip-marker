@@ -15,6 +15,14 @@
       <button type="submit" id="ingestBtn">Add video</button>
       <span class="ingest-state" id="ingestState"></span>
     </form>
+    <form class="ingest link" id="linkForm">
+      <label>YouTube link
+        <input id="youtubeLink" list="linkCandidates" placeholder="ID or URL; blank clears" autocomplete="off" />
+      </label>
+      <datalist id="linkCandidates"></datalist>
+      <button type="submit" id="linkBtn">Save</button>
+      <span class="ingest-state" id="linkState"></span>
+    </form>
     <label class="toggle"><input type="checkbox" id="allCues" checked /> all captions</label>
     <label class="toggle"><input type="checkbox" id="hideFiller" checked /> hide filler</label>
     <button type="button" class="text-btn" id="fillerWordsBtn">skip words…</button>

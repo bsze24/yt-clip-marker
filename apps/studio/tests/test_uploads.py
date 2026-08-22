@@ -123,6 +123,54 @@ class UploadCacheTests(unittest.TestCase):
         stored = json.loads(self.cache_path.read_text(encoding="utf-8"))
         self.assertEqual([item["id"] for item in stored["items"]], [CANARY["id"]])
 
+    def test_refresh_recovers_valid_rows_from_malformed_cache(self):
+        valid = uploads.normalize_item(CANARY)
+        malformed = dict(valid, id="not-a-video-id")
+        uploads.write_cache_atomic(self.cache_path, {
+            "fetchedAt": datetime.now(timezone.utc).isoformat(),
+            "channel": uploads.CHANNEL_ID,
+            "authenticated": True,
+            "items": [valid, malformed],
+        })
+        self.assertIsNone(uploads.read_cache(self.cache_path))
+        cache = uploads.UploadCache(
+            self.cache_path,
+            executable=self.fake_ytdlp([PUBLIC]),
+        )
+
+        self.assertTrue(cache.refresh())
+
+        stored = json.loads(self.cache_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            [item["id"] for item in stored["items"]],
+            [PUBLIC["id"], CANARY["id"]],
+        )
+
+    def test_drastic_authenticated_shrink_merges_and_logs(self):
+        previous = [CANARY] + [
+            {
+                "id": f"video{i:06d}",
+                "title": f"Lesson {i}",
+                "duration": 1000 + i,
+                "upload_date": "20260820",
+            }
+            for i in range(9)
+        ]
+        self.write_cache(previous)
+        cache = uploads.UploadCache(
+            self.cache_path,
+            executable=self.fake_ytdlp([CANARY]),
+        )
+
+        output = io.StringIO()
+        with contextlib.redirect_stderr(output):
+            self.assertTrue(cache.refresh())
+
+        stored = json.loads(self.cache_path.read_text(encoding="utf-8"))
+        self.assertTrue(stored["authenticated"])
+        self.assertEqual(len(stored["items"]), 10)
+        self.assertIn("drastic authenticated shrink (1 of 10)", output.getvalue())
+
     def test_failed_refresh_retains_cache_and_logs_once_per_episode(self):
         original = self.write_cache([CANARY])
         cache = uploads.UploadCache(

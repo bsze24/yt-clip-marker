@@ -1,7 +1,7 @@
 // Run list polling and run switching.
 import { $, escapeHtml, escapeAttr, extractedList } from "./util.js";
 import { S, setSave, rememberCursor, lastRunId, cursorFor, restoreChapter, seedChapterFromRun } from "./state.js";
-import { api } from "./api.js";
+import { api, saveFailed } from "./api.js";
 import { renderGrid, updateStats } from "./grid.js";
 import { loadVideo } from "./player.js";
 
@@ -34,6 +34,82 @@ function showRunWarnings(payload, id) {
   el.textContent = message;
   el.hidden = !message;
   if (message) console.error(message);
+}
+
+function renderRunMeta() {
+  if (!S.current || !S.currentId) return;
+  const run = S.current.run;
+  const extractedN = extractedList(run).length;
+  // A local run has no watch URL, and an empty href would link to this page.
+  const idHtml = run.url
+    ? `<a href="${escapeAttr(run.url)}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a>`
+    : escapeHtml(run.videoId || "");
+  const media = S.current.media || null;
+  const sourceHtml = media
+    ? ` · <span class="src-local" title="${escapeAttr(media.name)}">local file</span>`
+    : "";
+  $("meta").innerHTML = `<div>${escapeHtml(S.current.title || run.title || S.currentId)}</div><div>${idHtml}${sourceHtml} · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
+}
+
+function runLastCueStart() {
+  const cues = S.current && S.current.run && S.current.run.cues;
+  if (!Array.isArray(cues) || !cues.length) return null;
+  const value = Number(cues[cues.length - 1] && cues[cues.length - 1].start);
+  return Number.isFinite(value) ? value : null;
+}
+
+function renderLinkCandidates() {
+  const list = $("linkCandidates");
+  if (!list) return;
+  const lastCue = runLastCueStart();
+  const ranked = S.uploads.map((upload) => {
+    const duration = upload && upload.duration != null ? Number(upload.duration) : null;
+    const delta = lastCue != null && Number.isFinite(duration)
+      ? Math.abs(duration - lastCue)
+      : null;
+    return { upload, delta };
+  }).filter(({ upload }) => upload && /^[A-Za-z0-9_-]{11}$/.test(upload.id || ""));
+  ranked.sort((a, b) => {
+    if (a.delta == null && b.delta != null) return 1;
+    if (a.delta != null && b.delta == null) return -1;
+    if (a.delta != null && b.delta != null && a.delta !== b.delta) return a.delta - b.delta;
+    return String(a.upload.title || a.upload.id).localeCompare(String(b.upload.title || b.upload.id));
+  });
+  list.replaceChildren(...ranked.map(({ upload, delta }) => {
+    const option = document.createElement("option");
+    option.value = upload.id;
+    option.label = `${delta == null ? "duration unknown" : `${Math.round(delta)}s apart`} · ${upload.title || upload.id}`;
+    return option;
+  }));
+}
+
+function syncLinkControl() {
+  const input = $("youtubeLink");
+  if (!input) return;
+  if (document.activeElement !== input) input.value = (S.current && S.current.youtubeId) || "";
+  renderLinkCandidates();
+}
+
+function youtubeIdFromInput(raw) {
+  const value = String(raw || "").trim();
+  if (!value) return "";
+  if (/^[A-Za-z0-9_-]{11}$/.test(value)) return value;
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase().replace(/\.$/, "");
+    let candidate = "";
+    if (host === "youtu.be") candidate = parsed.pathname.split("/").filter(Boolean)[0] || "";
+    else if (["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com"].includes(host)) {
+      if (parsed.pathname.replace(/\/$/, "") === "/watch") candidate = parsed.searchParams.get("v") || "";
+      else {
+        const parts = parsed.pathname.split("/").filter(Boolean);
+        if (["shorts", "embed", "live"].includes(parts[0])) candidate = parts[1] || "";
+      }
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(candidate) ? candidate : null;
+  } catch (_) {
+    return null;
+  }
 }
 
 export function renderRunSelect() {
@@ -83,6 +159,12 @@ export async function refreshRuns() {
     return;
   }
   S.runs = runsResult.value;
+  const currentRow = S.currentId && S.runs.find((run) => run.id === S.currentId);
+  if (currentRow && S.current && S.current.id === S.currentId) {
+    S.current.title = currentRow.title;
+    renderRunMeta();
+  }
+  renderLinkCandidates();
   if (offline) {
     offline = false;
     setSave("saved");
@@ -109,8 +191,35 @@ export function chooseRunOrUpload(value) {
   return Promise.resolve();
 }
 
+export async function saveYoutubeLink(raw) {
+  if (!S.currentId) return;
+  const youtubeId = youtubeIdFromInput(raw);
+  if (youtubeId == null) {
+    $("linkState").textContent = "invalid YouTube id or URL";
+    return;
+  }
+  const runId = S.currentId;
+  $("linkBtn").disabled = true;
+  $("linkState").textContent = youtubeId ? "linking…" : "clearing…";
+  setSave("saving…");
+  try {
+    await api("/api/link", "PUT", { runId, youtubeId });
+    await openRun(runId);
+    await refreshRuns();
+    renderRunSelect();
+    $("linkState").textContent = youtubeId ? "linked" : "cleared";
+    setSave("saved");
+  } catch (err) {
+    $("linkState").textContent = "link failed: " + err.message;
+    saveFailed(err);
+  } finally {
+    $("linkBtn").disabled = false;
+  }
+}
+
 export async function openRun(id) {
   S.currentId = id;
+  $("linkState").textContent = "";
   S.activeIndex = null;
   S.selectedStart = null;
   S.selectedKey = null;
@@ -144,16 +253,9 @@ export async function openRun(id) {
   }
   rememberCursor();
   const run = S.current.run;
-  const extractedN = extractedList(run).length;
-  // A local run has no watch URL, and an empty href would link to this page.
-  const idHtml = run.url
-    ? `<a href="${escapeAttr(run.url)}" target="_blank" rel="noreferrer">${escapeHtml(run.videoId || "")}</a>`
-    : escapeHtml(run.videoId || "");
   const media = S.current.media || null;
-  const sourceHtml = media
-    ? ` · <span class="src-local" title="${escapeAttr(media.name)}">local file</span>`
-    : "";
-  $("meta").innerHTML = `<div>${escapeHtml(run.title || id)}</div><div>${idHtml}${sourceHtml} · ${(run.markers || []).length} markers · ${S.additions.length} added · ${extractedN} YT desc · ${(run.cues || []).length} cues</div>`;
+  renderRunMeta();
+  syncLinkControl();
   // The run's `videoId` may be a filename-derived local identity. Only the
   // server-resolved YouTube id is safe to hand to the embed; a local-only run
   // with missing media should stay empty and show its warning, not cue a
