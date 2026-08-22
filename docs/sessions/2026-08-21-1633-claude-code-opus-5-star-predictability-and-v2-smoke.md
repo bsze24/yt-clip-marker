@@ -1,7 +1,7 @@
 ---
 date: 2026-08-21
 time: "16:33"
-revised: 2026-08-22 06:20
+revised: 2026-08-21 23:15
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -117,7 +117,9 @@ in the transcript predicts `star`, so rung 4 of the ML ladder loses its target. 
 
 ---
 
-# Append — 2026-08-22 06:20 — the inbox spec, and two review rounds
+# Append — 2026-08-21 23:20 — the inbox spec, and two review rounds
+
+*(Heading corrected 23:15 — it was first written as `2026-08-22 06:20`, which is UTC. This file, its filename and every commit in the repo are local `-0700`, so the whole session is one local day: 2026-08-21 16:16 → 23:12. See the note in Next about the same drift in `REVIEW.md`.)*
 
 The 16:33 log ends with the eval work. Everything after it is coordination and review: Phase 6
 specced, Codex's Phase 2 readiness review resolved, and PRs 29 and 30 reviewed. Project state is
@@ -214,3 +216,117 @@ the part that has no home in those.
   authenticated refresh, clock skew, and a malformed cache row. Two became F38 and F39.
 - Found the main checkout sitting on Codex's branch; wrote every doc commit from a separate
   worktree on `main` and left their tree untouched.
+
+---
+
+# Append — 2026-08-21 23:15 — closing the thread; the build gets its own
+
+Written to close this thread. The next session should start a **new log on a build track**, and
+the reason is in Decisions below.
+
+## What changed
+
+Times are local `-0700`, from the transcript.
+
+- `0558373` — the inbox migration recorded. `~/lesson-inbox/` now holds 2.3 GB;
+  `docs/reference/` is back to 64 KB; both `media/` symlinks re-pointed and verified resolving.
+- `1b700c2`, `39e8e04` — PR 29 reviewed, F36/F37 filed, ledger audit.
+- `e3b640c` — PR 30 reviewed, F38/F39 filed.
+- `cc5f9d5` — the previous append.
+- `127d790` — **the PR recut**: §4 rewritten with a PR column, §3.10a added, every open finding
+  given a landing PR, both batons repointed.
+- Merged in this window by Brian: PR 29 (`255739f`), PR 30 (`9622365`).
+
+## Decisions
+
+- **PR boundaries follow blast radius, not size.** Phase 3 writes a new verdict type into an
+  append-only store ([[D-002]]); Phase 4 `shutil.move`s the user's only copy of a recording. Each
+  gets a review with nothing else in it. Phase 5 is a string and rides with Phase 3. Recorded in
+  `CURRENT.md` §4.
+- **Phase numbers are identities, not build order.** §3.7 is "Phase 4" in `REVIEW.md`, in finding
+  text and in three handoff notes. §4 gained a PR column instead of a renumber — the same rule
+  that forbids renumbering findings.
+- **Phase 6 before Phase 4**, because both need the same realpath primitive and the read-only one
+  should be reviewed first. Phase 4 must import `inbox.py` rather than grow a second copy.
+- **This thread closes on `track: reduce-manual-tagging`; the build starts a new one.** The track
+  is the eval thread and roughly 80% of this session was the local-file loop. Continuing to append
+  build content to an eval-tracked log is what makes `track:` stop working as a selector.
+
+## Learning arc
+
+- **Asked whether the review notes were actually being archived, not whether they were good.**
+  That question found a real gap: reviews were durable, the process reasoning was not. The doc-home
+  rule sat in chat for three commits before landing anywhere.
+- **Asked whether phases 3-6 were "just polish" rather than accepting the phase list as a plan.**
+  They were not — two of the four fail by destroying data. The question surfaced a cut nobody had
+  proposed.
+- **Asked whether the thread could be closed before closing it.** The answer turned out to be no
+  without one fix: `AGENTS.md` names the wrong head for this track.
+
+## Concepts touched
+
+- [concept] pr-as-container-vs-live-document — solidifying — the cut is by what a wrong version
+  destroys, not by diff size; two phases fail in different ways and neither may share a review
+- [concept] one-name-per-thing — solid — phase numbers kept as identities with order moved to a
+  separate column, rather than renumbering and breaking every reference
+- [concept] concurrent-writers-on-shared-docs — solidifying — a full session of two agents on the
+  same four docs with nothing lost: append-at-end, insert-only anchors, separate worktree
+- [concept] active state vs learning state — solidifying — the split held under pressure: findings
+  to `REVIEW.md`, contracts to `CURRENT.md` §3, arguments to handoff notes, lessons here
+
+## Coaching hooks
+
+- **Ask "is it recorded?" before "is it right?"** Twice today that question found the gap: review
+  notes were durable, process reasoning was not; and the ledger read CLOSED over a live finding.
+- **A stale pointer at an entry point costs more than a stale deep doc.** `AGENTS.md` named the
+  wrong head for this very track while the track was live. Third instance of this pattern.
+
+## Next / open threads
+
+1. **PR A — Phase 3 + Phase 5**, carrying F32, F34, TD-17, TD-18. `CURRENT.md` §4 and §6.
+2. **PR B — Phase 6**, then **PR C — Phase 4**. **PR E** — F31, F36, F37, the `annotated` proxy —
+   any time.
+3. **Timezone drift to sweep.** `REVIEW.md` and `CURRENT.md` label the PR 29/30 reviews
+   `2026-08-22`; those are UTC. Every commit in the repo is local `-0700` and locally it was still
+   2026-08-21. About eight labels. Cosmetic, but it makes commit dates and ledger dates disagree.
+4. **Use v2 for real on the next lesson** ([[D-043]]) — the only open eval item, waiting on a
+   lesson existing. **This is what `track: reduce-manual-tagging` resumes on**, and it is the one
+   thing the new build track should not absorb.
+
+## Open questions / blockers
+
+- None blocking. The build can start from `CURRENT.md` alone.
+
+## Chronology (the record)
+
+Local `-0700`, anchored to the transcript.
+
+- **16:16** — session opens with three eval next steps and "check the latest session logs for state".
+- **16:18** — `yt-clipper` invoked for real; v2 smoke test on video 3. 99 proposals, 2.25/min,
+  99/99 on exact cue starts, no gap over 60s. Score deliberately not recorded ([[D-043]]).
+- **~16:25** — star predictability test. Ten features dead; the ceiling test — a model reading
+  Brian's own labels — lands at 0.513. D-044 written; PR 27 opened.
+- **16:33** — first session log.
+- **16:56** — five Zoom exports found in `docs/reference/`; staging-folder question. Phase 6
+  specced and appended, since Codex held the file. Staging goes outside the repo.
+- **21:55** — Codex's five Phase 2 contracts resolved inline. Finding 1 verified rather than
+  accepted, and it was bigger than reported: in-app ingest already broken. F35 filed.
+- **22:00** — "all this inline at current.md?" Measured: 187 lines of review inside a 114-line
+  contracts section. Agreed it did not belong.
+- **22:01** — collapse executed. Decisions into contracts, argument into handoff notes, F35 into
+  `REVIEW.md`. Reversed my own proposal on re-reading rule 1: a spec review has no target SHA.
+- **22:24** — PR 29 reviewed. Tested the missing-binary branch the audit could only inspect.
+  F36, F37 filed.
+- **22:33** — "make sure your notes are in review.md". Ledger audit found four stale things,
+  including thread 7 reading CLOSED over an open F31.
+- **22:46** — PR 30 reviewed. 35 tests run, three edge behaviours probed. F38, F39 filed; F39 is a
+  hole in my own §3.5 5a.
+- **22:54** — "are you consistently posting these?" Grepped rather than asserted: reviews yes,
+  session log no. Append written.
+- **22:57** — state-of-the-app assessment, measured from disk and the live API rather than the
+  plan. Headline: nothing about marking clips changed and no disk has been freed.
+- **23:04** — "are 3-6 polish?" No: two of them destroy data when wrong. PR cut proposed.
+- **23:08** — Brian agreed the ordering. §4 recut, §3.10a promoted, findings assigned homes.
+- **23:11** — `/session-log`, asking whether the thread can close.
+- **23:12** — asked for timestamps on the chronology, which is what exposed the UTC/local drift
+  in the previous append's heading.
