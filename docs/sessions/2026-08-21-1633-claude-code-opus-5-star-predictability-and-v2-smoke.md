@@ -1,6 +1,7 @@
 ---
 date: 2026-08-21
 time: "16:33"
+revised: 2026-08-22 06:20
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -113,3 +114,103 @@ in the transcript predicts `star`, so rung 4 of the ML ladder loses its target. 
   with every fold of the store — starred 11 where it is 17, tagged 34 where it is 59. Corrected.
 - Consolidated four scratch scripts into one committed file so D-044 is checkable, opened PR 27
   for it, and committed the docs straight to `main` as living records.
+
+---
+
+# Append — 2026-08-22 06:20 — the inbox spec, and two review rounds
+
+The 16:33 log ends with the eval work. Everything after it is coordination and review: Phase 6
+specced, Codex's Phase 2 readiness review resolved, and PRs 29 and 30 reviewed. Project state is
+already committed — `CURRENT.md`, `REVIEW.md` threads 11-13, `DECISIONS.md`. This append carries
+the part that has no home in those.
+
+## What changed
+
+- `c3ff035` — Phase 6, the lesson inbox, appended to `CURRENT.md`. Staging goes **outside the
+  repo** (Brian's call): `docs/reference/**/*.mp4` is gitignored and `git clean -xdf` deletes
+  ignored files, so 2.4 GB of Zoom exports sat one clean away from gone.
+- `633e37e` → `183e836` — Codex's five Phase 2 contracts resolved inline, then the baton synced.
+- `f77bdb7` — the review thread collapsed out of §3 into the contracts it changed.
+- `1b700c2` → `39e8e04` — PR 29 reviewed; F36/F37 filed; the ledger audit.
+- `e3b640c` — PR 30 reviewed; F38/F39 filed.
+
+## Decisions
+
+- **A review thread does not live inside the task spec.** `CURRENT.md` reached 745 lines with 187
+  of them a review annotating a 114-line contracts section. The rule that came out of it:
+  **fold the decisions into the contracts they change, move the argument to the handoff notes,
+  and file anything that is a defect in merged code as its own `REVIEW.md` finding.** 187 lines
+  became about 20 in §3 plus a dated note.
+- **A spec review has no target SHA, so it does not belong in `REVIEW.md`.** Rule 1 of that file's
+  own concurrency protocol is one thread per SHA. I proposed moving the thread there and reversed
+  it on re-reading the protocol. Precedent already existed: the earlier readiness review was in
+  the handoff notes.
+
+## Learning arc
+
+- **Folding a decision into a contract forced a correction I would not have found by re-reading
+  my own argument.** I claimed Phase 3 hard-depends on Phase 2. §3.9 already ended "a free-text id
+  entry stays available for the offline case" — the paste door was in the spec the whole time.
+  Confidence went moderate → low and the recommendation weakened. Writing the decision *into the
+  place it governs* is what surfaced it.
+- **Reviewing my own work twice, and naming it both times.** F35 was my finding and I reviewed
+  its fix; F39 is a hole in the contract I wrote and I filed it against the contract rather than
+  against Codex's implementation. Saying "this one is mine" in the finding is what keeps a
+  review from quietly grading its author's own homework.
+- **The ledger pointed away from a live finding.** Thread 7 read CLOSED while F31 had been open
+  since 2026-08-21. A stale CLOSED is worse than a stale OPEN, because nobody re-reads a closed
+  thread.
+
+## Concepts touched
+
+- [concept] concurrent-writers-on-shared-docs — solidifying — was `stuck`. Three practices that
+  worked: append at the end of a file someone else holds, insert-only edits with exact-match
+  anchors and a zero-deletions check, and writing from a separate git worktree when the main
+  checkout is on another agent's branch
+- [concept] one-name-per-thing — solidifying — the doc-home rule is the same shape: contracts in
+  the spec, findings in the ledger, lessons in the log, and a fact in two places drifts
+- [concept] proxy-vs-recorded-fact — solid — the canary proves the login worked, not that the
+  listing was complete; F39 is exactly that gap, and I wrote the proxy myself
+
+## Coaching hooks
+
+- **Verify a claim in the environment it will run in, not the one you are typing in.** The
+  `PATH` bug hid for three PRs because every check was from a terminal. When the next
+  environment-shaped claim appears, the question is "measured where?"
+- **Probe, do not reason, when the claim is about behaviour under a bad input.** Both PR 30
+  findings came from a 30-line script, not from reading. Reading said `_validated_cache` was
+  strict; running it showed strict validation turning into data loss two calls later.
+
+## Next / open threads
+
+1. **PR 30 — Brian's merge call.** F38, F39 optional; both small, both in a file it already
+   touches.
+2. **F36, F37** open against `main` — next PR that opens `apps/studio/studio`.
+3. **F31** still open in thread 7.
+4. **Phase 3** after PR 30, carrying F32 and F34.
+5. **Phase 6, the lesson inbox** — specced, unbuilt. The 2.4 GB has not moved out of the repo yet.
+6. **Use v2 for real on the next lesson** ([[D-043]]) — still the only open eval item, still
+   waiting on a lesson existing.
+
+## Chronology (the record)
+
+- Five Zoom exports appeared in `docs/reference/`; Brian asked for a staging folder the tool
+  detects. Found three of his four steps already existed and only discovery was missing; specced
+  it as Phase 6 and appended rather than edited, since Codex held the file.
+- Verified the sidecar matcher already handles the new ` (1)` plus `_1920x1384` filenames, so the
+  spec says do not "fix" working code.
+- Resolved Codex's five Phase 2 contracts inline. Verified finding 1 rather than accepting it and
+  found it was bigger than reported: in-app ingest was already broken on the launchd agent. Filed
+  F35 in its own thread.
+- Rejected "define an authentication predicate" in favour of merge-never-remove, because an
+  authenticated 56 and an unauthenticated 2 are both exit 0 with valid JSON.
+- Brian asked whether all of that belonged inline. Measured the file, agreed it did not, and
+  collapsed it.
+- Reviewed PR 29. Tested the missing-binary branch the audit could only inspect. Filed F36, F37.
+- Audited the ledger before the next round: thread 7 mislabelled, thread 11 heading stale, PR 27
+  merged unreviewed, two "open in PR 27" pointers stale after it merged. All corrected; PR 27
+  recorded as thread 12, unreviewed, with what would justify opening it.
+- Reviewed PR 30. Ran the branch's 35 tests, then probed three edge behaviours: truncated
+  authenticated refresh, clock skew, and a malformed cache row. Two became F38 and F39.
+- Found the main checkout sitting on Codex's branch; wrote every doc commit from a separate
+  worktree on `main` and left their tree untouched.
