@@ -24,6 +24,8 @@ Merged to `main`:
   export labels; scoring and provenance; eval/feedback refinements; the launchd app surface;
   and work/lane section breaks. The detailed, live review state is `REVIEW.md`; PR #23 is only
   the review vehicle for the already-merged appification range and must never merge.
+- **PRs 28-30** (merged by `9622365`, 2026-08-22) — effective YouTube fallback, the launch-agent
+  yt-dlp PATH repair, and the background uploads cache with its no-run picker.
 
 Closed unmerged:
 
@@ -745,6 +747,28 @@ turns [[D-033]] from an observation into an invariant.
 not a skill pass. Video 2 qualifies and is the sharpest possible test — 75 clips over 64 minutes,
 14 clusters under 45 seconds apart, and **zero extracted stamps**, so `resolvedLabel` cannot
 manufacture the text-identity that made video 1 safe.
+
+### TD-17 — one malformed upload row makes refresh forget every valid cached row
+
+`uploads._validated_cache` correctly returns no API data when any cached row is invalid, but the
+background refresh uses that same all-or-nothing read as its merge input. One malformed row makes
+the previous cache look empty; a later unauthenticated refresh can then replace all valid rows
+with the two public uploads. The data is derived and the next complete authenticated refresh
+repairs it, so PR 30's review filed this as non-blocking F38 and merged as-is.
+
+**Trigger:** when `uploads.py` next changes. Separate strict API validation from tolerant refresh
+recovery: retain valid rows when the envelope (`channel`, timezone-aware `fetchedAt`) is usable.
+
+### TD-18 — a truncated authenticated upload refresh may prune a complete cache
+
+The upload canary proves Chrome authentication worked; it does not prove yt-dlp returned the
+whole playlist. A partial result containing the canary is currently allowed to prune every
+missing cached id. This only affects derived cache data and a later complete refresh restores it,
+so PR 30's review filed this as non-blocking F39 and merged as-is.
+
+**Trigger:** when `uploads.py` next changes, or if the picker suddenly loses many rows. Treat a
+drastic authenticated shrink as partial: merge and log instead of pruning. Revisit canary rot in
+the same change, because one hardcoded unlisted id can disappear or change visibility.
 
 
 ## Parking lot

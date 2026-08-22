@@ -1,10 +1,9 @@
 # Review
 
-Active target: **thread 13**, Phase 2 draft PR 30 at `e13e3e6` — **reviewed 2026-08-22, no
-blocking findings**; two non-blocking, F38 and F39, and F39 is a hole in the planner's own
-§3.5 5a rather than in the implementation. Thread 11's F35 is **resolved** —
-PR 29 merged at `255739f` on 2026-08-22 — while the two non-blocking findings it recommended
-folding in, **F36 and F37, remain open against `main`**. Thread 10 closed
+Active target: **thread 11**. Thread 13 closed after PR 30 merged at `9622365`; its non-blocking
+F38 and F39 are deferred as TD-17 and TD-18. Thread 11's F35 is **resolved** — PR 29 merged at
+`255739f` on 2026-08-22 — while the two non-blocking findings it recommended folding in,
+**F36 and F37, remain open against `main`**. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
@@ -45,7 +44,7 @@ and `BACKLOG.md`.
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
 | 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **OPEN** — reviewed clean, merged `255739f`; F35 resolved, **F36/F37 open against `main`** | implementer |
 | 12 — eval star predictability | `d8b21f1` (PR 27) | **UNREVIEWED** — merged `2026-08-21` with no thread. Author was the only reader. | — |
-| 13 — background uploads cache | `e13e3e6` (draft PR 30) | **REVIEWED** 2026-08-22 — no blocking findings; F38, F39 non-blocking | Brian, merge call |
+| 13 — background uploads cache | `e13e3e6` (PR 30) | **CLOSED** 2026-08-22 — merged `9622365`; F38/F39 deferred → TD-17/TD-18 | — |
 
 ---
 
@@ -794,7 +793,7 @@ and F34 into Phase 3 rather than giving three lines their own PR.
 
 ---
 
-## Thread 13 — background uploads cache (`e13e3e6`, draft PR 30) — REVIEWED 2026-08-22
+## Thread 13 — background uploads cache (`e13e3e6`, PR 30) — CLOSED 2026-08-22
 
 **Target.** One code commit on current `main`; verify with
 `git merge-base --is-ancestor e13e3e6 HEAD`. Scope is `CURRENT.md` §3.4-§3.6 and the explicitly
@@ -901,6 +900,8 @@ and refetchable, so the cost is one 30-minute window with a short list, and the 
 refresh heals it completely. **Fix, two lines:** drop invalid rows and keep valid ones; discard
 wholesale only when the envelope — channel, `fetchedAt` — is unusable.
 
+**Merge disposition:** deferred as TD-17. PR 30 merged without this optional repair.
+
 ### F39 — an authenticated but truncated refresh still prunes silently — non-blocking · open
 
 `merge_items` returns `list(fetched)` whenever the canary is present. The canary proves the
@@ -926,6 +927,8 @@ switches off permanently, and nothing says so — the cache simply stops shrinki
 if F39 is addressed anyway: treat any id already in the cache and known unlisted as a canary,
 rather than one constant.
 
+**Merge disposition:** deferred as TD-18. PR 30 merged without this optional repair.
+
 ### Not findings, recorded so nobody re-raises them
 
 - `/api/uploads` re-reads and re-validates 56 items on every four-second poll. Same family as
@@ -937,6 +940,6 @@ rather than one constant.
   on an invisible prompt until `SUBPROCESS_TIMEOUT`, then retains the cache and logs once — which
   is the correct failure.
 
-**Baton: Brian, for the merge call.** F38 and F39 are both small and both live in a file this PR
-already touches, so folding them in costs a handful of lines. Merging as-is is also defensible:
-neither can lose anything a refresh will not rebuild.
+**Merge outcome:** Brian explicitly approved the merge; PR 30 landed at `9622365`. The restarted
+Studio retained all 56 cached uploads including the private canary, and the merged uploads suite
+passed 11/11. Thread closed; F38/F39 live on as TD-17/TD-18.

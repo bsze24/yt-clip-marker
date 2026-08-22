@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ Brian — PR 30 reviewed, no blocking findings. The merge call is yours. See §6.**
+**→ planner — Phase 2 merged at `9622365`; Phase 3 is next. See §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -17,6 +17,11 @@ does not repeat it.
 **Phase 1 is merged.** PR 28 landed at `62278d6` on 2026-08-21 — reviewed clean, one deferred
 finding (F32, folded into Phase 3). Tests are now 24/24: `test_sidecars.py` 15/15 and
 `test_youtube_fallback.py` 9/9.
+
+**Phase 2 is merged.** PR 30 landed at `9622365` on 2026-08-22 after a clean review. The live
+restarted Studio reads all 56 cached uploads including the private canary; its uploads suite is
+11/11. Review findings F38 and F39 are deferred as TD-17 and TD-18 because they can only shrink
+derived, refetchable cache data temporarily; neither touches runs, labels, clips or media.
 
 **A running studio does not pick this up until it restarts.** The launchd agent on `:8765` serves
 whatever code it started with, so `/api/run` keeps omitting `youtubeId` until then. Review-only PR #23 was closed rather than
@@ -348,10 +353,9 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ Brian, for the merge call on PR 30.** Codex's readiness review is resolved (planner,
-2026-08-21), the `PATH` fix is merged, the production cookie gate passed, and Phase 2 is
-**reviewed clean** (2026-08-22) with two non-blocking findings — **F38** and **F39**, `REVIEW.md`
-thread 13. F39 is a hole in the planner's own §3.5 5a, not in the implementation.
+**→ planner, for Phase 3.** PR 30 merged at `9622365` on Brian's explicit approval after a clean
+review. The `PATH` fix, production cookie gate and Phase 2 are all complete. F38 and F39 remain
+visible as TD-17 and TD-18; neither blocks the next phase.
 
 **Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
 merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
@@ -359,7 +363,8 @@ optional and belong in whichever PR next opens `apps/studio/studio`.
 
 1. **Done — production cookie measurement.** A one-shot launchd job using the reinstalled
    agent's PATH returned 56 unique uploads, no stderr, and the private canary `Oa0wqetkNcg`.
-2. **Built, verified and reviewed — Phase 2** (§3.4-§3.6), draft PR 30 at `e13e3e6`; no merge.
+2. **Done — Phase 2** (§3.4-§3.6), PR 30 merged at `9622365`. The restarted live Studio exposes
+   56 cached uploads and the merged uploads suite passes 11/11.
 3. **Built with it — the one-line `.gitignore` rule** for Zoom's `*newChat*.txt`, the live
    broad-`git add` hazard carried from the readiness review.
 
