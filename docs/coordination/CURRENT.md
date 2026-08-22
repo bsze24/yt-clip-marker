@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer — Phase 2 is built and verified; record its SHA and open the fresh PR. See §6.**
+**→ reviewer — Phase 2 is draft PR 30 at `e13e3e6`. See §6 and `REVIEW.md` thread 13.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -348,8 +348,8 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer, to record Phase 2's SHA and open its fresh PR.** Codex's readiness review is
-resolved (planner, 2026-08-21), the `PATH` fix is merged, and the production cookie gate passed.
+**→ reviewer, for Phase 2 draft PR 30 at `e13e3e6`.** Codex's readiness review is resolved
+(planner, 2026-08-21), the `PATH` fix is merged, and the production cookie gate passed.
 
 **Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
 merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
@@ -357,7 +357,7 @@ optional and belong in whichever PR next opens `apps/studio/studio`.
 
 1. **Done — production cookie measurement.** A one-shot launchd job using the reinstalled
    agent's PATH returned 56 unique uploads, no stderr, and the private canary `Oa0wqetkNcg`.
-2. **Built and verified — Phase 2** (§3.4-§3.6), awaiting its SHA and fresh reviewed PR.
+2. **Built and verified — Phase 2** (§3.4-§3.6), draft PR 30 at `e13e3e6`; no merge.
 3. **Built with it — the one-line `.gitignore` rule** for Zoom's `*newChat*.txt`, the live
    broad-`git add` hazard carried from the readiness review.
 
@@ -807,7 +807,7 @@ case was inspected rather than tested by uninstalling the user's working yt-dlp.
 the generated plist; normal and minimal-PATH live installs; live agent environment inspection;
 live invalid-video ingest through the agent; and `git diff --check`.
 
-### 2026-08-21 — Codex, Phase 2 pre-SHA audit
+### 2026-08-21 — Codex, Phase 2 implementation (`e13e3e6`, draft PR 30)
 
 The gate passed before implementation: a one-shot launchd-managed refresh ran with the merged
 agent PATH and Chrome cookies, returned 56 unique uploads with no stderr, and included the private
@@ -847,3 +847,5 @@ without disrupting the user's machine.
 `uploads.py` and `server.py`; real launchd cold fill with 56 items and canary; browser picker and
 poll interaction; isolated cached/offline startup and clean browser diagnostics; `git diff
 --check`. Total automated tests: 35/35.
+
+Committed as `e13e3e6` and opened as draft PR 30. No merge performed.

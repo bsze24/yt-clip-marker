@@ -1,8 +1,8 @@
 # Review
 
-Active target: **thread 11**. F35 is **resolved** — PR 29 merged at `255739f` on 2026-08-22.
-It merged as-is, so the two non-blocking findings the review recommended folding in, **F36 and
-F37, are still open against `main`**. Thread 10 closed
+Active target: **thread 13**, Phase 2 draft PR 30 at `e13e3e6`. Thread 11's F35 is **resolved** —
+PR 29 merged at `255739f` on 2026-08-22 — while the two non-blocking findings it recommended
+folding in, **F36 and F37, remain open against `main`**. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
@@ -43,6 +43,7 @@ and `BACKLOG.md`.
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
 | 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **OPEN** — reviewed clean, merged `255739f`; F35 resolved, **F36/F37 open against `main`** | implementer |
 | 12 — eval star predictability | `d8b21f1` (PR 27) | **UNREVIEWED** — merged `2026-08-21` with no thread. Author was the only reader. | — |
+| 13 — background uploads cache | `e13e3e6` (draft PR 30) | **UNREVIEWED** — implementation audit complete | reviewer |
 
 ---
 
@@ -788,6 +789,33 @@ reinstall, and nothing in either README says so.
 **Baton: implementer.** F36 and F37 are two small changes in one file plus one sentence of docs.
 Natural home is whichever PR next opens `apps/studio/studio` — the same argument that folded F32
 and F34 into Phase 3 rather than giving three lines their own PR.
+
+---
+
+## Thread 13 — background uploads cache (`e13e3e6`, draft PR 30) — UNREVIEWED
+
+**Target.** One code commit on current `main`; verify with
+`git merge-base --is-ancestor e13e3e6 HEAD`. Scope is `CURRENT.md` §3.4-§3.6 and the explicitly
+carried Zoom `*newChat*.txt` ignore rule: authenticated uploads-playlist refresh, an atomic
+offline-safe cache, the optional read API, and the no-run upload picker interaction. No link
+event, duration match, cleanup, or title join belongs here.
+
+**Implementer receipts.** The pre-SHA three-part audit is in `CURRENT.md`'s final handoff note.
+Automated suites pass 35/35: uploads 11, sidecars 15, YouTube fallback 9. Live launchd cold start
+answered immediately with the empty API shape, then cached 56 authenticated items including the
+private canary. Browser acceptance showed 7 runs plus 51 no-run uploads; choosing one filled the
+Add video URL, restored the current run, and did not ingest across the next poll. An isolated
+server with a deliberately missing yt-dlp still loaded the real 56-item cache at normal speed,
+showed its age, and produced no browser diagnostics.
+
+**Where to look hard.** An expired Chrome login exits 0 with two public rows, so verify that a
+no-canary refresh updates/adds but never removes cached ids, while a canary refresh may prune.
+Verify request handlers can only read the cache and cannot start or stack yt-dlp. In the UI,
+verify upload option values cannot reach `openRun`, an uploads failure preserves both runs and
+the last in-memory upload list, and the four-second render never leaves an upload selected. The
+cache is derived user data and must remain ignored.
+
+**Baton: reviewer.** No merge without Brian's explicit approval.
 
 ---
 
