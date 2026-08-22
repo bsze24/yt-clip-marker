@@ -1,7 +1,7 @@
 ---
 date: 2026-08-17
 time: "17:40"
-revised: 2026-08-17 17:45
+revised: 2026-08-22 07:10 UTC
 surface: grok
 project: yt-clip-marker
 track: studio-workspace
@@ -58,36 +58,38 @@ One Friday sitting turned a first `/yt-clipper` run into the dashboard, then nam
 - None blocking this composer. Product questions live in 1507 (`g` on copy-timestamps, clip `end`s, suggest-markers as a studio action).
 
 ## Chronology (the record)
-- Fri 12:09: captions have start not end?
-- Fri 12:17–12:30: `yt-dlp` install — pip/`--user` vs Homebrew Python vs `brew install yt-dlp`.
-- Fri 12:35 (skill, same sitting): first `/yt-clipper` on `YYW4Q1Nivg8`. Run `YYW4Q1Nivg8-20260814-1248`.
-- Fri 12:42: 1:20 and 2:37 look arbitrary mid-playing. "Sniffing like an eval surface."
-- Fri 12:44: where is the runbook?
-- Fri 12:48: spin up a quick eval dashboard; rationale near the rule; `check` = good marker; 5 videos in a few hours.
-- Fri 12:51: store feedback durably "in case we want this in the product" → `labels.jsonl`.
-- Fri 13:03–13:05: `>>> GAP` is the fetch script, not a caption. Put caption rows on the grid.
-- Fri 13:09–13:11: formatting; keep YouTube native ←/→.
-- Fri 13:12–13:24: how to mark a missed clip; Enter on caption to add.
-- Fri 13:30: could replace large swaths of the actual tool. Editable description; keep the skill's original label.
-- Fri 13:32: is edit auto-saved?
-- Fri 13:36: extracted-marker / description column; 3-way time-aligned grid.
-- Fri 13:48: video on top; `j`/`k`/Enter; want YouTube expand back.
-- Fri 13:54: `f` toggles video-top vs video-left.
-- Fri 14:02–14:08: Enter to apply a clip; delete for adds; extracted-inserted rows vs overlap-with-caption.
-- Fri 14:15–14:16: kill the checkbox; freeform feedback; positive feedback on generated markers too.
-- Fri 14:20: click timestamp steals keys; Esc doesn't return them.
-- Fri 14:29–14:53: TAKE/CONCEPT independent of the clip. Tags + work (song|rendition) + lane. Autocomplete; Tab+t/w/l; field order Work, Lane, Tags; Enter on existing → edit label.
-- Fri 14:58: `j` stuck on 3:19 — two rows share a start. Selection must be row identity.
-- Fri 15:43: easiest path for Fable to audit/refactor. Dashboard is the app; don't wrap in Next or fold into the extension.
-- Fri 16:40: product breakthrough in your words — viewing (YouTube) vs annotating (dashboard), same yt-clipper.
-- Fri 16:44: media-scraper is a separate project; remind the long-term JSON-export tie. Skill vs wrap scrape into the app. Ask for a split to-do.
-- Fri 16:50: wrap chronology + findings as a **suggested path** for Claude → `docs/two-surface-handoff.md`.
-- Fri 17:03: Fable is going; does it have `python3 apps/studio/server.py` → 8765?
-- Fri 17:12: "annotation UX still on you" read as the product isn't built. Clarified: Fable has source, not a browser tab.
-- Fri 17:13: kill PID 56490 (zombie `eval/server.py`, empty `curl`); start `apps/studio/server.py`; paste-block for Fable (URL, curl, HTML-from-disk, restart Python on server edits).
-- Fri 17:14–17:48: 143s as that process (and the next) get SIGTERM. Port empty → restart studio again. Fable bouncing `server.py`.
-- Mon 17:39: audit 1507 vs this composer. ~25–30% is this Friday afternoon; most of 1507 is Fable + Sunday. Unique here: zombie 8765 / files-not-the-tab.
-- Mon 17:40: `/session-log` this composer. New file; do not edit 1507.
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-14 04:09 UTC** — captions have start not end?
+- **≈2026-08-14 04:17–04:30 UTC** — `yt-dlp` install — pip/`--user` vs Homebrew Python vs `brew install yt-dlp`.
+- **2026-08-14 04:35 UTC** — first `/yt-clipper` on `YYW4Q1Nivg8`. Run `YYW4Q1Nivg8-20260814-1248`.
+- **2026-08-14 04:42 UTC** — 1:20 and 2:37 look arbitrary mid-playing. "Sniffing like an eval surface."
+- **2026-08-14 04:44 UTC** — where is the runbook?
+- **2026-08-14 04:48 UTC** — spin up a quick eval dashboard; rationale near the rule; `check` = good marker; 5 videos in a few hours.
+- **2026-08-14 04:51 UTC** — store feedback durably "in case we want this in the product" → `labels.jsonl`.
+- **≈2026-08-14 05:03–05:05 UTC** — `>>> GAP` is the fetch script, not a caption. Put caption rows on the grid.
+- **≈2026-08-14 05:09–05:11 UTC** — formatting; keep YouTube native ←/→.
+- **≈2026-08-14 05:12–05:24 UTC** — how to mark a missed clip; Enter on caption to add.
+- **2026-08-14 05:30 UTC** — could replace large swaths of the actual tool. Editable description; keep the skill's original label.
+- **2026-08-14 05:32 UTC** — is edit auto-saved?
+- **2026-08-14 05:36 UTC** — extracted-marker / description column; 3-way time-aligned grid.
+- **2026-08-14 05:48 UTC** — video on top; `j`/`k`/Enter; want YouTube expand back.
+- **2026-08-14 05:54 UTC** — `f` toggles video-top vs video-left.
+- **≈2026-08-14 06:02–06:08 UTC** — Enter to apply a clip; delete for adds; extracted-inserted rows vs overlap-with-caption.
+- **≈2026-08-14 06:15–06:16 UTC** — kill the checkbox; freeform feedback; positive feedback on generated markers too.
+- **2026-08-14 06:20 UTC** — click timestamp steals keys; Esc doesn't return them.
+- **≈2026-08-14 06:29–06:53 UTC** — TAKE/CONCEPT independent of the clip. Tags + work (song|rendition) + lane. Autocomplete; Tab+t/w/l; field order Work, Lane, Tags; Enter on existing → edit label.
+- **2026-08-14 06:58 UTC** — `j` stuck on 3:19 — two rows share a start. Selection must be row identity.
+- **2026-08-14 07:43 UTC** — easiest path for Fable to audit/refactor. Dashboard is the app; don't wrap in Next or fold into the extension.
+- **2026-08-14 08:40 UTC** — product breakthrough in your words — viewing (YouTube) vs annotating (dashboard), same yt-clipper.
+- **2026-08-14 08:44 UTC** — media-scraper is a separate project; remind the long-term JSON-export tie. Skill vs wrap scrape into the app. Ask for a split to-do.
+- **2026-08-14 08:50 UTC** — wrap chronology + findings as a **suggested path** for Claude → `docs/two-surface-handoff.md`.
+- **2026-08-14 09:03 UTC** — Fable is going; does it have `python3 apps/studio/server.py` → 8765?
+- **2026-08-14 09:12 UTC** — "annotation UX still on you" read as the product isn't built. Clarified: Fable has source, not a browser tab.
+- **2026-08-14 09:13 UTC** — kill PID 56490 (zombie `eval/server.py`, empty `curl`); start `apps/studio/server.py`; paste-block for Fable (URL, curl, HTML-from-disk, restart Python on server edits).
+- **≈2026-08-14 09:14–09:48 UTC** — 143s as that process (and the next) get SIGTERM. Port empty → restart studio again. Fable bouncing `server.py`.
+- **2026-08-17 09:39 UTC** — audit 1507 vs this composer. ~25–30% is this Friday afternoon; most of 1507 is Fable + Sunday. Unique here: zombie 8765 / files-not-the-tab.
+- **2026-08-17 09:40 UTC** — `/session-log` this composer. New file; do not edit 1507.
 
 ## Banked artifacts
 
