@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "23:50"
-revised: 2026-08-21 16:25
+revised: 2026-08-22 07:10 UTC
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: reduce-manual-tagging
@@ -111,73 +111,75 @@ entries.
   than a real one. That reading is interpretation, not measurement.
 
 ## Chronology (the record)
-- **00:35** — "2nd review is in", asking for an audit of videos 1 and 2, a rating as eval/training
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-19 07:35 UTC** — "2nd review is in", asking for an audit of videos 1 and 2, a rating as eval/training
   data, and a diagnosis of his tagging. Two observations: `take` really means "jake demo", and
   "chord exercise" never appeared in video 1's dropdown.
-- Folded `labels.jsonl`. Star rate 25% on video 1 against 48% on video 2; 1.22 tags/row against
+- **≈2026-08-19 07:35–07:43 UTC** — Folded `labels.jsonl`. Star rate 25% on video 1 against 48% on video 2; 1.22 tags/row against
   1.83; 15 distinct tags with only 6 shared.
-- Found the structural asymmetry first: video 1 is mostly him judging skill markers, video 2 is
+- **≈2026-08-19 07:35–07:43 UTC** — Found the structural asymmetry first: video 1 is mostly him judging skill markers, video 2 is
   75 rows he authored with no proposals. Not two samples of the same thing.
-- Chased the dropdown report and could not reproduce it — the API returns `chord exercise` on 15
+- **≈2026-08-19 07:35–07:43 UTC** — Chased the dropdown report and could not reproduce it — the API returns `chord exercise` on 15
   rows. Real cause is that vocabulary is scoped per run, so any fresh video shows four tags.
   Filed as `TD-15`.
-- Found 144 of 240 label events whose stored `verdict` disagrees with their own `feedback` text.
+- **≈2026-08-19 07:35–07:43 UTC** — Found 144 of 240 label events whose stored `verdict` disagrees with their own `feedback` text.
   Later traced to F9, fixed forward-only on purpose. Filed as `TD-14`, not as a new bug.
-- Rated it: video 1 strong as an error taxonomy, video 2 strong as placement ground truth, both
+- **≈2026-08-19 07:35–07:46 UTC** — Rated it: video 1 strong as an error taxonomy, video 2 strong as placement ground truth, both
   weak for auto-tagging — four axes in one field, no `end` times, no negatives.
-- **00:46** — "reducing my manual tagging by 75%+ ... part of it is not tagging so granularly."
+- **2026-08-19 07:46 UTC** — "reducing my manual tagging by 75%+ ... part of it is not tagging so granularly."
   Contested it. Measured all 21 added clips against the 64 skill markers: 21 of 21 within 90s,
   19 within 45s, zero missed regions. Sorted the 24 rejections — exactly one was a genuine
   disagreement about what is worth marking.
-- *[~16 hour gap]*
-- **17:13** — trace PR 9. Five product commits, spec covering two of them.
-- "guessing you built that?" — no, a prior session did. Recommended landing PR 9 before starting
+- **≈2026-08-19 07:47–2026-08-20 00:13 UTC** — *[~16 hour gap]*
+- **2026-08-20 00:13 UTC** — trace PR 9. Five product commits, spec covering two of them.
+- **2026-08-20 00:20 UTC** — "guessing you built that?" — no, a prior session did. Recommended landing PR 9 before starting
   schema work, since steps 4-6 of the path touch the same three files.
-- Wrote the PR 9 review spec, closed `REVIEW.md` thread 4, harvested `D-034`-`D-038`, added the
+- **≈2026-08-20 00:20–00:31 UTC** — Wrote the PR 9 review spec, closed `REVIEW.md` thread 4, harvested `D-034`-`D-038`, added the
   tagging path and three `TD`s.
-- Committed the coordination docs to the branch instead of `main` — caught it, cherry-picked to
+- **≈2026-08-20 00:20–01:30 UTC** — Committed the coordination docs to the branch instead of `main` — caught it, cherry-picked to
   `main`, re-merged. First instance of the concurrency problem.
-- **~18:30** — "fair to say we're working on 1) here?" No. Recorded the missing loop, the `0:00
+- **≈2026-08-20 01:30 UTC** — "fair to say we're working on 1) here?" No. Recorded the missing loop, the `0:00
   Start` decision, and `TD-16`, all of which were living in a session log or inside a closed entry.
-- **18:30** — "this is becoming a re-organization thread." Read all four 8/19 logs. Reproduced the
+- **2026-08-20 01:30 UTC** — "this is becoming a re-organization thread." Read all four 8/19 logs. Reproduced the
   per-rule reject table from a pasted handoff and found it recorded nowhere. Corrected one claim
   in it — the three largest gaps are not all rejects, the second is a `g`.
-- Found the corpus blocker: four YouTube uploads with zero captions, still zero when re-checked.
+- **≈2026-08-20 01:30–02:22 UTC** — Found the corpus blocker: four YouTube uploads with zero captions, still zero when re-checked.
   And `Oa0wqetkNcg` is video 2 uploaded — 3883s against a last cue at 3870s, title still the Zoom
   filename.
-- Cleanup pass. `REVIEW.md` 798 → 155. `D-031` collapsed as superseded by `D-033`. Fixed `D-020`
+- **≈2026-08-20 01:30–02:22 UTC** — Cleanup pass. `REVIEW.md` 798 → 155. `D-031` collapsed as superseded by `D-033`. Fixed `D-020`
   telling readers to stop saying "skill marker", which contradicts the mandated vocabulary.
-- Mid-cleanup, `main` had moved: Codex had filed F20-F23 including a blocking one, and my
+- **≈2026-08-20 02:10–02:22 UTC** — Mid-cleanup, `main` had moved: Codex had filed F20-F23 including a blocking one, and my
   `REVIEW.md` rewrite was built on the pre-review copy. Stopped before committing, saved to
   scratch, rebuilt. Then found `origin/main` three further commits ahead with a `D-033` correction
   contradicting an edit I had just made.
-- **19:22** — "knock out all of F20-F23." F20 fixed and verified against the reviewer's own
+- **2026-08-20 02:22 UTC** — "knock out all of F20-F23." F20 fixed and verified against the reviewer's own
   fixture, before and after. F21 took three attempts: capping the media at 100% of a shrink-to-fit
   wrap is circular and collapsed the video to 28px. Verified at 760×520 and 1280×800 — grid height
   0 → 162.
-- **19:32** — interrupted with "are we all set here? didn't see a summary." Answered no and gave
+- **2026-08-20 02:32 UTC** — interrupted with "are we all set here? didn't see a summary." Answered no and gave
   the actual state, including an untested edit sitting in the tree.
-- **19:38** — "do it. any reason you paused on F23?" No gate; it was just last in the queue.
+- **2026-08-20 02:38 UTC** — "do it. any reason you paused on F23?" No gate; it was just last in the queue.
   Committed `8a47c2b`, threaded the responses, pushed.
-- **22:12** — `/plain-english` on the corpus passage. Rebuilding it by running the thing exposed
+- **2026-08-20 05:12 UTC** — `/plain-english` on the corpus passage. Rebuilding it by running the thing exposed
   that "teach the skill to read a run" was overstated: the skill eats a text file, and fifteen
   lines produced one from video 2's run — 708 lines, 20 GAP flags, speaker names throughout.
-- **22:28** — "what's the point of this section?" about `SKILL.md`'s negative rules. Measured all
+- **2026-08-20 05:28 UTC** — "what's the point of this section?" about `SKILL.md`'s negative rules. Measured all
   three. `R-NO-TALK-DETECT` confirmed independently on video 2. `R-NO-SPEAKER`'s premise is dead.
   Found the junk-caption labelling gap that accounts for 9 of 24 rejections.
-- **23:27** — "should we just start the skill from fresh?" Checked his premise: the 43-minute claim
+- **2026-08-20 06:27 UTC** — "should we just start the skill from fresh?" Checked his premise: the 43-minute claim
   in `SKILL.md` is 21.9 minutes in the store. Then found the stronger reason — `R-TAKE-GAP` does
   not transfer, because Zoom transcribes the playing (`Jake Sherman: Ba-ba-do da.`) instead of
   leaving silence.
-- **23:34** — scoping the finish line. Ran the lexicon test: `harmony` 89% vs 42%, `comping` 100%
+- **2026-08-20 06:34 UTC** — scoping the finish line. Ran the lexicon test: `harmony` 89% vs 42%, `comping` 100%
   vs 14%, `polish` 86% vs 64%, and no lexicon at all for `take` or `star`.
-- **23:41** — two clarifying questions, and correcting my own ordering: video 2 is already
+- **2026-08-20 06:41 UTC** — two clarifying questions, and correcting my own ordering: video 2 is already
   unanchored ground truth, so the skill run needs no new marking and goes first.
-- **23:43** — landed it. `93da38b` carries the ceiling table, the finish line, and `CURRENT.md`
+- **2026-08-20 06:43 UTC** — landed it. `93da38b` carries the ceiling table, the finish line, and `CURRENT.md`
   replaced with the eval spec.
-- **23:46** — asked what was staged in `AGENTS.md`. Unstaged, and it predated the session: the
+- **2026-08-20 06:46 UTC** — asked what was staged in `AGENTS.md`. Unstaged, and it predated the session: the
   rationale sentence naming PRs 5 and 6 had been dropped, probably by an editor reflow. Restored.
-- **23:48** — noticed only one of three options rendered a Run button; only one was in a shell
+- **2026-08-20 06:48 UTC** — noticed only one of three options rendered a Run button; only one was in a shell
   block. Then committed video 2's store — 147 label events and six run files that had never been
   backed up, and which tomorrow's task scores against.
 
@@ -338,53 +340,55 @@ because nobody counted what the model never showed him.
 
 ## Chronology (second stretch)
 
-- **05:12** — `/plain-english` on the corpus passage. Rebuilding by running the thing showed
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+
+- **2026-08-20 05:12 UTC** — `/plain-english` on the corpus passage. Rebuilding by running the thing showed
   "teach the skill to read a run" was overstated; fifteen lines produced the transcript file.
-- **05:28** — asked what `SKILL.md`'s three negative rules were for. Measured all three:
+- **2026-08-20 05:28 UTC** — asked what `SKILL.md`'s three negative rules were for. Measured all three:
   `R-NO-TALK-DETECT` confirmed on video 2, `R-NO-SPEAKER`'s premise dead. Found the
   junk-caption labelling gap behind 9 of video 1's 24 rejections.
-- **06:27** — "should we start the skill from fresh?" Checked his premise: `SKILL.md`'s
+- **2026-08-20 06:27 UTC** — "should we start the skill from fresh?" Checked his premise: `SKILL.md`'s
   43-minute claim is 21.9 minutes in the store. Then found the stronger reason.
-- **06:34** — scoping the finish line. Lexicon test: `harmony` 89% vs 42%, `comping` 100% vs
+- **2026-08-20 06:34 UTC** — scoping the finish line. Lexicon test: `harmony` 89% vs 42%, `comping` 100% vs
   14%, no lexicon at all for `take` or `star`.
-- **06:41-06:49** — corrected my own ordering (video 2 was already the held-out test, so the
+- **≈2026-08-20 06:41–06:49 UTC** — corrected my own ordering (video 2 was already the held-out test, so the
   skill run goes first). Landed the ceiling table and the eval spec. Restored `AGENTS.md`,
   which had lost the rationale sentence naming PRs 5 and 6 to an editor reflow.
-- **06:50** — first `/session-log`. Then committed video 2's store, which had never been backed
+- **2026-08-20 06:50 UTC** — first `/session-log`. Then committed video 2's store, which had never been backed
   up.
-- **06:54** — "upside is closer to 50% than 75%?" Measured video 2's annotation at 1.95×
+- **2026-08-20 06:54 UTC** — "upside is closer to 50% than 75%?" Measured video 2's annotation at 1.95×
   realtime from `labels.jsonl` timestamps, split it into watching and stopped time.
-- **06:57** — the "jake sherman brain" question. Tested whether the repository needs the
+- **2026-08-20 06:57 UTC** — the "jake sherman brain" question. Tested whether the repository needs the
   tagging: a finger-number regex finds 8 of 9 fingering rows at 10% false positive, with no
   training examples.
-- **07:06** — phone access. Checked `ListAgents` rather than answering from memory: one peer
+- **2026-08-20 07:06 UTC** — phone access. Checked `ListAgents` rather than answering from memory: one peer
   session, no cloud, no Remote Control.
-- *[~16 hour gap]*
-- **23:14** — back on the review-by-reading passage. Built the two eval scripts, found and
+- **≈2026-08-20 07:07–23:14 UTC** — *[~16 hour gap]*
+- **2026-08-20 23:14 UTC** — back on the review-by-reading passage. Built the two eval scripts, found and
   fixed a location-dependence bug by copying one out of the repo and watching it break.
-- **23:29-23:50** — three rounds of refresher questions: how the transcript got made, what a
+- **≈2026-08-20 23:29–23:50 UTC** — three rounds of refresher questions: how the transcript got made, what a
   run file is, the ingestion pipeline end to end, and a restatement of what `local.py` does.
   Rewriting that last one surfaced a real defect — my generator disagreed with the run about
   the gap count, three different answers for one transcript.
-- **02:20** — banked the scoring-script explanation as `/plain-english` example 004.
-- **02:29** — argued the 8 excluded stars were being discarded. Correct that they were; wrong
+- **2026-08-21 02:20 UTC** — banked the scoring-script explanation as `/plain-english` example 004.
+- **2026-08-21 02:29 UTC** — argued the 8 excluded stars were being discarded. Correct that they were; wrong
   that they belong in recall. Also found the 8 and the 9 were labelled backwards.
-- **04:14** — "I don't see PR10." It did not exist. Two branches had claimed the number in
+- **2026-08-21 04:14 UTC** — "I don't see PR10." It did not exist. Two branches had claimed the number in
   commit messages and neither was a pull request.
-- **04:18-04:29** — opened both, addressed both reviews. PR 10's doc changes stripped out and
+- **≈2026-08-21 04:18–04:29 UTC** — opened both, addressed both reviews. PR 10's doc changes stripped out and
   `main` merged in so the diff showed five lines instead of 106. PR 11's `NameError` on a
   zero-cue run fixed.
-- **04:55-05:30** — `build_cues` is captions, not markers. Then the sidecar hardening question:
+- **≈2026-08-21 04:55–05:30 UTC** — `build_cues` is captions, not markers. Then the sidecar hardening question:
   six adversarial shapes all correct, but no test suite and the provenance note was ephemeral.
   PR 12 fixed both.
-- **06:30** — "just simplify — what are the concrete changes?" Measured that deleting
+- **2026-08-21 06:30 UTC** — "just simplify — what are the concrete changes?" Measured that deleting
   `R-TAKE-GAP` strands zero stars, and that the 90-second tail is one 325-second hole.
-- **06:39** — wrote `SKILL.md` v2. Checked every historical rule id is accounted for.
-- **06:42** — work/lane. Measured they never vary per marker: video 2 carries one value 75
+- **2026-08-21 06:39 UTC** — wrote `SKILL.md` v2. Checked every historical rule id is accounted for.
+- **2026-08-21 06:42 UTC** — work/lane. Measured they never vary per marker: video 2 carries one value 75
   times. They are section metadata on the wrong object.
-- **06:44** — "are we shipped?" Yes, with the caveat that no timing measurement is of reviewing.
-- **06:46** — pushed back on the playback floor and was right.
-- **06:47** — renamed `polish` → `feel` (42 appended events), gated the three eval-chrome leaks,
+- **2026-08-21 06:44 UTC** — "are we shipped?" Yes, with the caveat that no timing measurement is of reviewing.
+- **2026-08-21 06:46 UTC** — pushed back on the playback floor and was right.
+- **2026-08-21 06:47 UTC** — renamed `polish` → `feel` (42 appended events), gated the three eval-chrome leaks,
   and auto-tagged video 3 as a preview. `harmony` fired on 49 of 51 rows — too loose.
 
 ---
@@ -508,24 +512,26 @@ of the repo, plus not re-reading what I had just changed.
 
 ## Chronology (third stretch)
 
-- **06:52** — `/session-log`, then the ballpark question: is the upside closer to 50% than 75%?
-- **07:00 onward** — measured video 2's annotation at 1.95x realtime from `labels.jsonl`
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+
+- **2026-08-21 06:52 UTC** — `/session-log`, then the ballpark question: is the upside closer to 50% than 75%?
+- **≈2026-08-21 07:00 UTC onward** — measured video 2's annotation at 1.95x realtime from `labels.jsonl`
   timestamps. Brian objected that video 3 skipped taxonomy, which broke the comparison; the split
   was roughly 22 minutes of skipped tagging and the rest bugs and distraction.
-- Pushed back on "playback is the floor" — the tool skips between markers, so the floor is the
+- **2026-08-21 06:46 UTC** — Pushed back on "playback is the floor" — the tool skips between markers, so the floor is the
   segments played. He was right and it moved 0.27x from unreachable to mid-range.
-- **Scored video 2, then video 3.** `R-TAKE-GAP` 92% then 50%; the prediction was wrong on one
+- **≈2026-08-21 06:17–06:23 UTC** — **Scored video 2, then video 3.** `R-TAKE-GAP` 92% then 50%; the prediction was wrong on one
   and right on the other, and the falsification test had been badly specified.
-- Wrote `SKILL.md` v2. Twelve rules to ten.
-- **The work/lane cleanup.** Brian: "seems messy to have two work fields". PR 17 had been a half
+- **2026-08-21 06:39 UTC** — Wrote `SKILL.md` v2. Twelve rules to ten.
+- **≈2026-08-21 16:44–17:03 UTC** — **The work/lane cleanup.** Brian: "seems messy to have two work fields". PR 17 had been a half
   change. PR 21 fixed it; PR 22 extended it to lane, reversing my earlier recommendation.
-- **"I don't see PR10"** — it did not exist. Two branches had claimed the number in commit
+- **≈2026-08-21 04:14–04:29 UTC** — **"I don't see PR10"** — it did not exist. Two branches had claimed the number in commit
   messages. Opened both properly.
-- **The merge rule.** Ten unreviewed merges, corrected twice — first as "never merge", then to
+- **≈2026-08-21 17:02–17:12 UTC** — **The merge rule.** Ten unreviewed merges, corrected twice — first as "never merge", then to
   his actual rule.
-- **The eval conversation**, flagged above. Ran from "is eval free?" through three wrong counts,
+- **≈2026-08-21 17:50–18:41 UTC** — **The eval conversation**, flagged above. Ran from "is eval free?" through three wrong counts,
   the accuracy challenge, the twenty-video reframe, and landed on [[D-041]].
-- **11:41** — this log. Codex's review on 21+22 is in and unaddressed.
+- **2026-08-21 18:41 UTC** — this log. Codex's review on 21+22 is in and unaddressed.
 
 ---
 
@@ -867,21 +873,23 @@ Unchanged from the previous record, plus:
 
 ## Chronology (the record)
 
-- Committed the worktrees/HEAD/reset side-chat record from the previous fork; pushed as `3f87bd8`.
-- Brian restated the PR 24/25 rebase situation in his own words and asked for the two gaps he had
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+
+- **≈2026-08-21 21:34–21:50 UTC** — Committed the worktrees/HEAD/reset side-chat record from the previous fork; pushed as `3f87bd8`.
+- **2026-08-21 21:47 UTC** — Brian restated the PR 24/25 rebase situation in his own words and asked for the two gaps he had
   marked `[something something]`.
-- Walked both ancestries on the real commits. Corrected: base is a branch, not a commit; a merge
+- **≈2026-08-21 21:47–21:50 UTC** — Walked both ancestries on the real commits. Corrected: base is a branch, not a commit; a merge
   keeps both parents rather than flattening to a line. Showed the two diffs side by side.
-- Noted the state had moved underneath the question — `origin/quit-csrf-guard` is at `7e4927e`,
+- **≈2026-08-21 21:47–21:50 UTC** — Noted the state had moved underneath the question — `origin/quit-csrf-guard` is at `7e4927e`,
   "Merge pull request #25", so the decision is now history.
-- Brian handed over the eval side chat and asked for a session log plus a standalone eval state
+- **2026-08-21 21:59 UTC** — Brian handed over the eval side chat and asked for a session log plus a standalone eval state
   doc, explicitly to set up a roadmap conversation.
-- Grounded the side chat against the store before writing: folded `labels.jsonl`, counted markers
+- **≈2026-08-21 21:59–22:57 UTC** — Grounded the side chat against the store before writing: folded `labels.jsonl`, counted markers
   and cues per run, read `score_run.py`, `grid.js`, `persist.js`, `suggest.js`, `keys.js`, and
   compared `SKILL.md`'s mtime against the proposals files.
-- Four corrections found (see Coaching hooks). One suspicious number chased and cleared: the
+- **≈2026-08-21 21:59–22:57 UTC** — Four corrections found (see Coaching hooks). One suspicious number chased and cleared: the
   688/688 cue coincidence.
-- Wrote `docs/coordination/EVAL.md`, added two pointers, committed to `main`.
+- **≈2026-08-21 21:59–22:57 UTC** — Wrote `docs/coordination/EVAL.md`, added two pointers, committed to `main`.
 
 ---
 
@@ -976,18 +984,20 @@ in D-042 under "Consequence to check".
 
 ## Chronology (the record)
 
-- Confirmed nothing was blocking: clean tree, no open PRs (PR 23 was closed rather than merged,
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+
+- **≈2026-08-21 22:57–23:02 UTC** — Confirmed nothing was blocking: clean tree, no open PRs (PR 23 was closed rather than merged,
   which was correct), 15/15 tests, and all six Codex worktree commits already in `main`.
-- Mapped Brian's YouTube asks against `CURRENT.md`: three of four were already phases 1-3; the
+- **2026-08-21 22:57 UTC** — Mapped Brian's YouTube asks against `CURRENT.md`: three of four were already phases 1-3; the
   rename was new.
-- Worked out that the rename is a join between `run.youtubeId` (phase 1) and `uploads.json`
+- **≈2026-08-21 22:57–23:02 UTC** — Worked out that the rename is a join between `run.youtubeId` (phase 1) and `uploads.json`
   (phase 3), not new machinery. Wrote it as phase 4 with a precedence rule and pull-only direction.
-- Flagged the two readings of "rename". Brian: the video name only, markers always one-way.
-- Discovered he had moved `EVAL.md` to `docs/reference/`. Recorded the move in git and repointed
+- **2026-08-21 23:02 UTC** — Flagged the two readings of "rename". Brian: the video name only, markers always one-way.
+- **≈2026-08-21 23:02–23:09 UTC** — Discovered he had moved `EVAL.md` to `docs/reference/`. Recorded the move in git and repointed
   `README.md` and `BACKLOG.md`.
-- Read `export.js` and `util.js:137` before writing D-042, which is what surfaced the
+- **≈2026-08-21 23:02–23:09 UTC** — Read `export.js` and `util.js:137` before writing D-042, which is what surfaced the
   `resolvedLabel` carve-out — the decision would otherwise have outlawed shipped behavior.
-- Grepped `DECISIONS.md` while numbering D-042 and found the D-041 / §7C contradiction. Flagged
+- **≈2026-08-21 23:09–23:12 UTC** — Grepped `DECISIONS.md` while numbering D-042 and found the D-041 / §7C contradiction. Flagged
   in place rather than resolving it.
 
 ---
@@ -1087,4 +1097,3 @@ checkable against that file and line, not against the general area.
 
 6. **F31** — `score_run.py` refuses cleanly when there are no human rows. Optional. Same pass as
    the `annotated` proxy fix (`docs/reference/EVAL.md` §4); both are in `score_run.py`.
-
