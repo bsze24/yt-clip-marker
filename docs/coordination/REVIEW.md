@@ -1,8 +1,10 @@
 # Review
 
-Active target: **none.** Thread 10 closed 2026-08-21 — Phase 1 reviewed clean and merged at
-`62278d6`; the one finding, F32, is deferred into Phase 3 by Brian's call. Threads 1-9 remain
-closed. Durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
+Active target: **thread 11**, the launchd app surface as merged on `main`. One blocking finding,
+F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken. Thread 10 closed
+2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
+into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
+and `BACKLOG.md`.
 
 > ## Concurrency protocol — read before editing
 >
@@ -38,6 +40,7 @@ closed. Durable outcomes live in `DECISIONS.md` and `BACKLOG.md`.
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
+| 11 — launchd app surface, ingest | PRs 24-26 as merged, `1052b5a` | **OPEN** 2026-08-21 — F35 blocking | implementer |
 
 ---
 
@@ -601,3 +604,53 @@ rather than through the keyboard. Worth a real keypress before merge.
 
 PR 24 landed at `9ae0345`; F30 delivered through PR 26 at `02e0dfb`. F29 and F30 are resolved,
 and review-only PR 23 was closed unmerged.
+
+---
+
+## Thread 11 — the launchd app surface cannot reach yt-dlp — OPEN 2026-08-21
+
+**Target:** the app surface as merged on `main` at `1052b5a` (PRs 24-26, thread 9, closed).
+Found while resolving Codex's Phase 2 readiness review, which reported it as a *prerequisite for
+the uploads cache*. It is not — it is a defect in code that already shipped, and it is filed here
+rather than in `CURRENT.md` because that document is the task, not the ledger.
+
+### F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken — blocking · open
+
+Four facts, each measured on 2026-08-21 rather than inferred:
+
+| | |
+| --- | --- |
+| the live agent | pid 15513, `PATH=/usr/bin:/bin:/usr/sbin:/sbin` |
+| `~/Library/LaunchAgents/com.briansze.yt-clip-studio.plist` | no `EnvironmentVariables` key at all |
+| `apps/studio/ingest.py:65` | invokes the bare string `"yt-dlp"` |
+| the binary | `/opt/homebrew/bin/yt-dlp` |
+
+`launchd` gives an agent a minimal `PATH` unless the plist sets one. Homebrew's directory is not
+in it, so every `subprocess.run(["yt-dlp", …])` raises `FileNotFoundError`, which `ingest.py:50`
+turns into the user-facing `yt-dlp not found. Install it: pip install yt-dlp`. **Ingesting a
+YouTube URL from the app has never worked.**
+
+**Why it stayed invisible for three PRs.** Every run before the app surface was `python3
+server.py` from a terminal, where Homebrew *is* on `PATH`. The regression arrived with the
+launchd agent in PRs 24-26 and nothing since has ingested a URL from the app rather than a shell.
+`/api/ingest` with a local *path* is unaffected — `local.py` shells out to nothing — which is why
+the Zoom workflow kept working and hid the other half.
+
+**Recommended fix.** `studio install` writes an explicit `PATH` into the plist containing the
+directory of the yt-dlp it detects at install time, and the live acceptance runs through the
+reinstalled agent rather than a shell. Teaching `ingest.py` a private Homebrew fallback fixes one
+caller and leaves the next one to rediscover this. Missing yt-dlp must still degrade to a clear
+error, never block server startup.
+
+**Ships as its own small PR, before Phase 2.** Repairing a merged user-visible bug inside a
+feature PR hides the fix in the feature's review.
+
+**The lesson, which is the reason this is worth more than its three-line fix.** The finding is one
+member of a class: *verified in a terminal, will run in a launchd agent*. `--cookies-from-browser
+chrome`, which Phase 2 depends on entirely, is the second member and is still unmeasured — on
+macOS it decrypts Chrome's Safe Storage key out of the login Keychain, and Keychain access is
+granted per binary with a first-use prompt. Every measurement behind §3.4 was taken from a shell,
+which proves nothing about the agent. `CURRENT.md` §6 gates Phase 2 on running that one refresh
+through the reinstalled agent.
+
+**Baton: implementer.**
