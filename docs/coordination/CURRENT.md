@@ -726,3 +726,20 @@ without an error.
 
 **Not re-filed, because the 17:05 Phase 6 note already has it:** the `.gitignore` gap on Zoom's
 `*newChat*.txt` sidecars, and §1's disk figure being stale.
+
+### 2026-08-21 — Codex, migrating the raw Zoom exports
+
+Brian expanded the move from the two marked lessons to **all seven raw Zoom export folders**.
+They now live directly under `/Users/briansze/lesson-inbox/`; no `GMT*` export folder remains in
+`docs/reference/`. The move was within one filesystem, and none of the source files was tracked.
+
+The two existing `apps/studio/media/` symlinks were atomically replaced to target the relocated
+`GMT20260712` and `GMT20260730` MP4s. Their immutable run files and `labels.jsonl` were untouched.
+After restarting the launchd Studio, both runs still reported local media and retained 51 and 75
+added markers. Browser verification loaded the relocated files at 2642.76s and 3882.496s,
+respectively, with no run warning and no console error.
+
+**Phase 6 now has a stronger live fixture than §6.4's constructed wording:** seven lesson folders
+exist in the inbox, two are already ingested through renamed `media/` symlinks, and the scanner
+should therefore offer exactly the other five. That exercises realpath exclusion and discovery
+in one acceptance pass.
