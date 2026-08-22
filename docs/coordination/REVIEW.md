@@ -1,8 +1,8 @@
 # Review
 
-Active target: **thread 11**, F35 addressed at draft PR 29 / `735ff6a` and **reviewed clean
-2026-08-22** — two non-blocking findings, F36 and F37, recommended to fold into the same PR.
-Baton: Brian, for the merge call. Thread 10 closed
+Active target: **thread 11**. F35 is **resolved** — PR 29 merged at `255739f` on 2026-08-22.
+It merged as-is, so the two non-blocking findings the review recommended folding in, **F36 and
+F37, are still open against `main`**. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
@@ -37,11 +37,12 @@ and `BACKLOG.md`.
 | 4 — local video mode | `fced73f` (PR 8) | **CLOSED** 2026-08-19 — merged `71b9d82`, F18/F19 resolved | — |
 | 5 — Zoom export ingest | `5eb55d2` → `8a47c2b` (PR 9) | **CLOSED** — merged `2ee9cc9` | — |
 | 6 — matching-label export fold | `e8d206c` (PR 10) | **CLOSED** — F24 repaired, merged `be32232` | — |
-| 7 — eval scoring scripts | `e8943cd` (PR 11) | **CLOSED** — F25 fixed at `ea698a3`, merged `70b343d` | — |
+| 7 — eval scoring scripts | `e8943cd` (PR 11) | **OPEN** — F25 fixed at `ea698a3`, merged `70b343d`; **F31 still open** | implementer |
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
-| 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **REVIEWED CLEAN** 2026-08-22 — F35 verified fixed; F36/F37 non-blocking | Brian, merge call |
+| 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **OPEN** — reviewed clean, merged `255739f`; F35 resolved, **F36/F37 open against `main`** | implementer |
+| 12 — eval star predictability | `d8b21f1` (PR 27) | **UNREVIEWED** — merged `2026-08-21` with no thread. Author was the only reader. | — |
 
 ---
 
@@ -608,14 +609,14 @@ and review-only PR 23 was closed unmerged.
 
 ---
 
-## Thread 11 — the launchd app surface cannot reach yt-dlp — OPEN 2026-08-21
+## Thread 11 — the launchd app surface cannot reach yt-dlp — OPEN (F35 resolved; F36, F37 open)
 
 **Target:** the app surface as merged on `main` at `1052b5a` (PRs 24-26, thread 9, closed).
 Found while resolving Codex's Phase 2 readiness review, which reported it as a *prerequisite for
 the uploads cache*. It is not — it is a defect in code that already shipped, and it is filed here
 rather than in `CURRENT.md` because that document is the task, not the ledger.
 
-### F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken — blocking · addressed
+### F35 — the running studio cannot find `yt-dlp`, so in-app ingest is broken — blocking · **resolved 2026-08-22**
 
 Four facts, each measured on 2026-08-21 rather than inferred:
 
@@ -759,6 +760,48 @@ so. `AGENTS.md` puts docs describing behaviour in the PR that changes it, so one
   Python, and a harness for three lines of shell is ceremony. The table above is the evidence
   instead.
 
-**Baton: Brian, for the merge call.** F36 and F37 are recommendations, not blockers. Merging as-is
-strictly improves the current state; folding them in first costs a few lines and closes the revert
-path in F36 (1). Phase 2 and the authenticated-cookie measurement remain outside this PR.
+**Baton at review time: Brian, for the merge call.** F36 and F37 were recommendations, not
+blockers.
+
+### Merge outcome — 2026-08-22
+
+**PR 29 merged as-is at `255739f`.** F35 is resolved. Neither recommendation was folded in, so
+both remain open against `main` — verified rather than assumed:
+
+```
+stale_plist()  still greps only for "<string>$APP_DIR/server.py</string>"     → F36 open
+find_ytdlp()   still checks only /opt/homebrew/bin and /usr/local/bin         → F37 open
+```
+
+**One half of F36 is closed by the merge itself, and it was the urgent half.** Consequence (1)
+was that `main`'s self-heal would rewrite the plist without `EnvironmentVariables` and silently
+undo the fix. `main`'s `write_plist` now carries the key, so that path is gone. **Consequence (2)
+stands:** the agent's PATH is still frozen at install time, and neither `heal_if_moved` nor
+`status` can see it drift.
+
+Re-severity: F36 drops from "fold this in" to **optional**, on the same shelf as F31 — a real
+defect whose trigger requires installing yt-dlp after the studio, moving Homebrew, or changing
+Mac architecture. F37 was already optional and is unchanged, **except that its doc half is now
+a gap on `main`**: `studio install` bakes the PATH, so installing yt-dlp afterwards needs a
+reinstall, and nothing in either README says so.
+
+**Baton: implementer.** F36 and F37 are two small changes in one file plus one sentence of docs.
+Natural home is whichever PR next opens `apps/studio/studio` — the same argument that folded F32
+and F34 into Phase 3 rather than giving three lines their own PR.
+
+---
+
+## Thread 12 — eval star predictability (`d8b21f1`, PR 27) — UNREVIEWED, merged 2026-08-21
+
+Recorded so the ledger does not imply a review that never happened. **PR 27 added
+`apps/studio/eval/star_predictability.py` and merged with no review thread and no second reader
+— its author was the only person who read it.** Every other code PR in this repo got a thread.
+
+Not re-opened as a review target, because the file is 300 lines of read-only analysis: it opens
+`labels.jsonl` and `runs/*.json`, writes nothing, imports nothing outside the stdlib, and no
+product code imports it. The realistic failure is a wrong number in [[D-044]], not a wrong
+behaviour in the studio — and a wrong number there is checkable by re-running it.
+
+**What would justify opening it:** if [[D-044]] is ever load-bearing for a decision bigger than
+"do not build rung 4" — for instance if it is cited to justify deleting collected labels — the
+arithmetic deserves a second reader first. Flagged, not scheduled.

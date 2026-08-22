@@ -79,7 +79,7 @@ fixes.
   (2.25/min against `R-COPIOUS`'s floor of 1), 99/99 on exact cue starts (`R-CUE-EXACT`), no
   gap over 60s (`R-COVERAGE`). Artifacts: `/tmp/video3-proposals-v2.json`.
 - **`eval/star_predictability.py`** (2026-08-21) — the §7E test, re-runnable. See [[D-044]].
-  Open in PR 27, so it is not on `main` yet.
+  Merged to `main` in PR 27 at `d8b21f1`.
 
 ## 4. Current state of the code — verified 2026-08-21
 

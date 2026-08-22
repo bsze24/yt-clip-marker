@@ -614,7 +614,7 @@ Answers the question `docs/reference/EVAL.md` §7E left open, and it is the same
 gave for `take`. Re-run the evidence with
 `python3 apps/studio/eval/star_predictability.py`.
 
-**The measurement** (script open in PR 27). 147 clips Brian created himself, 66 starred, base rate 45%. Ten features a
+**The measurement** (`apps/studio/eval/star_predictability.py`, PR 27). 147 clips Brian created himself, 66 starred, base rate 45%. Ten features a
 model could compute from the transcript — talk density, teacher share, theory-word density,
 instruction words, emphasis words, question rate, mean cue length, vocabulary richness, proximity
 to a silence gap, position in the lesson — scored between 0.44 and 0.60 AUC pooled. Not one keeps
