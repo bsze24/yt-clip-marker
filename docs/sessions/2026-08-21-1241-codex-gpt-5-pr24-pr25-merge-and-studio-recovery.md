@@ -1,5 +1,6 @@
 ---
 date: 2026-08-21
+revised: 2026-08-22 07:10 UTC
 time: "12:41"
 surface: codex-gpt-5
 project: yt-clip-marker
@@ -85,27 +86,29 @@ route was verified.
 
 ## Chronology (the record)
 
-- Continued the review role after the earlier PR 9–11 review handoff, then checked the later
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+
+- **≈2026-08-21 17:20–19:21 UTC** — Continued the review role after the earlier PR 9–11 review handoff, then checked the later
   studio appification work through the review-only PR 23 range and its repair path.
-- Confirmed F29: a foreign page could submit a normal form to localhost and stop the studio;
+- **≈2026-08-21 19:21–19:25 UTC** — Confirmed F29: a foreign page could submit a normal form to localhost and stop the studio;
   reviewed PR 24's same-origin JSON guard on both side-effect POST routes.
-- Confirmed F30 was only partly fixed in PR 24: `studio open` could heal the launchd plist, but
+- **≈2026-08-21 19:21–19:26 UTC** — Confirmed F30 was only partly fixed in PR 24: `studio open` could heal the launchd plist, but
   an already-built app bundle still carried its old absolute path.
-- Explained the remaining app-bundle limitation in plain language, then built the requested
+- **≈2026-08-21 19:25–19:31 UTC** — Explained the remaining app-bundle limitation in plain language, then built the requested
   move-safe follow-up: the generated bundle stays beside `studio` and derives that path from
   itself at launch.
-- Verified that follow-up in a disposable checkout with spaces, including moving the checkout
+- **≈2026-08-21 19:26–19:31 UTC** — Verified that follow-up in a disposable checkout with spaces, including moving the checkout
   and letting the launcher recover the launch-agent path.
-- Checked merge readiness for PR 24 after its branch incorporated the live coordination commits;
+- **≈2026-08-21 19:31–19:35 UTC** — Checked merge readiness for PR 24 after its branch incorporated the live coordination commits;
   it was clean and merged as `9ae0345`.
-- Investigated the GMT20260712 player reporting an unavailable video. The media symlink, current
+- **≈2026-08-21 19:32–19:35 UTC** — Investigated the GMT20260712 player reporting an unavailable video. The media symlink, current
   run resolution, and byte-range media route were all healthy. Port 8765 instead belonged to a
   launchd service started by the path-move test from a deleted temporary checkout.
-- Restored the real launch agent with `studio install`; the live API then returned the run's
+- **≈2026-08-21 19:32–19:35 UTC** — Restored the real launch agent with `studio install`; the live API then returned the run's
   local MP4 and `/media/...mp4` returned `206 Partial Content`.
-- Reviewed the small PR 25 diff, marked it ready, and merged it. Later, while preparing this
+- **≈2026-08-21 19:36–19:37 UTC** — Reviewed the small PR 25 diff, marked it ready, and merged it. Later, while preparing this
   log, caught that its base was still `quit-csrf-guard`, so that merge had not reached `main`.
-- Opened corrective PR 26 from that branch to `main`, waited for BugBot's summary, and merged
+- **≈2026-08-21 19:36–19:41 UTC** — Opened corrective PR 26 from that branch to `main`, waited for BugBot's summary, and merged
   the unchanged diff as `02e0dfb`. Closed the review-only PR 23 without merging.
-- Used the session-log discussion itself to settle the indexing rule: `review` is one durable
+- **≈2026-08-21 19:38–19:41 UTC** — Used the session-log discussion itself to settle the indexing rule: `review` is one durable
   continuity track across many PRs; exact PR lookup is deliberately a separate path.
