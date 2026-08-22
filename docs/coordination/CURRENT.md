@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ planner — Phase 2 merged at `9622365`; Phase 3 is next. See §6.**
+**→ implementer — PR A is Phase 3 + Phase 5. Sequence recut 2026-08-22, see §4 and §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -297,23 +297,106 @@ is not the door.
 A run whose duration is unknown matching every zero-duration upload is the same class of silent
 wrong answer this table exists to avoid.
 
+### 3.10a The lesson inbox
+
+Staging lives **outside the repo** — default `~/lesson-inbox/`, overridable with
+`CLIP_STUDIO_INBOX`. Migrated 2026-08-22; `docs/reference/` is back to 64 KB and both `media/`
+symlinks were re-pointed and verified resolving. The reason is survivability, not tidiness:
+`docs/reference/**/*.mp4` was gitignored and `git clean -xdf` deletes ignored files.
+
+**The one primitive, and §3.7 consumes it too.** A media file is already ingested when its
+**realpath** is the target of a `media/` entry named by some run's `media` field. Realpath, never
+filename — `stage_media` deduplicates names, so the two already differ:
+
+```
+media/GMT20260730-155336_Recording_640x360-1.mp4
+   -> ~/lesson-inbox/GMT20260730/GMT20260730-155336_Recording_640x360.mp4
+                                                             ^ no -1 at the target
+```
+
+`apps/studio/inbox.py`, stdlib, no server import:
+
+- `ingested_realpaths(runs_dir, media_dir)` → the set.
+- `scan(inbox_dir, ingested)` → one candidate per lesson folder: `{path, title, size, hasTranscript}`.
+  Bounded depth, no network, no writes.
+
+**One candidate per folder.** A Zoom export is `.mp4` + `.m4a` + `.transcript.vtt`; offer the
+video, largest if there are two. Offering the `.m4a` produces a second run for the same lesson,
+which §5 already names as destructive to untangle.
+
+**`GET /api/inbox`** returns `{items, root, scannedAt}`. **Synchronous is correct here** and the
+contrast with §3.5 is the point: that cache shells out to yt-dlp over the network, this is a
+bounded directory scan. A missing or unreadable inbox returns an empty list, not an error. The
+picker renders candidates in their own group and **selecting one fills the Add video control**,
+never starts an ingest — the same rule §3.6 sets for uploads. No filesystem watcher; the scan
+rides the existing runs poll.
+
+Sidecar matching already handles the new drops — verified 2026-08-21, do not "fix" it.
+`stem_variants` strips ` (1)` then `_1920x1384`, leaving a stem the `.transcript (1).vtt` matches
+at a `.` boundary.
+
+The argument behind this section is the handoff note of 2026-08-21 17:05.
+
 ### 3.10 Fixtures
 
 Do every destructive acceptance on the four zero-clip runs first. The two GMT runs hold 266 clips
 between them and are not fixtures.
 
-## 4. Chosen sequence — resequenced, five phases
+## 4. Sequence and PR cut — recut 2026-08-22
 
-Ordered by disk freed per line of code. Phase 1 frees 783 MB with a warning condition; the phase
-that adds the new event field comes after the cache that makes it usable.
+**Phase numbers are identities, not build order.** §3.7 is "Phase 4" in `REVIEW.md`, in finding
+text and in three handoff notes; renumbering would break every one of those references, the same
+reason findings are never renumbered. The **PR** column is the order to build in.
 
-| # | Phase | Contracts delivered | What it frees |
-| --- | --- | --- | --- |
-| 1 | Warning suppression + effective id | §3.1 rule 2, §3.3 | 783 MB, deleted by hand |
-| 2 | Uploads cache | §3.4, §3.5, §3.6 | nothing yet |
-| 3 | The link event | §3.1 rule 1, §3.2, §3.9 | makes the 368 MB disposable |
-| 4 | Inventory and guarded delete | §3.7 | the 368 MB, safely, in-app |
-| 5 | Title join | §3.8 | — |
+| # | Phase | Contracts | PR | State |
+| --- | --- | --- | --- | --- |
+| 1 | Warning suppression + effective id | §3.1 rule 2, §3.3 | PR 28 | **merged** `62278d6` |
+| 2 | Uploads cache | §3.4, §3.5, §3.6 | PR 30 | **merged** |
+| 3 | The link event | §3.1 rule 1, §3.2, §3.9 | **A** | next |
+| 5 | Title join | §3.8 | **A** | rides with Phase 3 |
+| 6 | The lesson inbox | §3.10a | **B** | after A |
+| 4 | Inventory and guarded delete | §3.7 | **C** | last |
+| — | Open-findings sweep | — | **E** | independent, any time |
+
+**Why the cut is by blast radius, not by size.** Two of these fail in ways nothing else here does,
+and each needs a review with nothing else in it to dilute attention:
+
+| Phase | What a wrong version destroys |
+| --- | --- |
+| 3 | writes a new verdict type into an append-only store that is never rewritten ([[D-002]]) — a wrong event shape is permanent ambiguity |
+| 4 | `shutil.move`s the user's only copy of a lesson recording |
+| 5 | a wrong string on screen |
+| 6 | a wrong list of files it never touches |
+
+**Why Phase 5 rides with Phase 3 (PR A).** Phase 5 consumes exactly what Phase 3 produces — the
+effective id — plus what Phase 2 already produced, and its two call sites are the picker and the
+header, which a reviewer checking "was the effective id plumbed everywhere" is already reading.
+It deviates from one-PR-per-phase; Brian accepted the deviation on 2026-08-22 because a full
+review round for a title string buys less than it costs.
+
+**Why Phase 6 comes before Phase 4.** They need the same primitive — resolve `media/` symlinks to
+realpaths, decide which runs claim which file (§3.10a). Phase 6 needs it read-only; Phase 4 needs
+it to decide what is safe to delete. Building it first means the most destructive PR in this task
+consumes a primitive that has already survived one review in a harmless context. **Phase 4 must
+import `inbox.py` rather than grow a second copy.** It also puts the five inbox lessons in the
+picker weeks earlier.
+
+**PR E, the findings sweep.** F36 and F37 (`apps/studio/studio`), F31 and the `annotated` proxy
+(`apps/studio/eval/score_run.py`). No remaining phase opens either file, so without a sweep these
+sit in the ledger indefinitely. Four small fixes, three files, no change to the annotation loop.
+
+**Debt and finding assignments.**
+
+| Item | Rides in | Why there |
+| --- | --- | --- |
+| `TD-17`, `TD-18` (ex-F38, F39) | **PR A** | both live in `uploads.py`, which Phase 3 already opens for §3.9's duration matching |
+| F32, F34 | **PR A** | already assigned to Phase 3 by `REVIEW.md` thread 10 |
+| F36, F37 | **PR E** | `apps/studio/studio`; no phase touches that file |
+| F31, `score_run.py`'s `annotated` proxy | **PR E** | same file, same pass |
+
+`TD-18` is a hole in **§3.5 5a**, the planner's own contract, not in PR 30's implementation — so
+PR A edits the contract text as well as the code. Prune only when the fetch is not a drastic
+shrink; merge and log otherwise.
 
 **Phase 1 acceptance.** Move the four zero-clip `.mp4`s out of `media/`. All four runs still play
 from YouTube, the picker's `⏏` marks clear, and no warning appears. Break the GMT20260730 symlink:
@@ -338,6 +421,13 @@ updates after the next background refresh. Kill the network and reopen: the last
 the cache's age, and nothing alarming in the console. Cold cache offline falls back to the run
 title.
 
+**Phase 6 acceptance.** Five folders in `~/lesson-inbox/` with no runs: the picker offers exactly
+five candidates, the `.mp4` of each and never the `.m4a`. Ingest one and it leaves the list on the
+next poll, no restart, with cues from its `.transcript (1).vtt`. Point `CLIP_STUDIO_INBOX` at a
+directory that does not exist: the studio opens at the same speed, the group is absent, the
+console is clean. A file already ingested through a *renamed* `media/` symlink still counts as
+ingested — the realpath test, not the filename test.
+
 ## 5. Out of scope
 
 Deleting or merging the duplicate runs. Once the link lands, `Oa0wqetkNcg` and the local
@@ -353,9 +443,14 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ planner, for Phase 3.** PR 30 merged at `9622365` on Brian's explicit approval after a clean
-review. The `PATH` fix, production cookie gate and Phase 2 are all complete. F38 and F39 remain
-visible as TD-17 and TD-18; neither blocks the next phase.
+**→ implementer, for PR A — Phase 3 + Phase 5.** The sequence and PR cut were recut on
+2026-08-22 (§4) and agreed by Brian: **A = Phase 3 + Phase 5, then B = Phase 6, then C = Phase 4**,
+with **E** the findings sweep, landable any time. Phase numbers stayed put; the build order is the
+PR column.
+
+PR 30 merged at `9622365` on Brian's explicit approval after a clean review. The `PATH` fix, the
+production cookie gate and Phase 2 are all complete. `TD-17` and `TD-18` ride into PR A rather
+than waiting for a debt pass.
 
 **Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
 merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
@@ -368,8 +463,13 @@ optional and belong in whichever PR next opens `apps/studio/studio`.
 3. **Built with it — the one-line `.gitignore` rule** for Zoom's `*newChat*.txt`, the live
    broad-`git add` hazard carried from the readiness review.
 
-The Phase 2 gate passed, so the current Phase 2 → Phase 3 order stands. The typed-id door in §3.9
-still keeps Phase 3 usable when the optional cache is absent.
+The Phase 2 gate passed. The typed-id door in §3.9 still keeps Phase 3 usable when the optional
+cache is absent.
+
+**PR A is the highest-consequence PR so far**, because it is the first to write a new verdict type
+into `labels.jsonl`, which is never rewritten ([[D-002]]). §3.2's two regression tests are
+mandatory, not advisory: writing a link leaves `load_sections` byte-identical, and writing a
+section leaves the effective id unchanged.
 
 Merging requires Brian's explicit approval, per PR.
 
@@ -497,6 +597,11 @@ case logged its existing visible warning as expected.
 above this line was touched. **This section is a phase spec sitting in the handoff notes because
 the safe place to write while someone else is mid-flight is the end of the file.** Fold it into
 §4 as Phase 6 when the baton is quiet.
+
+> **Done 2026-08-22.** The contract is now **§3.10a** and Phase 6 is in §4 as **PR B**. What
+> remains below is the argument, per the rule that §3 holds contracts and the handoff notes hold
+> why. The migration also happened: `~/lesson-inbox/` holds 2.3 GB, `docs/reference/` is back to
+> 64 KB, and both `media/` symlinks were re-pointed and verified resolving.
 
 **What prompted it.** Brian dropped five new Zoom exports into `docs/reference/` on 2026-08-21 —
 `GMT20260404`, `GMT20260409`, `GMT20260415`, `GMT20260518`, `GMT20260602` — and none of them is

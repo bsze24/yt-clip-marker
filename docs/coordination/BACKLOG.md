@@ -750,6 +750,9 @@ manufacture the text-identity that made video 1 safe.
 
 ### TD-17 — one malformed upload row makes refresh forget every valid cached row
 
+**Lands in PR A** (Phase 3 + Phase 5), assigned 2026-08-22 — Phase 3 opens `uploads.py`
+for §3.9's duration matching, so neither needs a debt pass of its own.
+
 `uploads._validated_cache` correctly returns no API data when any cached row is invalid, but the
 background refresh uses that same all-or-nothing read as its merge input. One malformed row makes
 the previous cache look empty; a later unauthenticated refresh can then replace all valid rows
@@ -760,6 +763,9 @@ repairs it, so PR 30's review filed this as non-blocking F38 and merged as-is.
 recovery: retain valid rows when the envelope (`channel`, timezone-aware `fetchedAt`) is usable.
 
 ### TD-18 — a truncated authenticated upload refresh may prune a complete cache
+
+**Lands in PR A** (Phase 3 + Phase 5), assigned 2026-08-22 — Phase 3 opens `uploads.py`
+for §3.9's duration matching, so neither needs a debt pass of its own.
 
 The upload canary proves Chrome authentication worked; it does not prove yt-dlp returned the
 whole playlist. A partial result containing the canary is currently allowed to prune every

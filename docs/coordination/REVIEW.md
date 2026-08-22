@@ -8,6 +8,22 @@ F38 and F39 are deferred as TD-17 and TD-18. Thread 11's F35 is **resolved** —
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
 
+### Where the open findings land — assigned 2026-08-22
+
+`CURRENT.md` §4 recut the PR sequence, so every open item now has a home rather than a status.
+
+| Item | Thread | Lands in |
+| --- | --- | --- |
+| F31 — `score_run.py` crashes instead of refusing on a run with no human rows | 7 | **PR E**, with the `annotated` proxy fix |
+| F36 — `stale_plist` sees a stale path, not a stale PATH | 11 | **PR E** |
+| F37 — the finder looks in Homebrew while three places advise pip | 11 | **PR E** |
+| F32, F34 | 10 | **PR A** (Phase 3), already assigned |
+| `TD-17`, `TD-18` (ex-F38, F39) | 13 | **PR A** — both in `uploads.py`, which Phase 3 opens anyway |
+
+PR E exists because no remaining phase opens `apps/studio/studio` or `apps/studio/eval/score_run.py`.
+Without it those three findings sit in the ledger indefinitely, which is how F31 stayed open for a
+day behind a thread heading that read CLOSED.
+
 > ## Concurrency protocol — read before editing
 >
 > More than one review can be in flight, and these branches are stacked. The rules stop two
