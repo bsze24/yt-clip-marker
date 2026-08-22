@@ -1,5 +1,6 @@
 ---
 date: 2026-08-19
+revised: 2026-08-22 07:10 UTC
 time: "05:36"
 surface: codex-gpt-5
 project: yt-clip-marker
@@ -99,39 +100,41 @@ between Codex, Claude and Grok.
   untracked and outside this commit.
 
 ## Chronology (the record)
-- Took over as builder and read the repo, product split, coordination docs and active branches.
-- Followed the supplied landing brief and separated the already-built product into PR 3 code,
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **≈2026-08-16 08:39–09:00 UTC** — Took over as builder and read the repo, product split, coordination docs and active branches.
+- **≈2026-08-16 09:00–09:35 UTC** — Followed the supplied landing brief and separated the already-built product into PR 3 code,
   PR 4 video-1 data and PR 5 session provenance.
-- Audited Grok's schema-word cleanup plan before implementation and flagged only the high-cost
+- **≈2026-08-18 03:03–03:12 UTC** — Audited Grok's schema-word cleanup plan before implementation and flagged only the high-cost
   gaps: immutable history, stale review anchors, degraded-load behavior, lossless migration and
   durable fallback semantics.
-- Went quiet during the audit long enough for two “are you stuck?” checks. Resumed with the
+- **≈2026-08-18 03:12–03:14 UTC** — Went quiet during the audit long enough for two “are you stuck?” checks. Resumed with the
   requested three-part readout: incoming prompt, plan edits and executed work.
-- Implemented the cleanup on PR 3, migrated the PR 4 run key, preserved `labels.jsonl`, and
+- **≈2026-08-18 03:14–03:27 UTC** — Implemented the cleanup on PR 3, migrated the PR 4 run key, preserved `labels.jsonl`, and
   used additive merges rather than force-pushing either published branch.
-- Discussed whether the review stack should have landed first. Concluded that base-first is the
+- **≈2026-08-18 03:27–03:37 UTC** — Discussed whether the review stack should have landed first. Concluded that base-first is the
   cheaper default, while the cleanup was still valid because the child branch was restacked and
   reverified.
-- Designed the cross-agent state model: one active task with SHAs, durable decisions, GitHub
+- **≈2026-08-18 03:37–03:51 UTC** — Designed the cross-agent state model: one active task with SHAs, durable decisions, GitHub
   review threads, backlog for deferrals, and session logs for learning context.
-- Read Claude's F6–F13 review. Accepted the three blocking findings and the concrete
+- **≈2026-08-18 03:51–04:13 UTC** — Read Claude's F6–F13 review. Accepted the three blocking findings and the concrete
   non-blockers rather than treating severity as a batch instruction.
-- Fixed F6–F11 at `6d2ee47`. Browser checks covered independent and same-record saves, stable
+- **≈2026-08-18 03:51–04:13 UTC** — Fixed F6–F11 at `6d2ee47`. Browser checks covered independent and same-record saves, stable
   selection, exact repaint and player-focus behavior; API checks covered the `wrong` verdict.
-- Declined F12 after the browser showed the player catcher makes the proposed iframe path
+- **≈2026-08-18 03:51–04:13 UTC** — Declined F12 after the browser showed the player catcher makes the proposed iframe path
   unreachable. Deferred F13 with a measurable trigger in TD-3.
-- Restacked PR 4 at `6de5aee` and verified its PR diff still contained only the run JSON and
+- **≈2026-08-18 03:51–04:13 UTC** — Restacked PR 4 at `6de5aee` and verified its PR diff still contained only the run JSON and
   `labels.jsonl`.
-- Read Claude's F14/F15 follow-up and chose to fix both. Preserved live taxonomy through the
+- **≈2026-08-18 04:20–04:29 UTC** — Read Claude's F14/F15 follow-up and chose to fix both. Preserved live taxonomy through the
   star toggle and split annotated keeps from blanks in both API and grid stats.
-- Browser-reproduced F14 with a deliberately stale row dataset, then confirmed the lane
+- **≈2026-08-18 04:20–04:29 UTC** — Browser-reproduced F14 with a deliberately stale row dataset, then confirmed the lane
   survived the `s` key. Reconciled F15 against the real store at 23/24/14/3/0.
-- Pushed PR 3 at `eea83b8`, restacked PR 4 at `43c99dd`, and returned the reviewer baton.
-- Claude later closed the review, Brian merged PR 3, and Claude reconciled the shared docs and
+- **≈2026-08-18 04:29–04:35 UTC** — Pushed PR 3 at `eea83b8`, restacked PR 4 at `43c99dd`, and returned the reviewer baton.
+- **≈2026-08-18 21:15–21:28 UTC** — Claude later closed the review, Brian merged PR 3, and Claude reconciled the shared docs and
   wrote the companion 05:28 session log.
-- Confirmed Codex can read Claude's session-log skill and both supporting references. Explained
+- **≈2026-08-18 21:25–21:36 UTC** — Confirmed Codex can read Claude's session-log skill and both supporting references. Explained
   that manual execution loses native triggering and cannot use Claude's transcript path for a
   Codex task.
-- Invoked that runbook manually on request, reused `track: two-surface-land`, and found
+- **≈2026-08-18 21:36–22:06 UTC** — Invoked that runbook manually on request, reused `track: two-surface-land`, and found
   concurrent reviewer edits closing PR 5. They landed at `02c2d3c` while the log was being
   drafted; refreshed the project pointer and prepared a path-only commit for this log.
