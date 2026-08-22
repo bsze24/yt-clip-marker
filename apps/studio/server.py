@@ -114,10 +114,10 @@ def read_label_events():
     return events
 
 
-def current_feedback_map():
+def current_feedback_map(events=None):
     """runId -> {markerIndexStr: feedbackText}, last event wins."""
     by_run = {}
-    for ev in read_label_events():
+    for ev in read_label_events() if events is None else events:
         run_id = ev.get("runId")
         if not run_id:
             continue
@@ -130,10 +130,10 @@ def current_feedback_map():
     return by_run
 
 
-def load_additions(run_id):
+def load_additions(run_id, events=None):
     """Human-added misses for a run. Last event per start time wins."""
     by_start = {}
-    for ev in read_label_events():
+    for ev in read_label_events() if events is None else events:
         if ev.get("runId") != run_id:
             continue
         start = ev.get("start")
@@ -159,11 +159,11 @@ def load_additions(run_id):
     return sorted(by_start.values(), key=lambda m: m["start"])
 
 
-def load_edits(run_id):
+def load_edits(run_id, events=None):
     """Human-edited labels for markers. Last relabel per index wins.
     The run JSON keeps the original description."""
     by_idx = {}
-    for ev in read_label_events():
+    for ev in read_label_events() if events is None else events:
         if ev.get("runId") != run_id:
             continue
         if ev.get("verdict") != "relabel":
@@ -175,7 +175,7 @@ def load_edits(run_id):
     return by_idx
 
 
-def load_sections(run_id):
+def load_sections(run_id, events=None):
     """Where the lesson's work changes, as [(start, work), ...] ascending.
 
     A work change is an event at a timestamp, stored once. It is not a property
@@ -190,7 +190,7 @@ def load_sections(run_id):
     clearing its work removes it.
     """
     by_start = {}
-    for ev in read_label_events():
+    for ev in read_label_events() if events is None else events:
         if ev.get("runId") != run_id or ev.get("verdict") != "chapter":
             continue
         start = ev.get("start")
@@ -244,10 +244,10 @@ def append_section(run_id, run, payload):
     return load_sections(run_id)
 
 
-def load_annotations(run_id):
+def load_annotations(run_id, events=None):
     """tags / lane / work on markers. Last annotate per index wins."""
     by_idx = {}
-    for ev in read_label_events():
+    for ev in read_label_events() if events is None else events:
         if ev.get("runId") != run_id:
             continue
         if ev.get("verdict") != "annotate":
@@ -278,18 +278,41 @@ def load_run(run_id):
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com"}
 
 
-def effective_youtube_id(run):
-    """The playable YouTube identity already present in immutable ingest data.
+def linked_youtube_id(run_id, events=None):
+    """Latest append-only link value for a run, or ``None`` when never set.
+
+    An explicit empty string is different from no event: it clears an immutable
+    URL fallback. Invalid non-empty values are treated as a clear on reads; the
+    writer rejects them, but a malformed hand-edited event must never authorize
+    playback or deletion.
+    """
+    linked = None
+    found = False
+    for ev in read_label_events() if events is None else events:
+        if (ev.get("runId") != run_id or ev.get("verdict") != "link"
+                or "youtubeId" not in ev):
+            continue
+        found = True
+        raw = ev.get("youtubeId")
+        candidate = raw.strip() if isinstance(raw, str) else ""
+        linked = candidate if ingest.VIDEO_ID_RE.fullmatch(candidate) else ""
+    return linked if found else None
+
+
+def effective_youtube_id(run_id, run, events=None):
+    """The playable YouTube identity from a link event or immutable ingest data.
 
     A local Zoom run has a filename-derived ``videoId`` that must never be sent
     to the embed. A downloaded YouTube run can also say ``source: local``, so
     source and id shape are not sufficient either. The canonical watch URL is
     the evidence: accept only known YouTube hosts and a valid 11-character id.
 
-    Phase 3 will add an append-only human link ahead of this fallback. Keeping
-    the URL rule in one resolver now gives the player, warnings and later delete
-    guard one answer instead of each guessing independently.
+    The latest link event wins, including an explicit empty string that clears
+    the fallback. Otherwise the run's canonical watch URL is the evidence.
     """
+    linked = linked_youtube_id(run_id, events)
+    if linked is not None:
+        return linked
     if not isinstance(run, dict):
         return ""
     raw = run.get("url")
@@ -313,7 +336,7 @@ def effective_youtube_id(run):
     return candidate if ingest.VIDEO_ID_RE.fullmatch(candidate or "") else ""
 
 
-def run_warnings(run_id, run, youtube_id):
+def run_warnings(run_id, run, events=None):
     """Nonfatal store faults that must stay visible while the run remains usable."""
     warnings = []
     if "gold" in run:
@@ -327,6 +350,7 @@ def run_warnings(run_id, run, youtube_id):
     # no reason — and the fix is a one-line repoint, but only if you know that
     # is what happened. Annotations are unaffected either way; they are keyed by
     # run id in labels.jsonl, not by the file.
+    youtube_id = effective_youtube_id(run_id, run, events)
     declared = run.get("media")
     if declared and resolve_run_media(run) is None and not youtube_id:
         message = (
@@ -341,6 +365,28 @@ def run_warnings(run_id, run, youtube_id):
 
 def load_feedback(run_id):
     return current_feedback_map().get(run_id, {})
+
+
+def append_link(run_id, run, payload):
+    """Append a human YouTube link (or explicit clear) for one immutable run."""
+    raw = payload.get("youtubeId")
+    if not isinstance(raw, str):
+        raise ValueError("youtubeId must be a string")
+    youtube_id = raw.strip()
+    if youtube_id and not ingest.VIDEO_ID_RE.fullmatch(youtube_id):
+        raise ValueError("youtubeId must be an 11-character YouTube id or empty")
+    append_event({
+        "schemaVersion": 2,
+        "recordedAt": datetime.now().astimezone().isoformat(),
+        "runId": run_id,
+        "videoId": run.get("videoId"),
+        "videoUrl": run.get("url"),
+        "videoTitle": run.get("title"),
+        "verdict": "link",
+        "youtubeId": youtube_id,
+        "source": "human-link",
+    })
+    return youtube_id
 
 
 def verdict_for(text):
@@ -600,9 +646,24 @@ def _mtime(path):
         return 0.0
 
 
+def cached_upload_titles():
+    """YouTube id -> current cached title; an invalid cache joins nothing."""
+    cached = uploads.read_cache(UPLOADS_PATH)
+    if cached is None:
+        return {}
+    return {item["id"]: item["title"] for item in cached["items"]}
+
+
+def display_title(run, youtube_id, titles):
+    """The read-time lesson title. YouTube owns it when the cache can join."""
+    return titles.get(youtube_id) or run.get("title") or ""
+
+
 def list_runs():
     ensure_dirs()
-    fb_by_run = current_feedback_map()
+    events = read_label_events()
+    fb_by_run = current_feedback_map(events)
+    titles = cached_upload_titles()
     rows = []
     for path in sorted(RUNS_DIR.glob("*.json"), key=_mtime, reverse=True):
         try:
@@ -610,10 +671,10 @@ def list_runs():
         except (OSError, json.JSONDecodeError):
             continue
         run_id = path.stem
-        youtube_id = effective_youtube_id(data)
+        youtube_id = effective_youtube_id(run_id, data, events)
         markers = data.get("markers") or []
         fb = fb_by_run.get(run_id, {})
-        annotations = load_annotations(run_id)
+        annotations = load_annotations(run_id, events)
         checks = wrongs = notes = keeps = 0
         for i, _m in enumerate(markers):
             v = verdict_for(fb.get(str(i), ""))
@@ -633,12 +694,13 @@ def list_runs():
                 "videoId": data.get("videoId") or "",
                 "youtubeId": youtube_id,
                 "url": data.get("url") or "",
-                "title": data.get("title") or run_id,
+                "title": display_title(data, youtube_id, titles) or run_id,
+                "runTitle": data.get("title") or run_id,
                 "createdAt": data.get("createdAt") or "",
                 "source": data.get("source") or "youtube",
                 "hasMedia": bool(resolve_run_media(data)),
                 "markerCount": len(markers),
-                "missCount": len(load_additions(run_id)),
+                "missCount": len(load_additions(run_id, events)),
                 "checkCount": checks,
                 "wrongCount": wrongs,
                 "noteCount": notes,
@@ -651,17 +713,19 @@ def list_runs():
 
 def run_payload(run_id, run):
     """Resolved `/api/run` response for one immutable run."""
-    youtube_id = effective_youtube_id(run)
+    events = read_label_events()
+    youtube_id = effective_youtube_id(run_id, run, events)
     return {
         "id": run_id,
         "youtubeId": youtube_id,
+        "title": display_title(run, youtube_id, cached_upload_titles()) or run_id,
         "run": run,
-        "feedback": load_feedback(run_id),
-        "sections": load_sections(run_id),
-        "additions": load_additions(run_id),
-        "edits": load_edits(run_id),
-        "annotations": load_annotations(run_id),
-        "warnings": run_warnings(run_id, run, youtube_id),
+        "feedback": current_feedback_map(events).get(run_id, {}),
+        "sections": load_sections(run_id, events),
+        "additions": load_additions(run_id, events),
+        "edits": load_edits(run_id, events),
+        "annotations": load_annotations(run_id, events),
+        "warnings": run_warnings(run_id, run, events),
         "media": resolve_run_media(run),
     }
 
@@ -1005,6 +1069,14 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/section":
             sections = append_section(run_id, run, payload)
             self._json(200, {"ok": True, "sections": sections})
+            return
+        if parsed.path == "/api/link":
+            try:
+                youtube_id = append_link(run_id, run, payload)
+            except ValueError as err:
+                self._json(400, {"error": str(err)})
+                return
+            self._json(200, {"ok": True, "youtubeId": youtube_id})
             return
         self._json(404, {"error": "not found"})
 

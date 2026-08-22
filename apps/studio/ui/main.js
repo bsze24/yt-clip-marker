@@ -12,7 +12,9 @@ import {
   queueTaxonomy, persistSection,
 } from "./persist.js";
 import { submitComposer, openEditor } from "./composer.js";
-import { refreshRuns, openRun, renderRunSelect, chooseRunOrUpload } from "./runs.js";
+import {
+  refreshRuns, openRun, renderRunSelect, chooseRunOrUpload, saveYoutubeLink,
+} from "./runs.js";
 import { initKeys } from "./keys.js";
 import { initTimeline, updateTimelineHead } from "./timeline.js";
 import { initFiller, syncDensity } from "./filler.js";
@@ -28,6 +30,11 @@ $("playerCatcher").addEventListener("click", () => {
   $("gridWrap").focus();
 });
 $("runSelect").addEventListener("change", (e) => chooseRunOrUpload(e.target.value));
+$("linkForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await saveYoutubeLink($("youtubeLink").value);
+  keepKeysOnPage();
+});
 $("allCues").addEventListener("change", (e) => {
   S.showAllCues = e.target.checked;
   renderGrid();

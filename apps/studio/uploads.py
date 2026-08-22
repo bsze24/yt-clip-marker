@@ -23,6 +23,7 @@ CHANNEL_ID = "UC5waNKHe9sqmnjPG78qyjRw"
 UPLOADS_URL = "https://www.youtube.com/playlist?list=UU5waNKHe9sqmnjPG78qyjRw"
 CANARY_ID = "Oa0wqetkNcg"
 REFRESH_SECONDS = 30 * 60
+PRUNE_MIN_RATIO = 0.5
 VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
 
 
@@ -159,6 +160,41 @@ def read_cache(path):
     return _validated_cache(raw)
 
 
+def read_cache_for_refresh(path):
+    """Recover valid rows for merging even when the strict API cache is bad.
+
+    The request path stays all-or-nothing: a malformed cache is optional data
+    and answers empty. Refresh has a different job — preserving valid derived
+    rows while it repairs the file — so only an unusable envelope discards the
+    previous contents.
+    """
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(raw, dict) or raw.get("channel") != CHANNEL_ID:
+        return None
+    if _aware_timestamp(raw.get("fetchedAt")) is None:
+        return None
+    items = raw.get("items")
+    if not isinstance(items, list):
+        return None
+    recovered = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        try:
+            recovered.append(normalize_item({
+                "id": item.get("id"),
+                "title": item.get("title"),
+                "duration": item.get("duration"),
+                "upload_date": item.get("uploadDate"),
+            }))
+        except UploadsError:
+            continue
+    return {"items": recovered}
+
+
 def empty_api_payload():
     return {
         "channel": CHANNEL_ID,
@@ -184,17 +220,21 @@ def api_payload(path, now=None):
 
 
 def merge_items(previous, fetched):
-    """Update by id; prune only when this refresh proves Chrome auth works."""
+    """Update by id; prune only on a complete-looking authenticated refresh."""
     authenticated = any(item["id"] == CANARY_ID for item in fetched)
-    if authenticated:
-        return list(fetched), True
+    drastic_shrink = bool(
+        authenticated and previous
+        and len(fetched) < len(previous) * PRUNE_MIN_RATIO
+    )
+    if authenticated and not drastic_shrink:
+        return list(fetched), True, False
 
     merged = list(fetched)
     seen = {item["id"] for item in fetched}
     for item in previous:
         if item["id"] not in seen:
             merged.append(item)
-    return merged, False
+    return merged, authenticated, drastic_shrink
 
 
 def write_cache_atomic(path, data):
@@ -238,6 +278,7 @@ class UploadCache:
         self._stop = threading.Event()
         self._thread = None
         self._failure_logged = False
+        self._shrink_logged = False
 
     def read_api(self, now=None):
         return api_payload(self.path, now)
@@ -247,11 +288,22 @@ class UploadCache:
             return False
         try:
             fetched = self.fetcher() if self.fetcher else fetch_uploads(self.executable)
-            previous = read_cache(self.path)
-            items, authenticated = merge_items(
+            previous = read_cache_for_refresh(self.path)
+            items, authenticated, drastic_shrink = merge_items(
                 previous["items"] if previous else [],
                 fetched,
             )
+            if drastic_shrink:
+                if not self._shrink_logged:
+                    print(
+                        "[studio] uploads refresh returned a drastic authenticated "
+                        f"shrink ({len(fetched)} of {len(previous['items'])}); "
+                        "merging without prune",
+                        file=sys.stderr,
+                    )
+                    self._shrink_logged = True
+            else:
+                self._shrink_logged = False
             data = {
                 "fetchedAt": datetime.now(timezone.utc).isoformat(),
                 "channel": CHANNEL_ID,

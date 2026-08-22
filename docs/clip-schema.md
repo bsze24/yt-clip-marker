@@ -58,11 +58,27 @@ filename-derived value, while a YouTube download ingested from its `.info.json` 
 watch URL even though its `source` is still `local`. Consumers must not infer playability from
 `source` or from the shape of `run.videoId`.
 
-Both `/api/run` and each `/api/runs` row expose `youtubeId`: the valid 11-character id parsed from
-the run's immutable YouTube URL, or `""` when no YouTube fallback exists. The player and
-missing-media warning use this resolved field. Local media still wins when present ([[D-035]]);
-when it disappears, a non-empty `youtubeId` restores the embed without rewriting the run file
-([[D-034]]). A local-only run with no media keeps its warning and does not attempt an embed.
+Both `/api/run` and each `/api/runs` row expose the same resolved `youtubeId`. Its precedence is:
+
+1. the latest `verdict: "link"` event for the run that carries a `youtubeId` key (an explicit
+   empty string clears the link);
+2. otherwise, the valid 11-character id parsed from the run's immutable YouTube URL;
+3. otherwise `""`.
+
+The link is its own event type so setting it cannot overwrite a `chapter` event at `start: 0`:
+
+```json
+{"schemaVersion":2,"recordedAt":"…","runId":"…","videoId":"…","videoUrl":"…","videoTitle":"…","verdict":"link","youtubeId":"Oa0wqetkNcg","source":"human-link"}
+```
+
+The player and missing-media warning use this resolved field. Local media still wins when
+present ([[D-035]]); when it disappears, a non-empty `youtubeId` restores the embed without
+rewriting the run file ([[D-034]]). A local-only run with no media keeps its warning and does not
+attempt an embed.
+
+The server also exposes a resolved display `title`: the cached YouTube title wins when the
+effective id joins an upload, otherwise the immutable run title wins. The join is read-only; a
+rename on YouTube never rewrites the run file ([[D-042]]).
 
 ## Exports (future studio buttons)
 
