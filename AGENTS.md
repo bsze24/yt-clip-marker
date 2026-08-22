@@ -84,10 +84,26 @@ after the fact sorts newest while pointing backwards. On `track: studio-workspac
 head is `2026-08-16-1507-grok-studio-fable-lock.md`, and the newer `2026-08-17-1740-…` file
 says so itself. The folded ledger shares the track but is a data artifact, not a resume point.
 
-**The live thread as of 2026-08-21 is `track: reduce-manual-tagging`**, head
-`docs/sessions/2026-08-19-2350-claude-code-opus-5-tagging-audit-and-autotag-ceiling.md`. Read its
-last two appends first — they carry the eval decisions (D-041 → D-043) and the sync direction
-(D-042). `track: review` is Codex's PR thread and is closed out.
+**Two live threads as of 2026-08-22, and they are not the same work.**
+
+- **The build** — the local-file loop, PRs 28-30 merged and PR A next. **Its state is
+  `docs/coordination/CURRENT.md`, not a session log.** §4 carries the PR cut and §6 the baton.
+  A session log for this thread gets a new `track:` when the build resumes; do not append build
+  work onto the eval track below, which is what makes `track:` stop working as a selector.
+- **The eval thread** — `track: reduce-manual-tagging`, head
+  `docs/sessions/2026-08-21-1633-claude-code-opus-5-star-predictability-and-v2-smoke.md`.
+  Closed out 2026-08-22 with one thing owed: use `SKILL.md` v2 for real on the next lesson and
+  record the four numbers ([[D-043]]). It waits on a lesson existing, not on code.
+
+Do not take the head from this paragraph if it looks old — it goes stale the same way the SHA
+above did. `grep -l "track: reduce-manual-tagging" docs/sessions/*.md` and read the "Project
+context" block of each candidate, per the warning above.
+
+`track: review` is Codex's PR thread and is closed out. Eval state and the ML roadmap live in
+`docs/reference/EVAL.md`; the eval verdict that removed rung 4 is [[D-044]].
+
+**Times in the coordination docs and session logs are UTC.** Git author dates are local `-0700`,
+so a commit reading `Aug 21 22:24` and a ledger entry reading `2026-08-22` are the same moment.
 
 - **Learning state** — what Brian understands, drills owed, the confusions themselves — lives
   in these logs, never in the coordination docs.
