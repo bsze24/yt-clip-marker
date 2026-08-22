@@ -1,7 +1,8 @@
 # Review
 
-Active target: **thread 11**, F35 addressed at draft PR 29 / `735ff6a`, awaiting reviewer
-verification. Thread 10 closed
+Active target: **thread 11**, F35 addressed at draft PR 29 / `735ff6a` and **reviewed clean
+2026-08-22** — two non-blocking findings, F36 and F37, recommended to fold into the same PR.
+Baton: Brian, for the merge call. Thread 10 closed
 2026-08-21 — Phase 1 reviewed clean and merged at `62278d6`; its one finding, F32, is deferred
 into Phase 3 by Brian's call. Threads 1-9 remain closed. Durable outcomes live in `DECISIONS.md`
 and `BACKLOG.md`.
@@ -40,7 +41,7 @@ and `BACKLOG.md`.
 | 8 — work and lane as sections | PRs 21 + 22, `355f216~1..2b9bba5` | **CLOSED** — merged `8d57e37` | — |
 | 9 — running the studio as an app | PRs 18-20 + PRs 24-26, `5c0c64d..02e0dfb` | **CLOSED** 2026-08-21 — F29/F30 resolved; PR 23 closed unmerged | — |
 | 10 — effective YouTube fallback | `05a325c` → `758460c` (PR 28) | **CLOSED** 2026-08-21 — no blocking findings; merged `62278d6`; F32 deferred to Phase 3 | — |
-| 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **ADDRESSED** 2026-08-21 — F35 awaiting re-review | reviewer |
+| 11 — launchd app surface, ingest | `1052b5a` → `735ff6a` (PR 29) | **REVIEWED CLEAN** 2026-08-22 — F35 verified fixed; F36/F37 non-blocking | Brian, merge call |
 
 ---
 
@@ -667,5 +668,97 @@ agent process reported that PATH. A JSON `/api/ingest` request for the intention
 `00000000000` reached yt-dlp and returned `Video unavailable`, not `yt-dlp not found`, and wrote
 no run. Existing tests 24/24, `bash -n`, and diff check pass.
 
-**Baton: reviewer.** Re-review `735ff6a`. Phase 2 and the authenticated-cookie measurement remain
-outside this PR, and merging still requires Brian's explicit approval.
+---
+
+## Reviewer round — 2026-08-22 (Claude Code), PR 29 / `735ff6a`
+
+**Verdict: no blocking findings.** 39 lines, one file, no product code, and exactly the fix F35
+recommended — the launcher owns dependency discovery rather than each Python caller. Two
+non-blocking findings follow, both small enough to fold into this PR rather than open another.
+
+### F35 — verified fixed, including the branch the audit could only inspect
+
+Checked on the live machine rather than taken from the audit:
+
+```
+pid 6138   PATH=/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin
+plist      <key>EnvironmentVariables</key> → PATH set
+```
+
+The audit recorded the missing-binary case as "inspected rather than tested by uninstalling the
+user's working yt-dlp", which was the right call — do not break a working tool to test a branch.
+It is now tested without touching anything: `find_ytdlp` and `agent_path` were extracted and run
+standalone across all three branches.
+
+| Environment | `agent_path` output | Exit |
+| --- | --- | --- |
+| normal terminal | `/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin` | 0 |
+| launchd's minimal PATH (the GUI-bundle case) | identical — the Homebrew fallback carries it | 0 |
+| yt-dlp absent everywhere | `/usr/bin:/bin:/usr/sbin:/sbin` | 0, no abort under `set -euo pipefail` |
+
+The third row is the one that mattered. `|| true` around `find_ytdlp` is what stops a missing
+dependency aborting `write_plist` and leaving the user with no agent at all. It holds.
+
+`plutil -lint` runs inside `write_plist` under `set -e`, so a directory containing
+XML-significant characters fails the install loudly instead of writing a corrupt plist. Same
+exposure `$APP_DIR` already had; covered.
+
+### F36 — `stale_plist` sees a stale path, not a stale PATH — non-blocking · open
+
+`stale_plist` asks exactly one question:
+
+```bash
+! grep -q "<string>$APP_DIR/server.py</string>" "$PLIST"
+```
+
+That detects a **moved checkout** and nothing else. The plist now carries a second piece of
+environment state that can go stale on its own, and neither `heal_if_moved` nor `status` can see
+it. Two consequences, and the first is live today:
+
+1. **Until PR 29 merges, `main`'s own self-heal silently reverts the fix.** `studio open` calls
+   `heal_if_moved`; on a moved checkout that runs `install` from whatever is checked out.
+   `main`'s `write_plist` has no `EnvironmentVariables` key, so it rewrites the plist without one
+   and F35 returns with no warning. The machine is currently running a configuration only the
+   unmerged branch can reproduce.
+2. **After merge, the PATH is frozen at install time.** Install yt-dlp *after* the studio, move
+   Homebrew, or migrate between Intel and Apple Silicon, and the recorded PATH stays wrong.
+   `status` says nothing, because it only checks the server.py path.
+
+**Recommended fix, two lines in the function this PR is already next to:** make `stale_plist`
+also true when the plist's recorded PATH differs from `agent_path()`. Both cases then heal
+through machinery that already exists. Same "fold a few lines into the PR already editing this"
+argument used for F32 and F34.
+
+### F37 — the finder looks in Homebrew; three places tell the user pip — optional · open
+
+`find_ytdlp` checks `command -v`, then `/opt/homebrew/bin` and `/usr/local/bin`. A pip or pipx
+install lands in `~/.local/bin` or `~/Library/Python/3.x/bin`, invisible when `studio install`
+runs from the app bundle with launchd's minimal PATH — the exact case the fallback list exists
+for. Meanwhile:
+
+| Where | What it says |
+| --- | --- |
+| `apps/studio/ingest.py:50` | `yt-dlp not found. Install it: pip install yt-dlp` |
+| `README.md:16` | "on PATH (`pip install yt-dlp`)" |
+| `apps/studio/README.md:50` | "Ingesting a YouTube URL needs `yt-dlp` on PATH" |
+
+Pick one and make them agree: add `$HOME/.local/bin` to the candidate list, or change the advice
+to `brew install yt-dlp`.
+
+**The doc half is a gap this PR created.** "On PATH" now means *the agent's* PATH, baked at
+install time — so **installing yt-dlp after `studio install` needs a reinstall**, and nothing says
+so. `AGENTS.md` puts docs describing behaviour in the PR that changes it, so one sentence in
+`apps/studio/README.md` belongs here rather than on `main` afterwards.
+
+### Not findings, recorded so nobody re-raises them
+
+- The yt-dlp directory is **prepended**, so every subprocess now prefers Homebrew binaries. Only
+  yt-dlp is shelled out today and `ProgramArguments` pins python3 absolutely, so nothing changes.
+  Worth knowing before something else gets shelled out.
+- No test ships with the PR. `studio` is bash; this repo's one test file is stdlib `unittest` for
+  Python, and a harness for three lines of shell is ceremony. The table above is the evidence
+  instead.
+
+**Baton: Brian, for the merge call.** F36 and F37 are recommendations, not blockers. Merging as-is
+strictly improves the current state; folding them in first costs a few lines and closes the revert
+path in F36 (1). Phase 2 and the authenticated-cookie measurement remain outside this PR.

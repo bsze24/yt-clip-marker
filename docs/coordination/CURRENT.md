@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ reviewer — F35 at draft PR 29 / `735ff6a`. Phase 2 remains gated; see §6.**
+**→ Brian — PR 29 reviewed clean, merge call is yours. Phase 2 remains gated; see §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -348,11 +348,16 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ reviewer, F35 at draft PR 29 / `735ff6a`.** Codex's readiness review is resolved (planner,
-2026-08-21), but Phase 2 remains gated. Order:
+**→ Brian, for the merge call on PR 29.** Codex's readiness review is resolved (planner,
+2026-08-21) and PR 29 is reviewed clean (2026-08-22), but Phase 2 remains gated. Order:
 
-1. **Review draft PR 29 / `735ff6a`, the `PATH` fix.** It remains unmerged and F35 is addressed,
-   awaiting reviewer verification in `REVIEW.md` thread 11.
+1. **PR 29 / `735ff6a`, the `PATH` fix — reviewed, no blocking findings.** F35 verified fixed on
+   the live agent, including the missing-binary branch the audit could only inspect. Two
+   non-blocking findings, **F36** (`stale_plist` cannot see a stale PATH, so `main`'s own
+   self-heal silently reverts this fix until it merges) and **F37** (the finder looks in Homebrew
+   while three places advise pip, plus the undocumented install-order dependency), are
+   recommended to fold in rather than open another PR. `REVIEW.md` thread 11. **Still a draft and
+   still unmerged — your call.**
 2. **Run the one measurement F35 names:** a refresh executed by the reinstalled agent, which must
    return `Oa0wqetkNcg`. This gates Phase 2 and costs one command. `--cookies-from-browser` is
    the second member of F35's class and is the only unmeasured thing Phase 2 rests on.
