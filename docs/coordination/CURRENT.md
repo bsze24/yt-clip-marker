@@ -349,16 +349,17 @@ lesson title only, and the title is the only field that moves YouTube → app.
 ## 6. Baton
 
 **→ implementer, for the measurement in step 1.** Codex's readiness review is resolved (planner,
-2026-08-21) and the `PATH` fix is merged, but Phase 2 is still gated. Order:
+2026-08-21) and the `PATH` fix is merged, but Phase 2 is still gated.
 
-0. **Done.** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It merged
-   as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are optional
-   and belong in whichever PR next opens `apps/studio/studio`.
-2. **Run the one measurement F35 names:** a refresh executed by the reinstalled agent, which must
+**Already done:** PR 29 merged at `255739f` on 2026-08-22 — reviewed clean, F35 resolved. It
+merged as-is, so **F36 and F37 are open against `main`** (`REVIEW.md` thread 11). Both are
+optional and belong in whichever PR next opens `apps/studio/studio`.
+
+1. **Run the one measurement F35 names:** a refresh executed by the reinstalled agent, which must
    return `Oa0wqetkNcg`. This gates Phase 2 and costs one command. `--cookies-from-browser` is
    the second member of F35's class and is the only unmeasured thing Phase 2 rests on.
-3. **Then Phase 2** (§3.4-§3.6) as its own fresh reviewed PR, if step 2 passes.
-4. **Also land the one-line `.gitignore` rule** for Zoom's `*newChat*.txt` — it is a live hazard
+2. **Then Phase 2** (§3.4-§3.6) as its own fresh reviewed PR, if step 1 passes.
+3. **Also land the one-line `.gitignore` rule** for Zoom's `*newChat*.txt` — it is a live hazard
    on any broad `git add` and does not need to wait for Phase 6.
 
 **Waiting on Brian:** whether Phases 2 and 3 swap order. Low confidence that it is needed — §3.9
