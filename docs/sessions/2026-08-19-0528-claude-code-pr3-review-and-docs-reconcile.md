@@ -1,7 +1,7 @@
 ---
 date: 2026-08-19
 time: "05:28"
-revised: 2026-08-19 17:51
+revised: 2026-08-22 07:10 UTC
 surface: claude-code-opus-5
 project: yt-clip-marker
 track: two-surface-land
@@ -148,149 +148,151 @@ and roughly half the session went to fixing that.
   end" as a decision. It is the rule that would have prevented PRs 5 and 6.
 
 ## Chronology (the record)
-- **11:35** — Asked whether I had enough state to review Codex's work in `REVIEW.md`. Read the
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
+- **2026-08-18 03:35 UTC** — Asked whether I had enough state to review Codex's work in `REVIEW.md`. Read the
   repo, Codex's ship summary, and Grok's original cleanup prompt. Answered yes, with three
   blanks: scope, where output goes, and whether Codex's browser claims were acceptable.
-- **11:40** — You took reviewer, said the local coordination docs outrank the PR copies, accepted
+- **2026-08-18 03:40 UTC** — You took reviewer, said the local coordination docs outrank the PR copies, accepted
   Codex's browser evidence. Asked why the files were being retired; the removal commit had no
   rationale, so I said so rather than guessing.
-- **11:40–12:10** — Reviewed PR 3 at `162e2f4`. Independently re-derived F1–F5, then filed
+- **≈2026-08-18 03:40–04:10 UTC** — Reviewed PR 3 at `162e2f4`. Independently re-derived F1–F5, then filed
   F6–F13: `0:00` misplacement, transitive fold drift, the shared debounce handle, `wrong`
   collapsing to `note`, a substring attribute selector, positional row keys, iframe focus, and
   event-log re-parsing. Proved F6 and F7 by running the shipped fold functions.
-- **12:13** — Codex's second cut (`6d2ee47`). Verified each fix, marked F6–F11 resolved, accepted
+- **2026-08-18 04:13 UTC** — Codex's second cut (`6d2ee47`). Verified each fix, marked F6–F11 resolved, accepted
   the F12 `wontfix` and the F13 deferral, filed F14 and F15.
-- **12:21** — You asked what threads 1/2/3 were.
-- **12:29** — Codex's third cut (`eea83b8`). Verified F14 and F15 end to end against a disposable
+- **2026-08-18 04:21 UTC** — You asked what threads 1/2/3 were.
+- **2026-08-18 04:29 UTC** — Codex's third cut (`eea83b8`). Verified F14 and F15 end to end against a disposable
   copy of the store; `check 23 · wrong 24 · keep 14 · note 3 · blank 0` reconciled with the
   ledger. Thread 1 closed.
-- **15:49** — You asked how the schema refactor was accounted for across the open PRs. Mapped it:
+- **2026-08-18 07:49 UTC** — You asked how the schema refactor was accounted for across the open PRs. Mapped it:
   one real rename, two additive extensions, and a pile of ordinary bug fixes. Found the
   `schemaVersion` gap and the four-document divergence.
-- **15:53–16:00** — You asked me to reconcile the coordination docs without losing state. Backed
+- **≈2026-08-18 07:53–08:00 UTC** — You asked me to reconcile the coordination docs without losing state. Backed
   them up, harvested D-024–D-029 and TD-4/TD-5, collapsed thread 1 to a banner.
-- **16:04** — You asked how thirteen findings could be resolved. They could not: F1–F5 had never
+- **2026-08-18 08:04 UTC** — You asked how thirteen findings could be resolved. They could not: F1–F5 had never
   left `addressed`, and I had deleted the only evidence for them in the same edit that promoted
   them. Corrected the banner.
-- **16:07** — You asked where the round-by-round lived. Checked: not in git, and PR 3's thread is
+- **2026-08-18 08:07 UTC** — You asked where the round-by-round lived. Checked: not in git, and PR 3's thread is
   five Bugbot "usage limit reached" notices with zero reviews. Restored all fifteen findings.
-- **16:12** — Wrote the prompt for Grok to independently re-derive F1–F5.
-- **16:17** — "Is Grok's audit the only thing blocking?" I answered with three ranked concerns
+- **2026-08-18 08:12 UTC** — Wrote the prompt for Grok to independently re-derive F1–F5.
+- **2026-08-18 08:17 UTC** — "Is Grok's audit the only thing blocking?" I answered with three ranked concerns
   above it. This is where your model and mine came apart.
-- **16:19–16:22** — Booted the studio at `127.0.0.1:8766` in an isolated worktree off PR 4's head
+- **≈2026-08-18 08:19–08:22 UTC** — Booted the studio at `127.0.0.1:8766` in an isolated worktree off PR 4's head
   and wrote an eight-item test list. You dropped the extension and Bugbot items.
-- **16:22** — "Where is w for swapping video on top to side?" It is `v`; `w` is the Tab-prefix
+- **2026-08-18 08:22 UTC** — "Where is w for swapping video on top to side?" It is `v`; `w` is the Tab-prefix
   chord for Work.
-- **16:25** — You sent a screenshot contradicting my test instruction. The app was right and the
+- **2026-08-18 08:25 UTC** — You sent a screenshot contradicting my test instruction. The app was right and the
   docs were wrong: the `1:18:50` example describes pre-[[D-008]] alignment, and the added marker
   it cites was tombstoned. Measured 0/64 skill markers drifting, 19/24 extracted stamps drifting,
   and corrected the standing trap.
-- **16:28** — "What is snapping, try again." I had coined a word and never defined it.
-- **16:31–16:34** — Checked the handoff file (clean), then the right file, which repeated the
+- **2026-08-18 08:28 UTC** — "What is snapping, try again." I had coined a word and never defined it.
+- **≈2026-08-18 08:31–08:34 UTC** — Checked the handoff file (clean), then the right file, which repeated the
   stale example four lines above the fact that refutes it. Reconciled it: the three-clock model
   collapses to two, split by provenance rather than marker class.
-- **16:41** — Checklist results. 3, 4, 5, 7, 8 pass. Filed `TD-7` (selection jumps when the
+- **2026-08-18 08:41 UTC** — Checklist results. 3, 4, 5, 7, 8 pass. Filed `TD-7` (selection jumps when the
   selected row is filtered out) and `TD-8` (suggest matching). Answered what eval mode gates
   ([[D-030]]).
-- **16:46** — Grok's audit: all five confirmed, none refuted, with better evidence than mine on
+- **2026-08-18 08:46 UTC** — Grok's audit: all five confirmed, none refuted, with better evidence than mine on
   force-push counts and the fault path.
-- **16:50–17:14** — Committed the coordination docs. Then explained F6, badly, four times.
-- **17:22–19:03** — Chapters versus clickable timestamps. Your export has four sub-10s gaps, so
+- **≈2026-08-18 08:50–09:14 UTC** — Committed the coordination docs. Then explained F6, badly, four times.
+- **≈2026-08-18 09:22–11:03 UTC** — Chapters versus clickable timestamps. Your export has four sub-10s gaps, so
   it would not qualify regardless. You wrote the define-then-reuse rule; I applied it to
   `~/.claude/CLAUDE.md`.
-- **19:03–19:05** — Bookmarked both explanations to memory, plus the parallel-referent correction
+- **≈2026-08-18 11:03–11:05 UTC** — Bookmarked both explanations to memory, plus the parallel-referent correction
   ("the top is line 0" should have been "the top is the first clip").
-- **04:48–05:07 (08-19)** — F7 explained. Measured its real impact: zero. No chains of three, so
+- **≈2026-08-18 20:48–21:07 UTC** — F7 explained. Measured its real impact: zero. No chains of three, so
   the drift never fired on video 1. Owned the overstatement.
-- **05:07** — "Nothing stopping us from merging PR 3?" Correct — and nothing had been for some
+- **2026-08-18 21:07 UTC** — "Nothing stopping us from merging PR 3?" Correct — and nothing had been for some
   time.
-- **05:09** — Mini retro. Three causes: no clean readiness state, explanation failures that
+- **2026-08-18 21:09 UTC** — Mini retro. Three causes: no clean readiness state, explanation failures that
   looked like open items, and a backlog that grew every turn.
-- **05:15** — You merged PR 3. Asked whether it changed the docs.
-- **05:16–05:22** — It had. Four files in two versions. Reconciled each on merit — the handoff
+- **2026-08-18 21:15 UTC** — You merged PR 3. Asked whether it changed the docs.
+- **≈2026-08-18 21:16–21:22 UTC** — It had. Four files in two versions. Reconciled each on merit — the handoff
   file's *main* copy turned out newer, reversing what I had said. Reading the assembled
   `AGENTS.md` before pushing caught four false claims in it.
-- **05:24–05:28** — You pushed. Closed PR 6, deleted three branches, cleaned the checkout,
+- **≈2026-08-18 21:24–21:28 UTC** — You pushed. Closed PR 6, deleted three branches, cleaned the checkout,
   preserved Grok's backup.
-- **05:31** — Reconciled PR 5 and closed it as superseded. Both files it adds are older copies of
+- **2026-08-18 21:31 UTC** — Reconciled PR 5 and closed it as superseded. Both files it adds are older copies of
   files `main` already carries under different names — same session log at a later `revised:`
   stamp, and the folded ledger with 40 `gold` hits against `main`'s zero. Applied the `brian.md`
   style edit. Committed `02c2d3c`.
-- **05:31** — Clobber check across open PRs, and I nearly reported it backwards.
+- **2026-08-18 21:31 UTC** — Clobber check across open PRs, and I nearly reported it backwards.
   `git diff main..branch` showed PR 5 deleting `attach_extracted.py`, restoring `attach_gold.py`,
   and reverting every F6-F15 fix across sixteen files. All an artifact of its base `a051667`. A
   merge applies only what a branch changed since its merge-base, which for PR 5 is two files and
   for PR 4 is two data files. **No open PR clobbers any document.** Method written into `TD-5`.
-- **05:40** — You asked why PR 5 ever existed. Traced it: created 2026-08-16 17:07 to hold two
+- **2026-08-18 21:40 UTC** — You asked why PR 5 ever existed. Traced it: created 2026-08-16 17:07 to hold two
   session artifacts out of PR 3's diff. Both files kept being edited as untracked files for two
   more days — the log renamed `claude` → `grok` and revised a day later, the ledger rewritten and
   moved to `docs/reference/`. Neither edit touched PR 5's branch. `git log --all` shows both of
   `main`'s copies first entering git only at `69ff615`.
-- **05:45** — What PR 4 substantively is: the run file plus 553 append-only events spanning
+- **2026-08-18 21:45 UTC** — What PR 4 substantively is: the run file plus 553 append-only events spanning
   2026-08-14 13:05 to 2026-08-16 15:12, all 64 markers touched. Reconciled the added-marker
   counts: 5 `unmiss` events but 4 tombstones, because `200.0` was deleted twice and nothing was
   ever re-added. Ledger's "21 live, 4 tombstoned" is exact.
-- **05:48** — "Where is run 1's data stored, and how do I load it back?" Found the sharp edge:
+- **2026-08-18 21:48 UTC** — "Where is run 1's data stored, and how do I load it back?" Found the sharp edge:
   it is on **no branch but PR 4**, and switching the checkout to `main` removed it locally. There
   is no load step — `server.py` globs `runs/*.json` and reads `labels.jsonl` at fixed paths, so
   loading is the file being on disk. Two doors in: the studio's Add video (empty `markers[]`) and
   the skill (populated `markers[]`). Neither can take a transcript the tool did not fetch.
-- **05:50** — Logged. Recommended finishing thread 2 here rather than in a new session, since its
+- **2026-08-18 21:50 UTC** — Logged. Recommended finishing thread 2 here rather than in a new session, since its
   evidence is already in this log.
-- **05:55** — Reviewed PR 4 against the contract. Clean on every check. Two findings, both
+- **2026-08-18 21:55 UTC** — Reviewed PR 4 against the contract. Clean on every check. Two findings, both
   non-blocking: `F16`, the standing trap I wrote yesterday claims added markers never drift and
   three of 21 do — they sit on extracted stamps, created from description-only rows, each with an
   empty `cueText`; and `F17`, three duplicate writes ~2 ms apart where file order and timestamp
   order disagree. Measured `F17`'s severity rather than assuming: the pairs are byte-identical, the
   server folds in file order, no count is affected. Fixed `F16` on `main` in the same commit.
-- **06:05** — Merged PR 4 and got it wrong. Its base was `codex/pr-3-two-surface-product`, not
+- **2026-08-18 22:05 UTC** — Merged PR 4 and got it wrong. Its base was `codex/pr-3-two-surface-product`, not
   `main`, so `gh pr merge 4` put run 1's data on a dead branch. Recovered with a second merge,
   `d16383d`. `CURRENT.md`'s own table said the base was "PR 3" — I wrote that line and did not
   check it before merging.
-- **06:10** — PR 7 turned out to be Codex's implementer-side session log, same track, reusing two
+- **2026-08-18 22:10 UTC** — PR 7 turned out to be Codex's implementer-side session log, same track, reusing two
   concept names from the trail rather than coining synonyms. Brian had already committed it
   straight to `main`, so the PR was redundant.
-- **06:20** — `F17` follow-through. Wrote the file-order rule into `apps/studio/README.md` and
+- **≈2026-08-18 22:20 UTC** — `F17` follow-through. Wrote the file-order rule into `apps/studio/README.md` and
   backlogged the cause as `TD-10`: the add-clip form's guard is a check that a form is open, and
   the form does not close until after the server replies. Recorded *not* to fix it by moving the
   timestamp inside the lock, which would hide the duplicate rather than stop it.
-- **06:35** — Argued `R-NEIGHBORHOOD` both ways at Brian's request. He found my steelman
+- **2026-08-18 22:35 UTC** — Argued `R-NEIGHBORHOOD` both ways at Brian's request. He found my steelman
   persuasive; on re-reading it was wrong — the replacement asks for *less* judgement, not more
   precision, so it cannot suppress candidates. Retired it for `R-CUE-EXACT` ([[D-032]]). Also
   resolved `TD-4` — both halves, which were never alternatives.
-- **06:50** — "Fixes all 4 what? Nothing seemed broken." Correct on both counts. There was no
+- **2026-08-18 22:50 UTC** — "Fixes all 4 what? Nothing seemed broken." Correct on both counts. There was no
   defect; I had called a trade a fix. And checking the label text — which I had never done —
   showed widening the fold deletes three of Brian's descriptions, not "nothing". Corrected `TD-9`
   and amended [[D-031]], which he had decided on that false premise.
-- **06:55** — "You didn't step back a change just because I questioned it?" No code was reverted.
+- **2026-08-18 22:55 UTC** — "You didn't step back a change just because I questioned it?" No code was reverted.
   But I had over-agreed on "orthogonal": YouTube is blind to the studio, yet the chain
   markers → export → description → chapters is real, so the window does decide whether chapters
   form. The narrow correction was that the window is not a *chapter feature*.
-- **07:00** — [[D-033]]: every marker reaches the output. Measured first — at the current 2s
+- **2026-08-18 23:00 UTC** — [[D-033]]: every marker reaches the output. Measured first — at the current 2s
   window all 10 collapsed candidates are text-identical to their survivor, so nothing is lost;
   at 6s three carry different text. Two seconds is the boundary between collapsing a duplicate
   and deleting work. `TD-9` closed wontfix, chapters abandoned.
-- **07:06** — Pre-flight triage. Found the local video player sitting as 448 uncommitted lines
+- **2026-08-18 23:06 UTC** — Pre-flight triage. Found the local video player sitting as 448 uncommitted lines
   across nine files plus an untracked `local.py` — the third time this session that critical work
   lived only in a working tree. Brian committed it as `4b344d5` while I was checking. It also
   closes the transcript-import gap raised at 05:48: `local.py` builds a run from a file on disk
   using yt-dlp's sidecars, no network.
-- **07:10** — Pre-flight stack-rank. Everything network-dependent first: download videos 2-5 with
+- **2026-08-18 23:10 UTC** — Pre-flight stack-rank. Everything network-dependent first: download videos 2-5 with
   sidecars, prove `local.py` on one file, then optionally `/yt-clipper` for markers to grade in
   the air. Held `TD-7` and `TD-8` back deliberately — he will hit both across four videos, which
   is exactly why touching studio code hours before losing support is a bad trade.
-- **07:20** — "Should doc changes always go straight to `main`?" Answered with a split rather than
+- **≈2026-08-18 23:20 UTC** — "Should doc changes always go straight to `main`?" Answered with a split rather than
   a yes: living records (`docs/coordination/`, `docs/sessions/`, `docs/reference/`) go straight to
   `main` because a PR only ever holds a stale snapshot of a document still being written; docs that
   *describe code* ride in the PR that changes the behaviour. Test: would this doc be wrong once some
   open PR merges? Written into `AGENTS.md` § Git workflow at `283e49e`, with the caveat that
   straight-to-main means no second reader. Also owned that `15571f9` was labelled docs work and
   changed `server.py` — product code through the wrong door.
-- **17:40** — Full accounting of everything open. Pulled from `main` rather than memory, which
+- **2026-08-20 00:40 UTC** — Full accounting of everything open. Pulled from `main` rather than memory, which
   mattered: two other sessions had been working. `TD-11`, `TD-12` were new; a fourth review thread
   (PR 8, local video mode) was mid-flight with `F18`/`F19` addressed; `CURRENT.md`'s baton had moved
   to a review I was not part of.
-- **17:45** — Brian asked whether the skill incorporates the `g` grades. It does not — the skill has
+- **≈2026-08-20 00:45 UTC** — Brian asked whether the skill incorporates the `g` grades. It does not — the skill has
   **no worked examples of any kind**, only twelve rules and three "do not" lessons. Measured which
   rule to revise instead of guessing: grouped video 1's 64 markers by the rule each cited.
   `R-CONCEPT` rejects at 26%, `R-TAKE-GAP` at 67%, `R-TAKE-CLUSTER` at 88% with zero `g` ever.
@@ -298,7 +300,7 @@ and roughly half the session went to fixing that.
   predicts almost everything: all three `g` takes land on a real sentence, eleven land on a
   backchannel or fragment (`Heat.`, `Wow.`, `Yeah.`, `D.`, `Blueberry.`) and none of the eleven
   earned a `g`. Proposed amending `R-TAKE-GAP` accordingly; not applied. `b6f3d87`.
-- **17:50** — Nearly shipped a duplicate. Drafted `TD-13`-`TD-15` for the three items I had flagged
+- **≈2026-08-20 00:50 UTC** — Nearly shipped a duplicate. Drafted `TD-13`-`TD-15` for the three items I had flagged
   as unrecorded; checked `main` first and found another session had recorded all three that hour,
   taking `TD-13`-`TD-16`, with its `TD-16` carrying the same detection-before-enforcement framing I
   was about to write. Threw the draft away and appended only the rule diagnosis its entry lacked.
