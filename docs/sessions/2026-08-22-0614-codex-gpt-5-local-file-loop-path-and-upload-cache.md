@@ -1,5 +1,6 @@
 ---
 date: 2026-08-22
+revised: 2026-08-22 07:10 UTC
 time: "06:14"
 surface: codex-gpt-5
 project: yt-clip-marker
@@ -110,6 +111,8 @@ offline-safe uploads cache and picker. All three merged after review and explici
   `CURRENT.md` and `REVIEW.md`.
 
 ## Chronology (the record)
+
+> **Chronology timestamp key:** All times are UTC. An unmarked minute is anchored to a recovered source event; `≈` marks a source-supported window or rounded prose boundary; `reconstructed` marks preserved ordering where the original source clock is unreliable.
 
 - **2026-08-21 23:15 UTC** — Added the first Codex readiness review inline to `CURRENT.md` for
   the new local-file loop. The timestamps below are reconstructed from git commits and live tool
