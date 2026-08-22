@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ implementer, Phase 2.**
+**→ planner, Phase 2 contract clarification.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
@@ -208,6 +208,58 @@ existing Add video control, where Brian explicitly starts the ingest. **A picker
 never launch a network ingest** — the current `runs.js` select assumes every option is a run id
 and calls `openRun` immediately.
 
+#### 3.6a Implementation-readiness review — Codex, 2026-08-21
+
+**Verdict: the direction is settled, but Phase 2 is not yet safe to implement without inventing
+five contracts.** Resolve these inline, then return the baton to the implementer for a fresh PR.
+
+1. **Blocking — the production service cannot find yt-dlp.** Measured on the running launchd
+   agent: its `PATH` is `/usr/bin:/bin:/usr/sbin:/sbin`, while `yt-dlp` is
+   `/opt/homebrew/bin/yt-dlp`. The bare executable in §3.4 works in a terminal and fails in the
+   actual Studio process. Choose who owns executable discovery. Codex recommends that `studio
+   install` write an explicit launch-agent `PATH` containing the detected yt-dlp directory, then
+   that live acceptance run through the reinstalled agent. That repairs the same latent problem
+   in `/api/ingest` instead of teaching only the new cache a private Homebrew fallback. Missing
+   yt-dlp must still degrade to an empty or retained cache rather than prevent server startup.
+
+2. **Blocking — “expired cookies keep the cache” has no success predicate.** The authenticated
+   command exits 0 with 56 items. The same uploads-playlist command without cookies also exits 0,
+   but returns only two public items (`sYLtRZctOQo`, `9RAKJB5FfgM`). Expired cookies can therefore
+   look like a successful, parseable refresh and replace the useful cache with the public
+   subset. Define what proves an authenticated result before `os.replace`; return code plus valid
+   JSON is insufficient. At minimum, an existing non-empty cache should not be replaced by a
+   strict subset without an explicit policy for real YouTube deletions. Cold-cache validation
+   still needs a rule of its own.
+
+3. **Blocking API/UI gap — name the read contract and the age surface.** Codex recommends
+   `GET /api/uploads` returning
+   `{"channel":"UC…","items":[],"fetchedAt":null,"ageSeconds":null}` when no valid cache
+   exists, and the populated equivalents otherwise. Missing, unreadable or invalid JSON should
+   be HTTP 200 with that empty shape so the run picker cannot be taken down by an optional cache.
+   Compute non-negative `ageSeconds` on the server from a timezone-aware `fetchedAt`; render it in
+   the optgroup label (for example, `YouTube uploads · cached 12m ago`). A failed uploads request
+   must not stop `/api/runs` from rendering or erase the last good upload list already in memory.
+
+4. **Correctness — do not parse a title with `|` as a delimiter.** YouTube titles may contain
+   that character. The installed yt-dlp (`2026.07.04`) was verified to support one JSON object per
+   item with `--print "%(.{id,title,duration,upload_date})j"`; make that the fake-executable test
+   contract too. State whether missing duration is stored as `null` (recommended, then Phase 3
+   ignores it for matching), map a missing date to `null`, and give the background subprocess a
+   finite timeout. A hung worker does not block HTTP, but without a timeout it suppresses every
+   later refresh forever under the one-worker rule.
+
+5. **Picker identity is still ambiguous.** The cache must retain all uploads for Phases 3 and 5,
+   but §3.6 does not say whether the Phase 2 optgroup displays all 56 or only ids with no run, nor
+   what selecting an upload that already backs a run does. Codex recommends that Phase 2 display
+   only no-run uploads because its only action is to fill the ingest control; Phase 3 should use
+   the full cache in its separate link choice, including `Oa0wqetkNcg`, which already has a run.
+   After filling the input, restore the picker to `S.currentId`; the four-second poll must not
+   leave a non-run value selected or call `openRun` with an upload id.
+
+**Fresh-PR hygiene.** Branch from current `origin/main` after these choices land. The two
+untracked Zoom export directories are user data exposed by the Phase 6 `*newChat*.txt` ignore
+gap; they do not belong in the Phase 2 PR, and exact-path staging remains mandatory.
+
 ### 3.7 Inventory and guarded cleanup
 
 A panel listing, per run: the media entry, whether it is a regular file, a live symlink or a
@@ -311,8 +363,9 @@ lesson title only, and the title is the only field that moves YouTube → app.
 
 ## 6. Baton
 
-**→ implementer, Phase 2 (uploads cache, §3.4-§3.6).** Build it as its own reviewed PR. Stop with
-the PR open; merging requires Brian's explicit approval, per PR.
+**→ planner, Phase 2 contract clarification.** Resolve §3.6a, then hand the uploads cache
+(§3.4-§3.6) back to the implementer as its own fresh reviewed PR. Merging requires Brian's
+explicit approval, per PR.
 
 Phase 1 is done and merged at `62278d6`. Its review is `REVIEW.md` thread 10, closed. Two notes
 ride into **Phase 3**, not Phase 2: F32 (fold the resolved id back inside `run_warnings` while the
