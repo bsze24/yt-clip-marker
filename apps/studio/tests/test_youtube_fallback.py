@@ -130,9 +130,13 @@ class ReadApiContract(unittest.TestCase):
 
     def test_link_event_overrides_url_and_empty_link_clears_it(self):
         run_id = "local-run"
-        run = {"url": "https://www.youtube.com/watch?v=dYT41doJw2I"}
+        run = {
+            "videoId": "local-filename-id",
+            "url": "https://www.youtube.com/watch?v=dYT41doJw2I",
+            "title": "Immutable lesson title",
+        }
 
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
         self.assertEqual(server.effective_youtube_id(run_id, run), "Oa0wqetkNcg")
         event = server.read_label_events()[-1]
         self.assertEqual(event["schemaVersion"], 2)
@@ -140,21 +144,24 @@ class ReadApiContract(unittest.TestCase):
         self.assertEqual(event["source"], "human-link")
         self.assertEqual(event["runId"], run_id)
         self.assertEqual(event["youtubeId"], "Oa0wqetkNcg")
+        self.assertEqual(event["videoId"], run["videoId"])
+        self.assertEqual(event["videoUrl"], run["url"])
+        self.assertEqual(event["videoTitle"], run["title"])
 
-        server.append_link(run_id, {"youtubeId": ""})
+        server.append_link(run_id, run, {"youtubeId": ""})
         self.assertEqual(server.effective_youtube_id(run_id, run), "")
 
     def test_link_event_suppresses_missing_media_warning_inside_resolver(self):
         run_id = "local-run"
         run = {"url": "", "media": "missing.mp4"}
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
 
         with mock.patch.object(server, "resolve_run_media", return_value=None):
             self.assertEqual(server.run_warnings(run_id, run), [])
 
     def test_invalid_link_is_refused_without_an_event(self):
         with self.assertRaisesRegex(ValueError, "11-character"):
-            server.append_link("local-run", {"youtubeId": "too-short"})
+            server.append_link("local-run", {}, {"youtubeId": "too-short"})
         self.assertEqual(server.read_label_events(), [])
 
     def test_writing_link_leaves_sections_byte_identical(self):
@@ -163,7 +170,7 @@ class ReadApiContract(unittest.TestCase):
         server.append_section(run_id, run, {"start": 0, "work": "Pennies", "lane": "comping"})
         before = json.dumps(server.load_sections(run_id), separators=(",", ":"))
 
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
 
         after = json.dumps(server.load_sections(run_id), separators=(",", ":"))
         self.assertEqual(after, before)
@@ -171,7 +178,7 @@ class ReadApiContract(unittest.TestCase):
     def test_writing_section_leaves_effective_id_unchanged(self):
         run_id = "local-run"
         run = {"videoId": "local", "url": "", "title": "Lesson"}
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
         before = server.effective_youtube_id(run_id, run)
 
         server.append_section(run_id, run, {"start": 0, "work": "Pennies", "lane": "comping"})
@@ -188,7 +195,7 @@ class ReadApiContract(unittest.TestCase):
             "cues": [],
         }
         self.write_run(run_id, run)
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
         server.uploads.write_cache_atomic(self.uploads, {
             "fetchedAt": "2026-08-22T00:00:00+00:00",
             "channel": server.uploads.CHANNEL_ID,
@@ -202,6 +209,7 @@ class ReadApiContract(unittest.TestCase):
         })
 
         self.assertEqual(server.list_runs()[0]["title"], "YouTube title")
+        self.assertEqual(server.list_runs()[0]["runTitle"], "Filename title")
         self.assertEqual(server.run_payload(run_id, run)["title"], "YouTube title")
         self.assertEqual(run["title"], "Filename title")
 
@@ -212,7 +220,7 @@ class ReadApiContract(unittest.TestCase):
             "markers": [], "cues": [],
         }
         self.write_run(run_id, run)
-        server.append_link(run_id, {"youtubeId": "Oa0wqetkNcg"})
+        server.append_link(run_id, run, {"youtubeId": "Oa0wqetkNcg"})
 
         self.assertEqual(server.list_runs()[0]["title"], "Filename title")
         self.assertEqual(server.run_payload(run_id, run)["title"], "Filename title")

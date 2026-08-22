@@ -95,7 +95,7 @@ function youtubeIdFromInput(raw) {
   if (!value) return "";
   if (/^[A-Za-z0-9_-]{11}$/.test(value)) return value;
   try {
-    const parsed = new URL(value);
+    const parsed = new URL(value.includes("://") ? value : `https://${value}`);
     const host = parsed.hostname.toLowerCase().replace(/\.$/, "");
     let candidate = "";
     if (host === "youtu.be") candidate = parsed.pathname.split("/").filter(Boolean)[0] || "";
@@ -115,11 +115,18 @@ function youtubeIdFromInput(raw) {
 export function renderRunSelect() {
   const select = $("runSelect");
   const prev = select.value;
+  const youtubeIdCounts = new Map();
+  for (const row of S.runs) {
+    if (row.youtubeId) youtubeIdCounts.set(row.youtubeId, (youtubeIdCounts.get(row.youtubeId) || 0) + 1);
+  }
   const runOptions = S.runs.map((r) => {
     const offlineMark = r.hasMedia ? "⏏ " : "";
+    const title = youtubeIdCounts.get(r.youtubeId) > 1
+      ? `${r.title} (${r.runTitle && r.runTitle !== r.title ? r.runTitle : r.id})`
+      : r.title;
     const label = S.evalMode
-      ? `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.checkCount} check`
-      : `${offlineMark}${r.title} · ${r.markerCount} markers · ${r.missCount} added`;
+      ? `${offlineMark}${title} · ${r.markerCount} markers · ${r.checkCount} check`
+      : `${offlineMark}${title} · ${r.markerCount} markers · ${r.missCount} added`;
     return `<option value="${escapeAttr(r.id)}">${escapeHtml(label)}</option>`;
   }).join("");
   const runIds = new Set(S.runs.map((r) => r.youtubeId).filter(Boolean));
@@ -147,8 +154,11 @@ export async function refreshRuns() {
     api("/api/runs", "GET"),
     api("/api/uploads", "GET"),
   ]);
+  let uploadsChanged = false;
   if (uploadsResult.status === "fulfilled" && Array.isArray(uploadsResult.value.items)) {
-    S.uploads = uploadsResult.value.items;
+    const nextUploads = uploadsResult.value.items;
+    uploadsChanged = JSON.stringify(nextUploads) !== JSON.stringify(S.uploads);
+    S.uploads = nextUploads;
     S.uploadsAgeSeconds = uploadsResult.value.ageSeconds;
   }
   if (runsResult.status === "rejected") {
@@ -160,11 +170,11 @@ export async function refreshRuns() {
   }
   S.runs = runsResult.value;
   const currentRow = S.currentId && S.runs.find((run) => run.id === S.currentId);
-  if (currentRow && S.current && S.current.id === S.currentId) {
+  if (currentRow && S.current && S.current.id === S.currentId && S.current.title !== currentRow.title) {
     S.current.title = currentRow.title;
     renderRunMeta();
   }
-  renderLinkCandidates();
+  if (uploadsChanged) renderLinkCandidates();
   if (offline) {
     offline = false;
     setSave("saved");
@@ -204,6 +214,7 @@ export async function saveYoutubeLink(raw) {
   setSave("saving…");
   try {
     await api("/api/link", "PUT", { runId, youtubeId });
+    $("youtubeLink").value = youtubeId;
     await openRun(runId);
     await refreshRuns();
     renderRunSelect();

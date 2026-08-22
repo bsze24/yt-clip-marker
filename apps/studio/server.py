@@ -367,7 +367,7 @@ def load_feedback(run_id):
     return current_feedback_map().get(run_id, {})
 
 
-def append_link(run_id, payload):
+def append_link(run_id, run, payload):
     """Append a human YouTube link (or explicit clear) for one immutable run."""
     raw = payload.get("youtubeId")
     if not isinstance(raw, str):
@@ -379,6 +379,9 @@ def append_link(run_id, payload):
         "schemaVersion": 2,
         "recordedAt": datetime.now().astimezone().isoformat(),
         "runId": run_id,
+        "videoId": run.get("videoId"),
+        "videoUrl": run.get("url"),
+        "videoTitle": run.get("title"),
         "verdict": "link",
         "youtubeId": youtube_id,
         "source": "human-link",
@@ -692,6 +695,7 @@ def list_runs():
                 "youtubeId": youtube_id,
                 "url": data.get("url") or "",
                 "title": display_title(data, youtube_id, titles) or run_id,
+                "runTitle": data.get("title") or run_id,
                 "createdAt": data.get("createdAt") or "",
                 "source": data.get("source") or "youtube",
                 "hasMedia": bool(resolve_run_media(data)),
@@ -1068,7 +1072,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/link":
             try:
-                youtube_id = append_link(run_id, payload)
+                youtube_id = append_link(run_id, run, payload)
             except ValueError as err:
                 self._json(400, {"error": str(err)})
                 return

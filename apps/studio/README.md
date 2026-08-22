@@ -108,7 +108,8 @@ For a local run, the **YouTube link** control writes an append-only `link` event
 11-character id, paste a watch URL, or choose from the duration-ranked cached candidates; saving
 an empty field explicitly clears the fallback. Local media still plays first. The cached YouTube
 title is joined on read into the picker and lesson header, so the lesson is renamed on YouTube in
-one place and the immutable run file is never edited.
+one place and the immutable run file is never edited. When duplicate runs resolve to the same
+YouTube id, the picker keeps their immutable run title (or run id) as a disambiguator.
 
 ## Label event (`labels.jsonl`)
 
@@ -140,7 +141,8 @@ One JSON object per line. Every save appends; the latest event for a row identit
 
 `annotate` stamps `tags` / `lane` / `work` on a marker (`markerIndex`). Latest wins. Added clips store those fields on the `miss` event.
 
-`link` carries `youtubeId` and `source: "human-link"`, keyed by `runId`. Latest wins; an empty
+`link` carries the run's video identity plus `youtubeId` and `source: "human-link"`, keyed by
+`runId`. Latest wins; an empty
 `youtubeId` is a deliberate clear. It never shares the `chapter` fold, because clearing a link
 must not erase the lesson-level work/lane section at zero.
 

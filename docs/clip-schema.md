@@ -68,7 +68,7 @@ Both `/api/run` and each `/api/runs` row expose the same resolved `youtubeId`. I
 The link is its own event type so setting it cannot overwrite a `chapter` event at `start: 0`:
 
 ```json
-{"schemaVersion":2,"recordedAt":"…","runId":"…","verdict":"link","youtubeId":"Oa0wqetkNcg","source":"human-link"}
+{"schemaVersion":2,"recordedAt":"…","runId":"…","videoId":"…","videoUrl":"…","videoTitle":"…","verdict":"link","youtubeId":"Oa0wqetkNcg","source":"human-link"}
 ```
 
 The player and missing-media warning use this resolved field. Local media still wins when
