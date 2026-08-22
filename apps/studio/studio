@@ -23,7 +23,42 @@ DOMAIN="gui/$(id -u)"
 
 py() { command -v python3; }
 
+# launchd gives user agents a minimal PATH, so a Homebrew yt-dlp that works in
+# a terminal is otherwise invisible to the server. Resolve the dependency at
+# install time, where environment ownership belongs, instead of teaching every
+# Python caller a private package-manager fallback. The standard Homebrew paths
+# keep self-healing installs working when this script is launched from the app
+# bundle, whose GUI environment may itself have the minimal PATH.
+find_ytdlp() {
+  local found candidate
+  found="$(command -v yt-dlp 2>/dev/null || true)"
+  if [ -n "$found" ] && [ -x "$found" ]; then
+    printf '%s\n' "$found"
+    return 0
+  fi
+  for candidate in /opt/homebrew/bin/yt-dlp /usr/local/bin/yt-dlp; do
+    if [ -x "$candidate" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+agent_path() {
+  local base="/usr/bin:/bin:/usr/sbin:/sbin"
+  local ytdlp
+  ytdlp="$(find_ytdlp || true)"
+  if [ -n "$ytdlp" ]; then
+    printf '%s:%s\n' "$(dirname "$ytdlp")" "$base"
+  else
+    printf '%s\n' "$base"
+  fi
+}
+
 write_plist() {
+  local runtime_path
+  runtime_path="$(agent_path)"
   mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"
   cat > "$PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -39,6 +74,10 @@ write_plist() {
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
   <key>WorkingDirectory</key><string>$(dirname "$(dirname "$APP_DIR")")</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>$runtime_path</string>
+  </dict>
   <key>StandardOutPath</key><string>$LOG</string>
   <key>StandardErrorPath</key><string>$LOG</string>
 </dict>
