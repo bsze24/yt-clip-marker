@@ -2,7 +2,7 @@
 
 **Close the local-file loop: dead downloads become deletable, a run learns its YouTube id, the
 uploads list loads itself, and the lesson is renamed in exactly one place.** Baton:
-**→ planner, Phase 2 contract clarification.**
+**→ implementer — the `PATH` fix (F35), then one measurement, then Phase 2. See §6.**
 
 The work is specced, the contracts are settled, and Brian chose the resequenced five-phase plan
 on 2026-08-21. One reviewed PR per phase; never merge without Brian's explicit approval.
