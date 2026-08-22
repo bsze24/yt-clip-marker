@@ -126,10 +126,12 @@ Each line is a standalone example. You do not need the run file to score it.
 
 ## Local video mode
 
-Playback falls back from the YouTube embed to a plain `<video>` element fed by the
-studio's own `/media/` route, so a session works with no network at all. Nothing
-switches modes by hand: a run plays locally when a matching file sits in `media/`,
-and plays from YouTube when it does not.
+Playback prefers a plain `<video>` element fed by the studio's own `/media/` route,
+so a session works with no network at all. Nothing switches modes by hand: a run
+plays locally when a matching file sits in `media/`, and falls back to YouTube when
+its immutable watch URL supplies a valid YouTube id. A raw local run has neither;
+if its file disappears, it warns and leaves the player empty rather than sending
+its filename-derived `videoId` to the embed.
 
 **Attaching a file to an existing YouTube run.** Name it after the video id and drop
 it in — `media/YYW4Q1Nivg8.mp4` is the whole step. The match is computed on every

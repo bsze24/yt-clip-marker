@@ -272,7 +272,45 @@ def load_run(run_id):
         return None
 
 
-def run_warnings(run_id, run):
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com"}
+
+
+def effective_youtube_id(run):
+    """The playable YouTube identity already present in immutable ingest data.
+
+    A local Zoom run has a filename-derived ``videoId`` that must never be sent
+    to the embed. A downloaded YouTube run can also say ``source: local``, so
+    source and id shape are not sufficient either. The canonical watch URL is
+    the evidence: accept only known YouTube hosts and a valid 11-character id.
+
+    Phase 3 will add an append-only human link ahead of this fallback. Keeping
+    the URL rule in one resolver now gives the player, warnings and later delete
+    guard one answer instead of each guessing independently.
+    """
+    if not isinstance(run, dict):
+        return ""
+    raw = run.get("url")
+    if not isinstance(raw, str) or not raw.strip():
+        return ""
+    try:
+        parsed = urlparse(raw.strip())
+    except ValueError:
+        return ""
+    host = (parsed.hostname or "").lower().rstrip(".")
+    candidate = ""
+    if host == "youtu.be":
+        candidate = parsed.path.strip("/").split("/", 1)[0]
+    elif host in YOUTUBE_HOSTS:
+        if parsed.path.rstrip("/") == "/watch":
+            candidate = (parse_qs(parsed.query).get("v") or [""])[0]
+        else:
+            parts = [part for part in parsed.path.split("/") if part]
+            if len(parts) >= 2 and parts[0] in ("shorts", "embed", "live"):
+                candidate = parts[1]
+    return candidate if ingest.VIDEO_ID_RE.fullmatch(candidate or "") else ""
+
+
+def run_warnings(run_id, run, youtube_id):
     """Nonfatal store faults that must stay visible while the run remains usable."""
     warnings = []
     if "gold" in run:
@@ -287,7 +325,7 @@ def run_warnings(run_id, run):
     # is what happened. Annotations are unaffected either way; they are keyed by
     # run id in labels.jsonl, not by the file.
     declared = run.get("media")
-    if declared and resolve_run_media(run) is None:
+    if declared and resolve_run_media(run) is None and not youtube_id:
         message = (
             f"run {run_id} expects media/{declared}, which is missing or is a "
             f"broken symlink — captions and markers are intact, but it will not play. "
@@ -569,6 +607,7 @@ def list_runs():
         except (OSError, json.JSONDecodeError):
             continue
         run_id = path.stem
+        youtube_id = effective_youtube_id(data)
         markers = data.get("markers") or []
         fb = fb_by_run.get(run_id, {})
         annotations = load_annotations(run_id)
@@ -589,6 +628,7 @@ def list_runs():
             {
                 "id": run_id,
                 "videoId": data.get("videoId") or "",
+                "youtubeId": youtube_id,
                 "url": data.get("url") or "",
                 "title": data.get("title") or run_id,
                 "createdAt": data.get("createdAt") or "",
@@ -604,6 +644,23 @@ def list_runs():
             }
         )
     return rows
+
+
+def run_payload(run_id, run):
+    """Resolved `/api/run` response for one immutable run."""
+    youtube_id = effective_youtube_id(run)
+    return {
+        "id": run_id,
+        "youtubeId": youtube_id,
+        "run": run,
+        "feedback": load_feedback(run_id),
+        "sections": load_sections(run_id),
+        "additions": load_additions(run_id),
+        "edits": load_edits(run_id),
+        "annotations": load_annotations(run_id),
+        "warnings": run_warnings(run_id, run, youtube_id),
+        "media": resolve_run_media(run),
+    }
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -778,20 +835,7 @@ class Handler(BaseHTTPRequestHandler):
             if run is None:
                 self._json(404, {"error": "run not found"})
                 return
-            self._json(
-                200,
-                {
-                    "id": run_id,
-                    "run": run,
-                    "feedback": load_feedback(run_id),
-                    "sections": load_sections(run_id),
-                    "additions": load_additions(run_id),
-                    "edits": load_edits(run_id),
-                    "annotations": load_annotations(run_id),
-                    "warnings": run_warnings(run_id, run),
-                    "media": resolve_run_media(run),
-                },
-            )
+            self._json(200, run_payload(run_id, run))
             return
         self._json(404, {"error": "not found"})
 
